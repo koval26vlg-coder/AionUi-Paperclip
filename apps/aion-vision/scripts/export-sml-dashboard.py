@@ -175,6 +175,42 @@ def build_payload(db_path: Path = DB_PATH) -> dict[str, Any]:
                 ).fetchall()
             ]
 
+            # NexusGraph: расчет связей
+            # 1. Связи через общие файлы
+            collab_rows = conn.execute(
+                """
+                SELECT a.author_agent as source, b.author_agent as target, COUNT(*) as weight
+                FROM records a
+                JOIN records b ON a.source_file = b.source_file
+                WHERE a.author_agent < b.author_agent 
+                  AND a.source_file IS NOT NULL
+                  AND a.deleted_at IS NULL AND b.deleted_at IS NULL
+                GROUP BY a.author_agent, b.author_agent
+                """
+            ).fetchall()
+            
+            # 2. Связи через замещение (supersede)
+            supersede_rows = conn.execute(
+                """
+                SELECT author_agent as source, superseded_by_agent as target, COUNT(*) as weight
+                FROM (
+                    SELECT r1.author_agent, r2.author_agent as superseded_by_agent
+                    FROM records r1
+                    JOIN records r2 ON r1.id = r2.supersedes_id
+                    WHERE r1.author_agent != r2.author_agent
+                      AND r1.deleted_at IS NULL AND r2.deleted_at IS NULL
+                )
+                GROUP BY source, target
+                """
+            ).fetchall()
+
+            nexus_nodes = [{"id": a["name"], "records": a["records"]} for a in agents]
+            nexus_links = []
+            for r in collab_rows:
+                nexus_links.append({"source": r["source"], "target": r["target"], "type": "collab", "weight": r["weight"]})
+            for r in supersede_rows:
+                nexus_links.append({"source": r["source"], "target": r["target"], "type": "supersede", "weight": r["weight"]})
+
             state = "live" if records_total else "empty"
             return {
                 "generatedAt": _utc_now(),
@@ -194,6 +230,10 @@ def build_payload(db_path: Path = DB_PATH) -> dict[str, Any]:
                 "typeCounts": type_counts,
                 "dailyActivity": daily_activity,
                 "agents": agents,
+                "nexusGraph": {
+                    "nodes": nexus_nodes,
+                    "links": nexus_links
+                }
             }
     except Exception as exc:
         return _empty_payload(f"Не удалось прочитать SML SQLite: {exc}")

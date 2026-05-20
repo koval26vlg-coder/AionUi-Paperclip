@@ -30,6 +30,18 @@ export interface SmlAgent {
   status: string;
 }
 
+export interface NexusNode {
+  id: string;
+  records: number;
+}
+
+export interface NexusLink {
+  source: string;
+  target: string;
+  type: 'collab' | 'supersede';
+  weight: number;
+}
+
 export interface DashboardData {
   generatedAt: string;
   status: {
@@ -48,4 +60,8 @@ export interface DashboardData {
   typeCounts: SmlTypeCount[];
   dailyActivity: SmlDailyActivity[];
   agents: SmlAgent[];
+  nexusGraph?: {
+    nodes: NexusNode[];
+    links: NexusLink[];
+  };
 }

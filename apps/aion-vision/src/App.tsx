@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import DashboardLayout from './components/layout/DashboardLayout';
 import MetricTile from './components/dashboard/MetricTile';
 import RecordCard from './components/dashboard/RecordCard';
 import AutomationPulse from './components/dashboard/AutomationPulse';
+import NexusGraph from './components/dashboard/NexusGraph';
 import { Activity, Brain, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 import {
   EMPTY_DASHBOARD_DATA,
@@ -15,6 +16,7 @@ import type { DashboardData, SmlAgent } from './types/dashboard';
 function App() {
   const [data, setData] = useState<DashboardData>(EMPTY_DASHBOARD_DATA);
   const [loading, setLoading] = useState(true);
+  const autoRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshData = useCallback(async () => {
     setLoading(true);
@@ -27,19 +29,27 @@ function App() {
 
   useEffect(() => {
     let active = true;
-    loadDashboardData()
-      .then((nextData) => {
-        if (active) {
-          setData(nextData);
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
+    
+    const load = async () => {
+      const nextData = await loadDashboardData();
+      if (active) {
+        setData(nextData);
+        setLoading(false);
+      }
+    };
+
+    void load();
+
+    // Real-time Feed: автообновление каждые 30 секунд
+    autoRefreshRef.current = setInterval(() => {
+      void loadDashboardData().then((nextData) => {
+        if (active) setData(nextData);
       });
+    }, 30000);
+
     return () => {
       active = false;
+      if (autoRefreshRef.current) clearInterval(autoRefreshRef.current);
     };
   }, []);
 
@@ -114,6 +124,15 @@ function App() {
           </div>
 
           <div className="space-y-12">
+            <section>
+              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold mb-6 border-b border-white/10 pb-4">
+                Nexus Graph
+              </h2>
+              {data.nexusGraph && (
+                <NexusGraph nodes={data.nexusGraph.nodes} links={data.nexusGraph.links} />
+              )}
+            </section>
+
             <section>
               <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold mb-6 border-b border-white/10 pb-4">
                 System Pulse
