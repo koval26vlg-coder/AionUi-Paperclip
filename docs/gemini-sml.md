@@ -266,7 +266,7 @@ gemini -p "Прочитай общий контекст через SML. Оцен
 
 ## Что должен делать Gemini после подключения
 
-Gemini должен работать как дополнительный агент в той же системе, что Codex, Cursor и Kiro:
+Gemini должен работать как активный агент в той же системе, что Codex:
 
 1. открыть папку `D:\AionUi-Paperclip`;
 2. прочитать `AGENTS.md`, `docs/START-HERE.md`, `docs/context-packs/context-pack-latest.md`;

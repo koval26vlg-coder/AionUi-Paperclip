@@ -6,7 +6,7 @@
 sml
 ```
 
-`sml` — это Shared_Memory_Layer из `tools/sml/`. Он заменяет старый `aion-file-memory` как основной канал чтения и записи памяти для Codex, Cursor и Kiro.
+`sml` — это Shared_Memory_Layer из `tools/sml/`. Он заменяет старый `aion-file-memory` как основной канал чтения и записи памяти для активной связки Codex + Gemini CLI.
 
 ## Что делает SML
 
@@ -118,7 +118,7 @@ bge-m3:latest
 tools/aion_memory_mcp.py
 ```
 
-Статус: legacy/reference. Он больше не должен быть основным сервером памяти в конфигурациях Codex, Cursor и Kiro.
+Статус: legacy/reference. Он больше не должен быть основным сервером памяти в активной конфигурации Codex + Gemini. Исторические конфиги Cursor/Kiro могут оставаться в проекте как резерв, но не считаются текущим рабочим путем.
 
 Исторически он предоставлял инструменты:
 

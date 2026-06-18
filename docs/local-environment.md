@@ -1,6 +1,6 @@
 # Локальное окружение
 
-Дата последнего обновления: 2026-05-12
+Дата последнего обновления: 2026-06-17
 
 ## Рабочая папка
 
@@ -12,11 +12,12 @@ D:\AionUi-Paperclip
 
 | Инструмент | Путь или состояние | Комментарий |
 | --- | --- | --- |
-| VS Code | `C:\Users\koval\AppData\Local\Programs\Microsoft VS Code\Code.exe` | Установлен; подходит как бесплатная IDE-оболочка для Gemini CLI |
+| VS Code | `C:\Users\koval\AppData\Local\Programs\Microsoft VS Code\Code.exe` | Установлен, версия `1.124.2`; общая IDE-оболочка для `D:\AionUi-Paperclip`, SML, терминалов Codex/Claude/Gemini и VS Code Tasks. Команда `code` не найдена в PATH текущей PowerShell-сессии |
 | Codex CLI | `C:\Users\koval\AppData\Roaming\npm\codex.cmd` и `C:\Users\koval\AppData\Local\OpenAI\Codex\bin\codex.exe` | Версия проверялась: `codex-cli 0.128.0` |
-| Cursor | `C:\Users\koval\AppData\Local\Programs\cursor\resources\app\bin\cursor.cmd` | Команда может быть не видна в отдельных PowerShell-сессиях, но файл найден |
-| Kiro | `C:\Users\koval\AppData\Local\Programs\Kiro\Kiro.exe` | Проверено: `0.12.155`, запускается с `--locale ru`, MCP `sml` подключен через `.kiro/settings/mcp.json` |
+| Cursor | `C:\Users\koval\AppData\Local\Programs\cursor\resources\app\bin\cursor.cmd` | Исторически настроен, но не активен в текущей схеме |
+| Kiro | `C:\Users\koval\AppData\Local\Programs\Kiro\Kiro.exe` | Исторически настроен, но не активен в текущей схеме |
 | Gemini CLI | `C:\Users\koval\AppData\Roaming\npm\gemini.cmd` | Проверено: `0.42.0`, авторизован, MCP `sml` подключен и показывает `Connected` |
+| MiMo Code | `C:\Users\koval\AppData\Roaming\npm\mimo.cmd` | Установлен, версия `0.1.1`; проектный MCP `sml` подключен, но `mimo providers list` показывает `0 credentials` |
 | OpenCode | Установлен ранее, версия проверялась как `1.14.33` | Может зависеть от PATH текущей сессии |
 | Hermes | Удален/отключен | Не используется в новой архитектуре |
 | AionUi | Удален пользователем | Не используется |
@@ -37,12 +38,16 @@ D:\AionUi-Paperclip
 
 ## MCP-память
 
-Основной MCP-сервер памяти `sml` подключен к:
+Основной MCP-сервер памяти `sml` подключен к активным инструментам:
 
 - Codex CLI через `C:\Users\koval\.codex\config.toml`;
+- Gemini CLI через `C:\Users\koval\.gemini\settings.json` и `D:\AionUi-Paperclip\.gemini\settings.json`.
+- MiMo Code через `D:\AionUi-Paperclip\.mimocode\mimocode.json`.
+
+Исторические конфиги остаются в проекте:
+
 - Cursor через `.cursor/mcp.json`;
 - Kiro через `.kiro/settings/mcp.json`.
-- Gemini CLI через `C:\Users\koval\.gemini\settings.json` и `D:\AionUi-Paperclip\.gemini\settings.json`.
 
 Сервер запускается через:
 
@@ -50,7 +55,7 @@ D:\AionUi-Paperclip
 C:\Program Files\PowerShell\7\pwsh.exe -NoProfile -File D:\AionUi-Paperclip\tools\sml\start-sml.ps1
 ```
 
-Для Kiro также выставлены:
+Для Kiro исторически были выставлены:
 
 - пользовательская локаль `ru`;
 - `kiroAgent.configureMCP = Enabled`;
@@ -71,6 +76,60 @@ C:\Program Files\PowerShell\7\pwsh.exe -NoProfile -File D:\AionUi-Paperclip\tool
 Подробная инструкция по запуску и проверке находится в `D:\AionUi-Paperclip\docs\gemini-sml.md`.
 
 Отдельная инструкция для подключения Gemini как модели внутри Cursor находится в `D:\AionUi-Paperclip\docs\cursor-gemini-model.md`.
+
+## VS Code
+
+VS Code используется как общая IDE-оболочка проекта памяти, а не как отдельный агент.
+
+Добавлены:
+
+- `D:\AionUi-Paperclip\OPEN-VSCODE-SML.cmd`;
+- `D:\AionUi-Paperclip\CHECK-VSCODE-SML.cmd`;
+- `D:\AionUi-Paperclip\.vscode\settings.json`;
+- `D:\AionUi-Paperclip\.vscode\tasks.json`;
+- `D:\AionUi-Paperclip\docs\vscode-sml.md`.
+
+Запуск:
+
+```powershell
+D:\AionUi-Paperclip\OPEN-VSCODE-SML.cmd
+```
+
+Проверка:
+
+```powershell
+D:\AionUi-Paperclip\CHECK-VSCODE-SML.cmd
+```
+
+Внутри VS Code использовать `Terminal -> Run Task...` и задачи `SML:*` / `Claude:*`.
+
+## MiMo Code
+
+MiMo Code установлен как экспериментальный агент поверх SML.
+
+Файлы:
+
+- `D:\AionUi-Paperclip\.mimocode\mimocode.json`;
+- `D:\AionUi-Paperclip\.mimocode\agents\sml-review.md`;
+- `D:\AionUi-Paperclip\.mimocode\agents\sml-plan.md`;
+- `D:\AionUi-Paperclip\.mimocode\agents\sml-build.md`;
+- `D:\AionUi-Paperclip\OPEN-MIMO-SML.cmd`;
+- `D:\AionUi-Paperclip\CHECK-MIMO-SML.cmd`;
+- `D:\AionUi-Paperclip\docs\mimo-code-integration.md`.
+
+Проверка:
+
+```powershell
+D:\AionUi-Paperclip\CHECK-MIMO-SML.cmd
+```
+
+Запуск:
+
+```powershell
+D:\AionUi-Paperclip\OPEN-MIMO-SML.cmd
+```
+
+Важно: провайдеры MiMo пока не авторизованы (`0 credentials`). Первый интерактивный запуск должен выбрать MiMo Auto, Xiaomi MiMo Platform, импорт Claude Code или custom provider. API-ключи не хранить в проектных файлах.
 
 ### VS Code IDE integration
 

@@ -1,0 +1,57 @@
+# Baseline наличия `print(` в каждом файле Scope_Python_Files (Property 12)
+# Target_Repo: C:\Users\koval\bat\bitrix24-automation
+# Задача: 1.5 spec-а bitrix24-automation-hygiene
+# Паттерн: print\( (Select-String -AllMatches)
+# Область: *.py в корне Target_Repo + рекурсивно bitrix\, asr\, ui\, pipelines\
+# Исключены: __pycache__\, venv\, .venv\, system--diarize\, reports\, docs\,
+#            logging_setup.py (ещё не существует), pipelines\bitnewton_sync.py
+# Дата снятия: 2026-05-10
+# Формат: <count_print>\t<relative_path>
+#
+# Итого файлов в Scope_Python_Files: 32
+# Файлов с count_print >= 1: 17
+# Файлов с count_print == 0: 15
+# Сумма count_print по всем файлам: 443
+#
+# Топ-5 файлов по count_print:
+#   1. op_full_analytics.py                  78
+#   2. op_lost_deals_analysis.py             66
+#   3. pipelines\dump_one_call_debug.py      48
+#   4. crm_report.py                         40
+#   5. custom_period_report.py               30
+#
+# --- Полная таблица (sorted по count, затем по имени) ---
+
+count	file
+0	asr\__init__.py
+0	asr\bitnewton.py
+0	bit_newton_asr.py
+0	bitnewton_sync_to_api.py
+0	bitrix\__init__.py
+0	bitrix\api.py
+0	bitrix\recordings.py
+0	config.py
+0	download_resolver.py
+0	dump_one_call.py
+0	pipelines\__init__.py
+0	ui\__init__.py
+0	ui\audio_downloader.py
+0	ui_audio_downloader.py
+0	web_ui.py
+4	bitrix24_api.py
+6	yesterday_leads_stats.py
+10	yesterday_leads.py
+13	detailed_managers_report.py
+14	managers_call_stats_auto.py
+16	crm_contacts.py
+17	crm_leads.py
+17	managers_call_stats.py
+18	detailed_calls_analysis.py
+19	download_ffmpeg.py
+21	crm_deals.py
+26	op_deals_analytics.py
+30	custom_period_report.py
+40	crm_report.py
+48	pipelines\dump_one_call_debug.py
+66	op_lost_deals_analysis.py
+78	op_full_analytics.py

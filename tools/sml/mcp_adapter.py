@@ -379,38 +379,65 @@ def _tool_read(server: SMLServer, params: dict[str, Any], op_id: str) -> dict[st
     return ok_response({"found": True, "record": record.as_public_dict()})
 
 
+def _semantic_text_fallback(
+    server: SMLServer,
+    query: str,
+    limit: int,
+    include_superseded: bool,
+) -> list[dict[str, Any]]:
+    """Полнотекстовый поиск (FTS5), когда семантика недоступна."""
+    pairs = server.store.text_search(
+        query, limit=limit, include_superseded=include_superseded
+    )
+    results: list[dict[str, Any]] = []
+    for record, score in pairs:
+        results.append({"record": record.as_public_dict(), "relevance_score": score})
+    return results
+
+
 def _tool_semantic_query(
     server: SMLServer, params: dict[str, Any], op_id: str
 ) -> dict[str, Any]:
-    if server.engine is None:
-        raise IOErrorSML(
-            "Embedding_Engine не инициализирован (проверьте Ollama на 127.0.0.1:11434)"
-        )
     query = params["query"]
     limit = int(params.get("limit", DEFAULT_LIMIT))
     include_superseded = bool(params.get("include_superseded", False))
     min_score = float(params.get("min_score", 0.5))
-    hits = server.engine.search(
-        query, limit=limit, min_score=min_score
-    )
-    results: list[dict[str, Any]] = []
-    for hit in hits:
-        record = server.store.read_by_id(hit.record_id)
-        if record is None:
-            continue
-        if not include_superseded and not record.is_current:
-            continue
-        payload = record.as_public_dict()
-        # поле relevance_score выдаётся рядом, не внутри record
-        results.append({"record": payload, "relevance_score": hit.relevance_score})
-    degraded = server.store.count() > 10_000
+
+    mode = "semantic"
+    results: list[dict[str, Any]]
+
+    if server.engine is None:
+        # Ollama/LanceDB не поднялись при старте — сразу текстовый фоллбэк.
+        mode = "text"
+        results = _semantic_text_fallback(server, query, limit, include_superseded)
+    else:
+        try:
+            hits = server.engine.search(query, limit=limit, min_score=min_score)
+            results = []
+            for hit in hits:
+                record = server.store.read_by_id(hit.record_id)
+                if record is None:
+                    continue
+                if not include_superseded and not record.is_current:
+                    continue
+                payload = record.as_public_dict()
+                results.append(
+                    {"record": payload, "relevance_score": hit.relevance_score}
+                )
+        except IOErrorSML:
+            # Ollama отвалилась в рантайме — деградируем на текстовый поиск,
+            # а не роняем весь запрос.
+            mode = "text"
+            results = _semantic_text_fallback(server, query, limit, include_superseded)
+
+    degraded = mode == "text" or server.store.count() > 10_000
     server.op_log.log(
         agent=server.default_agent,
         op="semantic_query",
         result="success",
         operation_id=op_id,
     )
-    return ok_response({"results": results, "degraded": degraded})
+    return ok_response({"results": results, "degraded": degraded, "mode": mode})
 
 
 def _tool_temporal_query(

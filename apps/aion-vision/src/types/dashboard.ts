@@ -23,6 +23,13 @@ export interface SmlDailyActivity {
   current: number;
 }
 
+export interface SmlWeeklyActivity {
+  week: string;
+  weekStart: string;
+  total: number;
+  current: number;
+}
+
 export interface SmlAgent {
   name: string;
   records: number;
@@ -40,6 +47,41 @@ export interface NexusLink {
   target: string;
   type: 'collab' | 'supersede';
   weight: number;
+}
+
+export interface SystemHealth {
+  watcher: {
+    status: 'ok' | 'stale' | 'missing' | 'unknown';
+    ageSeconds: number | null;
+    last: string | null;
+  };
+  search: {
+    mode: 'semantic' | 'text';
+    ollama: boolean;
+  };
+  backup: {
+    status: 'ok' | 'stale' | 'missing' | 'unknown';
+    last: string | null;
+    count: number;
+  };
+}
+
+export interface SearchResultItem {
+  id: string;
+  type: string;
+  author: string;
+  date: string;
+  isCurrent: boolean;
+  content: string;
+  relevanceScore: number;
+  tags: string[];
+}
+
+export interface SearchResponse {
+  query: string;
+  mode: 'semantic' | 'text' | 'none' | 'error';
+  results: SearchResultItem[];
+  error?: string;
 }
 
 export interface DashboardData {
@@ -64,4 +106,6 @@ export interface DashboardData {
     nodes: NexusNode[];
     links: NexusLink[];
   };
+  weeklyActivity?: SmlWeeklyActivity[];
+  health?: SystemHealth;
 }

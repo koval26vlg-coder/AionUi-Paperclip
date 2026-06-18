@@ -22,13 +22,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, statusLabel
         </div>
         
         <nav className="flex-1 p-4 space-y-2">
-          <NavItem icon={<LayoutDashboard className="w-5 h-5" />} label="Overview" active />
-          <NavItem icon={<Activity className="w-5 h-5" />} label="SML Streams" />
-          <NavItem icon={<Database className="w-5 h-5" />} label="Memory Sources" />
+          <NavItem icon={<LayoutDashboard className="w-5 h-5" />} label="Обзор" active />
+          <NavItem icon={<Activity className="w-5 h-5" />} label="Потоки SML" />
+          <NavItem icon={<Database className="w-5 h-5" />} label="Источники памяти" />
         </nav>
         
         <div className="p-4 border-t border-white/10 opacity-50 text-[10px] font-mono tracking-widest uppercase">
-          Vanguard System v1.0.0
+Система Vanguard v1.0.0
         </div>
       </aside>
 
@@ -42,7 +42,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, statusLabel
           <div className="flex items-center gap-4">
             <Menu className="w-5 h-5 opacity-50 cursor-pointer lg:hidden" />
             <div className="flex gap-2 text-[10px] font-mono uppercase tracking-widest opacity-50">
-              <span>Status:</span>
+              <span>Статус:</span>
               <span className="text-cyan-data">{statusLabel}</span>
               {generatedAt && <span>{new Date(generatedAt).toLocaleTimeString('ru-RU')}</span>}
             </div>

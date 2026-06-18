@@ -26,8 +26,15 @@
 
 1. `sml.startup_pack` — стартовый набор из 6 разделов (природа проекта, решения, активные задачи, предпочтения, ограничения, последние записи журнала).
 2. `sml.semantic_query` по теме запроса с лимитом 10–20.
-3. `sml.semantic_query` по ключевым сущностям, если тема сложная.
-4. При необходимости — `sml.temporal_query` (состояние на конкретную метку времени) или `sml.read` (конкретный Memory_Record по id).
+3. Relationship-map query по теме запроса, если есть `docs/relationship-maps/graphify-sml-relationship-map.json`.
+4. `sml.semantic_query` по ключевым сущностям, если тема сложная.
+5. При необходимости — `sml.temporal_query` (состояние на конкретную метку времени) или `sml.read` (конкретный Memory_Record по id).
+
+Relationship-map — быстрый навигационный слой поверх SML и документов. Он нужен не вместо SML, а перед широким чтением файлов, чтобы агент быстро увидел центральные узлы, мосты и вероятные направления поиска:
+
+```powershell
+& "D:\AionUi-Paperclip\.venv-sml\Scripts\python.exe" "D:\AionUi-Paperclip\tools\query-relationship-map.py" "<тема запроса>"
+```
 
 После работы:
 
@@ -36,6 +43,7 @@
 3. `sml.add_decision`, если принято архитектурное решение — append в `docs/decisions.md`.
 4. `sml.supersede`, если новое решение/факт отменяет предыдущие.
 5. `sml.build_context_pack` для пересборки `docs/context-packs/context-pack-latest.md` (автоматически делает и `tools/watch-memory.ps1`, но явный вызов форсирует обновление).
+6. `tools/build-relationship-map.ps1` для явной пересборки карты связей, если нужно обновить навигационный слой сразу.
 
 Если `sml` недоступен (таймаут ≥ 5 с или ошибка), используй старый `aion-file-memory` как fallback:
 
@@ -48,10 +56,11 @@
 Используй файловый fallback:
 
 1. Прочитай `docs/context-packs/context-pack-latest.md`.
-2. Проверь `docs/tasks.md`.
-3. Проверь `docs/decisions.md`.
-4. Проверь последние записи `docs/agent-log/`.
-5. При необходимости используй поиск по файлам в `docs/`.
+2. Если есть карта связей, выполни `tools/query-relationship-map.py "<тема>"`.
+3. Проверь `docs/tasks.md`.
+4. Проверь `docs/decisions.md`.
+5. Проверь последние записи `docs/agent-log/`.
+6. При необходимости используй поиск по файлам в `docs/`.
 
 ## Когда можно не искать
 
@@ -75,4 +84,3 @@
 - "Последняя активная задача..."
 
 Если найденный контекст противоречит запросу пользователя, сообщи о конфликте.
-

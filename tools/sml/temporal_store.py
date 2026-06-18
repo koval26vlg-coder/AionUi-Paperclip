@@ -35,7 +35,7 @@ from .errors import ConflictError, IOErrorSML, NotFoundError
 from .ids import new_id
 from .models import MemoryRecord
 from .timefmt import format_iso8601_ms, now_utc_ms, parse_iso8601_ms
-from .validation import MemoryType
+from .validation import MemoryType, normalize_author
 
 __all__ = ["TemporalStore", "open_store", "SchemaVersion", "MIGRATIONS"]
 
@@ -46,7 +46,7 @@ __all__ = ["TemporalStore", "open_store", "SchemaVersion", "MIGRATIONS"]
 
 
 class SchemaVersion:
-    CURRENT = 1
+    CURRENT = 2
 
 
 # Каждая миграция — кортеж (version, sql_script). Применяются в одной
@@ -99,6 +99,39 @@ MIGRATIONS: list[tuple[int, str]] = [
             ON records(source_file);
         CREATE INDEX IF NOT EXISTS idx_history_id_from
             ON records_history(id, valid_from);
+        """,
+    ),
+    (
+        2,
+        # Полнотекстовый индекс FTS5 — фоллбэк семантического поиска, когда
+        # Ollama/LanceDB недоступны. ``records_fts`` синхронизируется с
+        # ``records`` триггерами по rowid; колонка ``id`` хранится, но не
+        # индексируется (UNINDEXED) — нужна только чтобы достать UUID без JOIN.
+        # tokenize unicode61 + remove_diacritics корректно работает с русским.
+        """
+        CREATE VIRTUAL TABLE IF NOT EXISTS records_fts USING fts5(
+            content,
+            id UNINDEXED,
+            tokenize='unicode61 remove_diacritics 2'
+        );
+
+        INSERT INTO records_fts (rowid, content, id)
+            SELECT rowid, content, id FROM records WHERE deleted_at IS NULL;
+
+        CREATE TRIGGER IF NOT EXISTS records_fts_ai AFTER INSERT ON records BEGIN
+            INSERT INTO records_fts (rowid, content, id)
+                VALUES (new.rowid, new.content, new.id);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS records_fts_ad AFTER DELETE ON records BEGIN
+            DELETE FROM records_fts WHERE rowid = old.rowid;
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS records_fts_au AFTER UPDATE ON records BEGIN
+            DELETE FROM records_fts WHERE rowid = old.rowid;
+            INSERT INTO records_fts (rowid, content, id)
+                VALUES (new.rowid, new.content, new.id);
+        END;
         """,
     ),
 ]
@@ -246,6 +279,61 @@ class TemporalStore:
             {"id": record_id},
         ).fetchone()
         return row is not None
+
+    def text_search(
+        self,
+        query: str,
+        *,
+        limit: int = 20,
+        include_superseded: bool = False,
+    ) -> List[tuple[MemoryRecord, float]]:
+        """Полнотекстовый поиск по FTS5 — фоллбэк семантики без Ollama.
+
+        Возвращает список ``(MemoryRecord, relevance)``, отсортированный по
+        релевантности BM25 (лучшие первыми). ``relevance`` — синтетическая
+        оценка в (0, 1], убывающая по позиции (у текстового поиска нет
+        косинусной близости, но поле сохраняем для совместимости с API).
+
+        Пустой запрос или запрос без значимых токенов → пустой список.
+        Удалённые записи исключаются; устаревшие — по ``include_superseded``.
+        """
+        match = _build_fts_match(query)
+        if match is None:
+            return []
+        try:
+            rows = self._conn.execute(
+                """
+                SELECT r.id, r.type, r.content, r.author_agent,
+                       r.created_at, r.updated_at, r.is_current,
+                       r.supersedes_id, r.superseded_by_id,
+                       r.source_file, r.source_lines, r.tags_json
+                  FROM records_fts f
+                  JOIN records r ON r.id = f.id
+                 WHERE records_fts MATCH :match
+                   AND r.deleted_at IS NULL
+                 ORDER BY rank
+                 LIMIT :limit
+                """,
+                {"match": match, "limit": max(1, int(limit)) * 2},
+            ).fetchall()
+        except sqlite3.Error as exc:
+            raise IOErrorSML(f"Сбой FTS5-поиска: {exc}") from exc
+
+        out: list[MemoryRecord] = []
+        for row in rows:
+            record = _row_to_record(row)
+            if not include_superseded and not record.is_current:
+                continue
+            out.append(record)
+            if len(out) >= limit:
+                break
+        # Синтетическая релевантность: 0.99 у первого, плавно вниз, но > 0.
+        scored: list[tuple[MemoryRecord, float]] = []
+        n = len(out)
+        for idx, rec in enumerate(out):
+            score = round(0.99 - (idx / max(n, 1)) * 0.49, 3)
+            scored.append((rec, score))
+        return scored
 
     def update_fields(self, record_id: str, **fields: Any) -> MemoryRecord:
         """Частичное обновление записи + запись истории.
@@ -603,6 +691,37 @@ def _apply_migrations(conn: sqlite3.Connection) -> None:
 
 
 # ---------------------------------------------------------------------------
+# FTS5 helper
+# ---------------------------------------------------------------------------
+
+
+import re as _re
+
+_FTS_TOKEN_RE = _re.compile(r"\w+", _re.UNICODE)
+
+
+def _build_fts_match(query: str) -> Optional[str]:
+    """Превращает естественный запрос в безопасный FTS5 MATCH-выражение.
+
+    Слова длиной ≥ 2 берутся как префиксные термы в OR: ``"конверс"* OR
+    "отчет"*``. Каждый терм обёрнут в двойные кавычки (внутренние кавычки
+    удвоены) — это исключает интерпретацию спецсимволов FTS5 и инъекции в
+    синтаксис запроса. Если значимых токенов нет — возвращает ``None``.
+    """
+    if not isinstance(query, str):
+        return None
+    terms: list[str] = []
+    for tok in _FTS_TOKEN_RE.findall(query):
+        if len(tok) < 2:
+            continue
+        safe = tok.replace('"', '""')
+        terms.append(f'"{safe}"*')
+    if not terms:
+        return None
+    return " OR ".join(terms)
+
+
+# ---------------------------------------------------------------------------
 # Сериализация MemoryRecord <-> SQLite row
 # ---------------------------------------------------------------------------
 
@@ -705,7 +824,7 @@ def make_new_record(
             "id": new_id(),
             "type": type,
             "content": content,
-            "author_agent": author_agent,
+            "author_agent": normalize_author(author_agent),
             "created_at": now,
             "updated_at": now,
             "is_current": True,

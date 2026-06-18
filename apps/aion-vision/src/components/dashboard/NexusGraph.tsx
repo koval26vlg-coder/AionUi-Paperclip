@@ -7,6 +7,18 @@ interface NexusGraphProps {
 }
 
 export default function NexusGraph({ nodes, links }: NexusGraphProps) {
+  // Защита от пустого графа: без узлов круговая раскладка дала бы
+  // деление на ноль и NaN-координаты — SVG молча отрисовался бы пустым.
+  if (nodes.length === 0) {
+    return (
+      <div className="bg-white/5 border border-white/10 p-6 rounded-sm text-center">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-white/30 py-8">
+          Нет данных графа связей
+        </p>
+      </div>
+    );
+  }
+
   // Простая круговая раскладка для визуализации связей
   const radius = 120;
   const centerX = 160;
@@ -26,8 +38,8 @@ export default function NexusGraph({ nodes, links }: NexusGraphProps) {
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
       
       <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold mb-6 flex justify-between items-center">
-        Nexus Graph
-        <span className="text-[10px] text-cyan-data/50 font-normal">Active Neural Links</span>
+        Граф связей
+        <span className="text-[10px] text-cyan-data/50 font-normal">Активные нейросвязи</span>
       </h2>
 
       <div className="relative aspect-square max-w-[320px] mx-auto">
@@ -94,15 +106,15 @@ export default function NexusGraph({ nodes, links }: NexusGraphProps) {
       <div className="mt-6 grid grid-cols-2 gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[9px] font-mono text-cyan-data uppercase">
-            <div className="w-2 h-[1px] bg-cyan-data"></div> Collaboration
+            <div className="w-2 h-[1px] bg-cyan-data"></div> Сотрудничество
           </div>
-          <p className="text-[8px] text-white/30 font-mono italic">Shared context access</p>
+          <p className="text-[8px] text-white/30 font-mono italic">Общий доступ к контексту</p>
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[9px] font-mono text-amber-industrial uppercase">
-            <div className="w-2 h-[1px] bg-amber-industrial"></div> Evolution
+            <div className="w-2 h-[1px] bg-amber-industrial"></div> Эволюция
           </div>
-          <p className="text-[8px] text-white/30 font-mono italic">Superseded records</p>
+          <p className="text-[8px] text-white/30 font-mono italic">Замещённые записи</p>
         </div>
       </div>
     </div>

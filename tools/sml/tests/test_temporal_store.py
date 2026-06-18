@@ -216,7 +216,8 @@ def test_migrations_are_idempotent(tmp_path: Path) -> None:
         "SELECT version FROM schema_migrations ORDER BY version"
     ).fetchall()
     s2.close()
-    assert [v[0] for v in versions] == [1]
+    # Каждая миграция применяется ровно один раз, по возрастанию версии.
+    assert [v[0] for v in versions] == [1, 2]
 
 
 def test_durability_across_reopen(tmp_path: Path) -> None:

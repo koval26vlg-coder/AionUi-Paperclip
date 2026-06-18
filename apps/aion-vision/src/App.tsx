@@ -4,6 +4,9 @@ import MetricTile from './components/dashboard/MetricTile';
 import RecordCard from './components/dashboard/RecordCard';
 import AutomationPulse from './components/dashboard/AutomationPulse';
 import NexusGraph from './components/dashboard/NexusGraph';
+import MemorySearch from './components/dashboard/MemorySearch';
+import SystemHealth from './components/dashboard/SystemHealth';
+import MemoryAnalytics from './components/dashboard/MemoryAnalytics';
 import { Activity, Brain, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 import {
   EMPTY_DASHBOARD_DATA,
@@ -53,7 +56,7 @@ function App() {
     };
   }, []);
 
-  const statusLabel = loading ? 'SYNCING' : data.status.label;
+  const statusLabel = loading ? 'СИНХРОНИЗАЦИЯ' : data.status.label;
   const currentRatio = data.totals.recordsTotal
     ? Math.round((data.totals.currentRecords * 100) / data.totals.recordsTotal)
     : 0;
@@ -65,25 +68,25 @@ function App() {
           <MetricTile
             label="Всего записей"
             value={compactNumber(data.totals.recordsTotal)}
-            trend={`${currentRatio}% current`}
+            trend={`${currentRatio}% актуальных`}
             icon={<Database className="w-5 h-5" />}
           />
           <MetricTile
             label="Актуальная память"
             value={compactNumber(data.totals.currentRecords)}
-            trend={`${compactNumber(data.totals.supersededRecords)} old`}
+            trend={`${compactNumber(data.totals.supersededRecords)} устар.`}
             icon={<Brain className="w-5 h-5" />}
             color="amber"
           />
           <MetricTile
             label="Агенты"
             value={compactNumber(data.totals.authorsTotal)}
-            trend={`${compactNumber(data.totals.sourceFilesTotal)} files`}
+            trend={`${compactNumber(data.totals.sourceFilesTotal)} файлов`}
             icon={<Activity className="w-5 h-5" />}
           />
           <MetricTile
             label="Источник"
-            value={data.status.state === 'live' ? 'LIVE' : data.status.state.toUpperCase()}
+            value={data.status.state === 'live' ? 'В ЭФИРЕ' : data.status.state.toUpperCase()}
             trend={formatDateTime(data.generatedAt)}
             icon={<ShieldCheck className="w-5 h-5" />}
             color="amber"
@@ -92,8 +95,10 @@ function App() {
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-8">
+            <MemorySearch />
+
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">SML Live Feed</h2>
+              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Лента SML в реальном времени</h2>
               <button
                 type="button"
                 onClick={() => void refreshData()}
@@ -101,7 +106,7 @@ function App() {
                 className="inline-flex items-center gap-2 text-[10px] font-mono uppercase text-cyan-data border border-cyan-data/30 px-3 py-1 hover:bg-cyan-data/10 disabled:opacity-40 transition-colors"
               >
                 <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+                Обновить
               </button>
             </div>
 
@@ -121,12 +126,20 @@ function App() {
                 </div>
               )}
             </div>
+
+            <MemoryAnalytics
+              weekly={data.weeklyActivity}
+              agents={data.agents}
+              typeCounts={data.typeCounts}
+            />
           </div>
 
           <div className="space-y-12">
+            <SystemHealth health={data.health} />
+
             <section>
               <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold mb-6 border-b border-white/10 pb-4">
-                Nexus Graph
+                Граф связей
               </h2>
               {data.nexusGraph && (
                 <NexusGraph nodes={data.nexusGraph.nodes} links={data.nexusGraph.links} />
@@ -135,13 +148,13 @@ function App() {
 
             <section>
               <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold mb-6 border-b border-white/10 pb-4">
-                System Pulse
+                Пульс системы
               </h2>
               <AutomationPulse data={data.dailyActivity} />
             </section>
 
             <section className="bg-white/5 border border-white/10 p-6 rounded-sm space-y-6">
-              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Active Agents</h2>
+              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Активные агенты</h2>
               <div className="space-y-4">
                 {data.agents.map((agent, idx) => (
                   <AgentStatus
@@ -154,7 +167,7 @@ function App() {
             </section>
 
             <section className="bg-white/5 border border-white/10 p-6 rounded-sm space-y-4">
-              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Record Types</h2>
+              <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Типы записей</h2>
               {data.typeCounts.map((item) => (
                 <div key={item.type} className="flex items-center justify-between text-xs font-mono uppercase">
                   <span className="text-white/60">{item.type}</span>

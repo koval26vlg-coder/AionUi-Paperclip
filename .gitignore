@@ -30,16 +30,28 @@ var/sml/*.ndjson
 logs/
 *.log
 
+# Generated SML snapshots
+docs/context-packs/context-pack-*.md
+!docs/context-packs/context-pack-latest.md
+docs/relationship-maps/
+
 # Node.js / React (Aion Vision)
 apps/aion-vision/node_modules/
 apps/aion-vision/dist/
 apps/aion-vision/.eslintcache
 apps/aion-vision/package-lock.json
 
+# Browser/test artifacts
+.playwright-mcp/
+apps/aion-vision/.playwright-mcp/
+analytics-and-health.png
+memory-search-result.png
+
 # IDE / AI Agents
 .cursor/
 .kiro/
 .gemini/
+.claude/settings.local.json
 .idea/
 .vscode/
 *.tmp

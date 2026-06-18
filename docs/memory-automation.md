@@ -21,7 +21,14 @@ tools/watch-memory.ps1
 
 ```text
 docs/context-packs/context-pack-latest.md
+docs/relationship-maps/graphify-sml-relationship-map.md
+docs/relationship-maps/graphify-sml-relationship-map.json
 ```
+
+То есть автоматизация теперь обновляет два слоя:
+
+- **context-pack** — краткий текстовый вход для агента;
+- **relationship-map** — граф навигации по SML, документам, агентам, задачам, решениям и инструментам.
 
 ## Автозапуск
 
@@ -69,6 +76,13 @@ C:\Program Files\PowerShell\7\pwsh.exe
 logs/memory-auto.log
 ```
 
+В логе должны появляться строки:
+
+```text
+Context pack rebuilt.
+Relationship map rebuilt.
+```
+
 ## Что остается обязанностью агента
 
 Автоматизация не может сама понять смысл работы, если агент ничего не записал.
@@ -92,4 +106,4 @@ logs/memory-auto.log
 
 Пользователь не должен вручную нажимать кнопку для обновления памяти.
 
-Достаточно, чтобы агент записал результат в общую базу. Наблюдатель сам пересоберет контекст.
+Достаточно, чтобы агент записал результат в общую базу. Наблюдатель сам пересоберет контекст и карту связей.

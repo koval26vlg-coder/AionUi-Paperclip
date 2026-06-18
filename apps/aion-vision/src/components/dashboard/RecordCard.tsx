@@ -40,7 +40,7 @@ const RecordCard: React.FC<RecordCardProps> = ({ id, type, content, author, date
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="w-3 h-3" />
-            <span className="text-[10px] font-mono uppercase">{new Date(date).toLocaleDateString()}</span>
+            <span className="text-[10px] font-mono uppercase">{new Date(date).toLocaleDateString('ru-RU')}</span>
           </div>
         </div>
       </div>
@@ -52,10 +52,15 @@ const RecordCard: React.FC<RecordCardProps> = ({ id, type, content, author, date
 
 const getTypeColor = (type: string) => {
   switch (type.toLowerCase()) {
-    case 'agent_log': return 'bg-cyan-data shadow-[0_0_8px_rgba(6,182,212,0.5)]';
-    case 'decision': return 'bg-amber-industrial shadow-[0_0_8px_rgba(245,158,11,0.5)]';
-    case 'fact': return 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]';
-    default: return 'bg-white/50';
+    case 'agent_log':      return 'bg-cyan-data shadow-[0_0_8px_rgba(6,182,212,0.5)]';
+    case 'decision':       return 'bg-amber-industrial shadow-[0_0_8px_rgba(245,158,11,0.5)]';
+    case 'fact':           return 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]';
+    case 'preference':     return 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]';
+    case 'constraint':     return 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]';
+    case 'task':           return 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]';
+    case 'task_link':      return 'bg-blue-300 shadow-[0_0_8px_rgba(147,197,253,0.5)]';
+    case 'timeline_event': return 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]';
+    default:               return 'bg-white/50';
   }
 };
 

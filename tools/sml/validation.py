@@ -21,7 +21,45 @@ __all__ = [
     "validate_type",
     "validate_source_lines",
     "validate_tags",
+    "normalize_author",
+    "AUTHOR_CANONICAL",
 ]
+
+
+# Канонические имена активных агентов. Ключ — нормализованная (lower/strip)
+# форма входящего ``author_agent``, значение — каноническое имя для хранения.
+# Цель: убрать расщепление личности агентов в SML (codex/Codex,
+# gemini/Gemini-CLI/Gemini CLI, claude/Claude Code), которое искажало
+# метрику «Агенты» и граф связей дашборда.
+AUTHOR_CANONICAL: dict[str, str] = {
+    "codex": "Codex",
+    "claude": "Claude Code",
+    "claude code": "Claude Code",
+    "claude-code": "Claude Code",
+    "claudecode": "Claude Code",
+    "gemini": "Gemini CLI",
+    "gemini cli": "Gemini CLI",
+    "gemini-cli": "Gemini CLI",
+    "geminicli": "Gemini CLI",
+}
+
+
+def normalize_author(raw: str) -> str:
+    """Приводит имя агента к каноническому виду.
+
+    Известные синонимы (см. ``AUTHOR_CANONICAL``) маппятся на единое имя.
+    Неизвестные значения возвращаются обрезанными по краям, но без изменения
+    регистра — чтобы не ломать будущих агентов, которых нет в карте.
+
+    Пустую/нестроковую величину не трогаем — её отвергнёт валидатор модели.
+    """
+    if not isinstance(raw, str):
+        return raw
+    key = raw.strip().lower()
+    canonical = AUTHOR_CANONICAL.get(key)
+    if canonical is not None:
+        return canonical
+    return raw.strip() or raw
 
 
 class MemoryType(StrEnum):

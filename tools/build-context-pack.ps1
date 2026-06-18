@@ -20,6 +20,7 @@ $coreFiles = @(
     "docs\current-context.md",
     "docs\tasks.md",
     "docs\decisions.md",
+    "docs\relationship-maps.md",
     "docs\agents.md",
     "docs\local-environment.md",
     "docs\memory\architecture.md",

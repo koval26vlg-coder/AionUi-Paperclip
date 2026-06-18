@@ -13,10 +13,68 @@ APP_DIR = Path(__file__).resolve().parents[1]
 ROOT_DIR = Path(__file__).resolve().parents[3]
 DB_PATH = ROOT_DIR / "var" / "sml" / "state.db"
 DEFAULT_OUT = APP_DIR / "public" / "aion-data.json"
+HEARTBEAT_PATH = ROOT_DIR / "logs" / "memory-auto.heartbeat"
+BACKUP_DIR = ROOT_DIR / "var" / "sml" / "backups"
+HEARTBEAT_STALE_SECONDS = 120
 
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _health() -> dict[str, Any]:
+    """Операционное здоровье системы: watcher, поиск (Ollama), бэкап.
+
+    Все проверки быстрые и не падают — дашборд не должен висеть из-за health.
+    """
+    now = datetime.now(timezone.utc)
+
+    # 1) Watcher heartbeat
+    watcher = {"status": "missing", "ageSeconds": None, "last": None}
+    try:
+        if HEARTBEAT_PATH.exists():
+            raw = HEARTBEAT_PATH.read_text(encoding="utf-8").lstrip("﻿").strip()
+            ts = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            age = int((now - ts).total_seconds())
+            watcher = {
+                "status": "ok" if age <= HEARTBEAT_STALE_SECONDS else "stale",
+                "ageSeconds": age,
+                "last": raw,
+            }
+    except Exception:
+        watcher = {"status": "unknown", "ageSeconds": None, "last": None}
+
+    # 2) Поиск: доступна ли Ollama → semantic, иначе text (FTS5-фоллбэк)
+    search = {"mode": "text", "ollama": False}
+    try:
+        import requests
+
+        host = "127.0.0.1"
+        r = requests.get(f"http://{host}:11434/api/version", timeout=1.5)
+        if r.status_code == 200:
+            search = {"mode": "semantic", "ollama": True}
+    except Exception:
+        pass
+
+    # 3) Последний бэкап БД
+    backup: dict[str, Any] = {"status": "missing", "last": None, "count": 0}
+    try:
+        if BACKUP_DIR.exists():
+            files = sorted(BACKUP_DIR.glob("state-*.db"), key=lambda p: p.name, reverse=True)
+            if files:
+                latest = files[0]
+                # имя формата state-YYYY-MM-DD.db
+                day = latest.stem.replace("state-", "")
+                fresh = day == now.strftime("%Y-%m-%d")
+                backup = {
+                    "status": "ok" if fresh else "stale",
+                    "last": day,
+                    "count": len(files),
+                }
+    except Exception:
+        backup = {"status": "unknown", "last": None, "count": 0}
+
+    return {"watcher": watcher, "search": search, "backup": backup}
 
 
 def _empty_payload(message: str) -> dict[str, Any]:
@@ -34,6 +92,7 @@ def _empty_payload(message: str) -> dict[str, Any]:
         "typeCounts": [],
         "dailyActivity": [],
         "agents": [],
+        "health": _health(),
     }
 
 
@@ -154,6 +213,29 @@ def build_payload(db_path: Path = DB_PATH) -> dict[str, Any]:
                 ).fetchall()[::-1]
             ]
 
+            # Тренды по неделям (понедельник как старт недели), последние 10.
+            weekly_activity = [
+                {
+                    "week": row["week"],
+                    "weekStart": row["week_start"],
+                    "total": int(row["total"] or 0),
+                    "current": int(row["current"] or 0),
+                }
+                for row in conn.execute(
+                    """
+                    SELECT strftime('%Y-%W', updated_at) AS week,
+                           date(updated_at, 'weekday 0', '-6 days') AS week_start,
+                           COUNT(*) AS total,
+                           SUM(CASE WHEN is_current = 1 THEN 1 ELSE 0 END) AS current
+                      FROM records
+                     WHERE deleted_at IS NULL
+                     GROUP BY week
+                     ORDER BY week DESC
+                     LIMIT 10
+                    """
+                ).fetchall()[::-1]
+            ]
+
             agents = [
                 {
                     "name": row["author_agent"],
@@ -233,7 +315,9 @@ def build_payload(db_path: Path = DB_PATH) -> dict[str, Any]:
                 "nexusGraph": {
                     "nodes": nexus_nodes,
                     "links": nexus_links
-                }
+                },
+                "weeklyActivity": weekly_activity,
+                "health": _health(),
             }
     except Exception as exc:
         return _empty_payload(f"Не удалось прочитать SML SQLite: {exc}")

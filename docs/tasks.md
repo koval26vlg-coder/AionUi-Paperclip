@@ -2,9 +2,8 @@
 
 ## Активные
 
-- Провести живой smoke-тест MCP-сервера `sml` в интерфейсе Cursor.
-- Провести живой smoke-тест MCP-сервера `sml` в интерфейсе Kiro.
-- Создать первый тестовый цикл: Codex выполняет задачу, Cursor оценивает, Kiro оформляет spec или план доработки.
+- Поддерживать устойчивый рабочий цикл Codex + Claude Code + Gemini CLI: один агент выполняет задачу, другой проверяет через SML, итог фиксируется в SML и `docs/agent-log/`.
+- Перезапустить MCP-сервер `sml` у активных агентов, чтобы нормализация `author_agent` применялась к новым записям (живой процесс держит старый код до перезапуска клиента).
 
 ## Внешние проекты
 
@@ -13,6 +12,11 @@
 - Общий список задач `D:\AionUi-Paperclip` должен содержать только задачи инфраструктуры памяти, агентов и Aion Vision. Прикладные задачи Bitrix не смешивать с активными задачами SML.
 
 ## Завершенные
+
+- 2026-06-18 (Claude Code) Aion Vision: постоянный HTTP-сервис `serve-sml.py` (stdlib) для прод-режима — статика `dist/` + API без dev-сервера; запускатель `START-AION-VISION-SERVE.cmd`. Проверено curl + Playwright (поиск «конверсия за неделю» → 10 результатов, 0 console errors).
+- 2026-06-18 (Claude Code) Aion Vision «мощнее»: живые данные через `/api/sml-dashboard` (откат на снимок) и семантический поиск по памяти прямо из UI (`/api/search` + `search-sml.py` с FTS5-фоллбэком, компонент `MemorySearch`). ESLint + build зелёные.
+- 2026-06-18 (Claude Code) Надёжность топ-3: FTS5-фоллбэк семантического поиска без Ollama (миграция БД v2, `mode=text`); heartbeat watcher + тревога в `status-memory-auto`; verify бэкапа (integrity + сверка записей); CI на GitHub Actions + unit-тест `normalize_author`. 163 теста зелёные.
+- 2026-06-18 (Claude Code) Аудит проекта + правки P0/P1/P2/P3: подключён экспорт дашборда и ежедневный бэкап БД к watcher; нормализованы имена агентов в SML (7→4 автора); расширен цветовой код типов и защищён NexusGraph в Aion Vision; убран мёртвый API-endpoint; достроен CLI ядра SML (`stats/ping/selfcheck`); выведены Cursor/Kiro/MiMo, их спецификации сохранены в `docs/specs/`.
 
 - Проверено наличие и содержание `.cursor/rules/`. Правило `shared-context.mdc` обновлено для использования SML вместо устаревшего `aion-file-memory`.
 - Gemini CLI авторизован и успешно прошел smoke-test SML (ping, startup_pack, semantic_query, add_log).
@@ -40,9 +44,19 @@
 - Полный набор тестов SML проходит: `141 passed`.
 - Доведено до рабочего состояния: повторный Google AI Pro login, `GEMINI_API_KEY` или Vertex AI (подтверждено активной сессией).
 - После авторизации Gemini CLI запущен `CHECK-GEMINI-SML.cmd` и записан успешный `sml.add_log` от имени `Gemini CLI`.
+- На 2026-05-27 активная рабочая схема сведена к Codex + Gemini; Cursor и Kiro исключены из обязательного рабочего цикла.
+- Актуализированы ключевые документы под схему Codex + Gemini: `AGENTS.md`, `GEMINI.md`, `docs/current-context.md`, `docs/agents.md`, `docs/tasks.md`, `docs/local-environment.md`, `docs/mcp-memory.md`, `docs/memory/layers/constraints.md`, `docs/decisions.md`.
+- Добавлен постоянный Codex skill `relationship-map-builder` для Graphify-style карт связей, адаптированный под SML. Созданы `docs/relationship-maps.md`, `docs/relationship-maps/graphify-sml-relationship-map.md` и JSON-граф.
+- Relationship-map подключен как автоматический слой памяти: watcher пересобирает карту вместе с context-pack, добавлены `tools/build-relationship-map.ps1` и `tools/query-relationship-map.py`.
+- Claude Code добавлен в активную схему общей памяти: созданы `CLAUDE.md`, проектный `.mcp.json`, `OPEN-CLAUDE-SML.cmd` и `CHECK-CLAUDE-SML.cmd`; CLI версии `2.1.178` найден через `C:\Users\koval\AppData\Roaming\npm\claude.cmd`, `sml` в `claude mcp list` подключен, но живой prompt/smoke-test ожидает `claude auth login`.
+- VS Code добавлен в общий контекст как IDE-оболочка SML: созданы `.vscode/settings.json`, `.vscode/tasks.json`, `OPEN-VSCODE-SML.cmd`, `CHECK-VSCODE-SML.cmd` и `docs/vscode-sml.md`; `Code.exe` версии `1.124.2` найден по прямому пути, но `code` не найден в PATH текущей PowerShell-сессии.
+- MiMo Code установлен и подключен к SML как экспериментальный агент: создан `.mimocode/mimocode.json`, агенты `sml-review/sml-plan/sml-build`, `OPEN-MIMO-SML.cmd`, `CHECK-MIMO-SML.cmd`; `mimo mcp list` показывает `sml connected`, но `mimo providers list` показывает `0 credentials`.
 
 
 ## Отложенные
 
-- Настроить автоматические Kiro hooks поверх SML.
 - Настроить регулярный аудит качества записей SML.
+
+## Устаревшие
+
+- Настроить автоматические Kiro hooks поверх SML — неактуально, пока Kiro не входит в активную схему.

@@ -18,20 +18,26 @@ if (-not (Test-Path -LiteralPath $watchScript -PathType Leaf)) {
 
 $argument = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$watchScript`""
 $action = New-ScheduledTaskAction -Execute $powershell -Argument $argument -WorkingDirectory $root
+# Триггер при входе пользователя — watcher поднимается автоматически после
+# логина и держит heartbeat зелёным всю сессию.
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+# Устойчивость к сбоям: много попыток перезапуска с коротким интервалом,
+# чтобы heartbeat восстанавливался без ручного вмешательства. Лимита времени
+# выполнения нет (бесконечный watcher).
 $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
-    -ExecutionTimeLimit (New-TimeSpan -Days 365) `
-    -RestartCount 3 `
-    -RestartInterval (New-TimeSpan -Minutes 1)
+    -ExecutionTimeLimit ([TimeSpan]::Zero) `
+    -RestartCount 100 `
+    -RestartInterval (New-TimeSpan -Minutes 1) `
+    -MultipleInstances IgnoreNew
 
 Register-ScheduledTask `
     -TaskName $taskName `
     -Action $action `
     -Trigger $trigger `
     -Settings $settings `
-    -Description "Automatically rebuilds D:\AionUi-Paperclip context memory pack when shared context files change." `
+    -Description "Automatically rebuilds D:\AionUi-Paperclip context pack and relationship-map memory layer when shared context files change." `
     -Force | Out-Null
 
 Start-ScheduledTask -TaskName $taskName

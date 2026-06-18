@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "sml": {
+      "type": "stdio",
+      "command": "D:\\AionUi-Paperclip\\.venv-sml\\Scripts\\python.exe",
+      "args": [
+        "-X",
+        "utf8",
+        "-m",
+        "tools.sml.mcp_adapter"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "D:\\AionUi-Paperclip",
+        "SML_ROOT": "D:\\AionUi-Paperclip",
+        "OLLAMA_HOST": "127.0.0.1"
+      }
+    }
+  }
+}

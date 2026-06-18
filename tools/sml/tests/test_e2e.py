@@ -81,7 +81,9 @@ def test_p2_read_after_commit_two_agents(tmp_path: Path) -> None:
         read_res = _call(cursor, "sml.read", {"id": rid})
         assert read_res["found"] is True
         assert read_res["record"]["content"] == "факт от codex"
-        assert read_res["record"]["author_agent"] == "codex"
+        # Имя агента нормализуется на входе: "codex" -> "Codex"
+        # (см. tools/sml/validation.normalize_author).
+        assert read_res["record"]["author_agent"] == "Codex"
     finally:
         codex.close()
         cursor.close()

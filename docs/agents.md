@@ -2,25 +2,29 @@
 
 Этот файл описывает агентов, которых можно подключать к общей системе.
 
-## Активная базовая тройка
+## Активная связка
+
+На 2026-06-18 активная рабочая связка — Codex + Claude Code + Gemini CLI. Все три агента равноправны и взаимозаменяемы: видят общий контекст через SML, документы и context-pack, проверяют работу друг друга.
 
 | Агент | Роль | Статус | Главный вход в контекст |
 | --- | --- | --- | --- |
-| Codex | Инженерная реализация, анализ, тесты, ревью | Основной агент | `AGENTS.md`, `docs/context-packs/context-pack-latest.md` |
-| Cursor | IDE, быстрые правки, навигация, второе мнение | Используется пока есть доступ | `.cursor/rules/`, `AGENTS.md`, `docs/context-packs/context-pack-latest.md` |
-| Kiro | Specs, требования, архитектура, планирование | Используется пока есть доступ | `.kiro/steering/`, `AGENTS.md`, `docs/context-packs/context-pack-latest.md` |
+| Codex | Инженерная реализация, анализ, тесты, ревью, автоматизации | Активен | `AGENTS.md`, `docs/context-packs/context-pack-latest.md`, SML |
+| Claude Code | Сильное инженерное ревью, архитектурный анализ, исполнитель задач | Активен | `CLAUDE.md`, `.mcp.json`, `docs/context-packs/context-pack-latest.md`, SML |
+| Gemini CLI | Анализ большого контекста, независимое ревью, альтернативное мнение | Активен | `GEMINI.md`, `docs/context-packs/context-pack-latest.md`, SML |
 
-## Потенциальные дополнительные агенты
+## Рабочие оболочки
 
-| Агент | Возможная роль | Как подключать |
-| --- | --- | --- |
-| Claude Code | Сильный ревьюер и инженер для сложных задач | Дать прочитать `docs/START-HERE.md` и `docs/context-packs/context-pack-latest.md` |
-| Gemini CLI | Дополнительный агент для анализа, ревью и альтернативного мнения | Установлен, авторизован и подключен к SML; см. `docs/gemini-sml.md` |
-| OpenCode | Универсальный CLI-агент с разными провайдерами | Подключить к этой папке и заставить следовать `AGENTS.md` |
-| Goose | Автоматизация и выполнение повторяемых задач | Использовать для регулярных проверок, если появится необходимость |
-| Aider | Точечные git-правки | Давать ограниченные задачи и требовать запись в журнал |
-| GitHub Copilot Agent | Альтернативный IDE-агент | Подключить через общий контекст и журнал |
-| Windsurf | Альтернативный IDE-агент | Использовать по тому же протоколу, что Cursor |
+| Оболочка | Роль | Статус | Главный вход в контекст |
+| --- | --- | --- | --- |
+| VS Code | Общая IDE-оболочка для SML, документов, терминалов и задач проверки | Активна | `docs/vscode-sml.md`, `.vscode/tasks.json`, `AGENTS.md` |
+
+## Выведены из схемы
+
+Cursor, Kiro и MiMo Code больше не входят в систему. Их конфиги (`.cursor/`, `.kiro/`, `.mimocode/`) и запускатели (`OPEN-KIRO-RU.cmd`, `OPEN-MIMO-SML.cmd`, `CHECK-MIMO-SML.cmd`) удалены 2026-06-18, чтобы не создавать путаницу в активной схеме.
+
+Историческая память об их работе сохранена: записи этих инструментов остаются в SML и `docs/agent-log/` как контекст, а ценные спецификации из бывшего `.kiro/specs/` перенесены в `docs/specs/` (в т.ч. спецификация ядра SML `agents-shared-memory-layer`).
+
+Вернуть любой из этих инструментов можно только по отдельному решению пользователя.
 
 ## Условия добавления нового агента
 
@@ -36,5 +40,5 @@
 ## Универсальная фраза для подключения нового агента
 
 ```text
-Открой папку D:\AionUi-Paperclip. Прочитай AGENTS.md, docs/START-HERE.md и docs/context-packs/context-pack-latest.md. Если context-pack-latest.md отсутствует, прочитай docs/context-index.md, docs/current-context.md, docs/tasks.md, docs/decisions.md и последние записи docs/agent-log. Работай на русском языке. После работы оставь отчет в docs/agent-log и обнови общий контекст.
+Открой папку D:\AionUi-Paperclip. Если работаешь через VS Code, открывай именно эту папку через OPEN-VSCODE-SML.cmd. Прочитай AGENTS.md, docs/START-HERE.md и docs/context-packs/context-pack-latest.md. Если ты Claude Code, также прочитай CLAUDE.md и проверь MCP-сервер sml через проектный .mcp.json. Если context-pack-latest.md отсутствует, прочитай docs/context-index.md, docs/current-context.md, docs/tasks.md, docs/decisions.md и последние записи docs/agent-log. Работай на русском языке. После работы оставь отчет в docs/agent-log и обнови общий контекст.
 ```
