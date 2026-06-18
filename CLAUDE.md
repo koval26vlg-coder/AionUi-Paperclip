@@ -14,6 +14,14 @@
 
 Не считай текущий чат единственной памятью.
 
+Даже если Claude Code запущен не из `D:\AionUi-Paperclip`, перед любой содержательной задачей подтяни общую память по абсолютному пути:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "Claude Code" -Query "<тема запроса>"
+```
+
+Каноническое правило: `D:\AionUi-Paperclip\docs\agent-memory-bootstrap.md`.
+
 Важно: обычные Claude web/Desktop projects/chats и OpenClaude/Cowork-сессии не являются общей памятью этого проекта. Общая память находится в локальной папке `D:\AionUi-Paperclip`, SML и relationship-map. Если ты не видишь эти файлы и MCP-сервер `sml`, значит ты работаешь вне общего контура памяти.
 
 Главные источники истины:

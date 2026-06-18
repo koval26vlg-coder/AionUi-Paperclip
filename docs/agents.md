@@ -8,9 +8,9 @@
 
 | Агент | Роль | Статус | Главный вход в контекст |
 | --- | --- | --- | --- |
-| Codex | Инженерная реализация, анализ, тесты, ревью, автоматизации | Активен | `AGENTS.md`, `docs/context-packs/context-pack-latest.md`, SML |
-| Claude Code | Сильное инженерное ревью, архитектурный анализ, исполнитель задач | Активен | `CLAUDE.md`, `.mcp.json`, `docs/context-packs/context-pack-latest.md`, SML |
-| Gemini CLI | Анализ большого контекста, независимое ревью, альтернативное мнение | Активен | `GEMINI.md`, `docs/context-packs/context-pack-latest.md`, SML |
+| Codex | Инженерная реализация, анализ, тесты, ревью, автоматизации | Активен | `C:\Users\koval\.codex\AGENTS.md`, skill `sml-memory-bootstrap`, `AGENTS.md`, SML |
+| Claude Code | Сильное инженерное ревью, архитектурный анализ, исполнитель задач | Активен | `C:\Users\koval\.claude\CLAUDE.md`, `CLAUDE.md`, user/project MCP `sml` |
+| Gemini CLI | Анализ большого контекста, независимое ревью, альтернативное мнение | Активен | `C:\Users\koval\.gemini\GEMINI.md`, `GEMINI.md`, user/project MCP `sml` |
 
 ## Рабочие оболочки
 
@@ -40,5 +40,5 @@ Cursor, Kiro и MiMo Code больше не входят в систему. Их
 ## Универсальная фраза для подключения нового агента
 
 ```text
-Открой папку D:\AionUi-Paperclip. Если работаешь через VS Code, открывай именно эту папку через OPEN-VSCODE-SML.cmd. Прочитай AGENTS.md, docs/START-HERE.md и docs/context-packs/context-pack-latest.md. Если ты Claude Code, также прочитай CLAUDE.md и проверь MCP-сервер sml через проектный .mcp.json. Если context-pack-latest.md отсутствует, прочитай docs/context-index.md, docs/current-context.md, docs/tasks.md, docs/decisions.md и последние записи docs/agent-log. Работай на русском языке. После работы оставь отчет в docs/agent-log и обнови общий контекст.
+Перед задачей подтяни общую память командой: `& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "<имя агента>" -Query "<тема>"`. Затем учитывай `D:\AionUi-Paperclip\docs\agent-memory-bootstrap.md`, `AGENTS.md`, `docs/context-packs/context-pack-latest.md`, `docs/current-context.md`, `docs/tasks.md`, `docs/decisions.md` и последние записи `docs/agent-log`. Если доступен MCP-сервер `sml`, вызови `sml.startup_pack` и `sml.semantic_query`. Работай на русском языке. После работы оставь отчет в `docs/agent-log` и обнови общий контекст.
 ```

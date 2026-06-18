@@ -55,6 +55,7 @@ AionUi, Paperclip и Hermes больше не используются как о
 - `docs/memory/` - файловый источник истины для общей памяти.
 - `docs/specs/` - спецификации проекта, в т.ч. ядра SML `agents-shared-memory-layer`.
 - `docs/START-HERE.md` - первый файл для любого нового агента.
+- `docs/agent-memory-bootstrap.md` - каноническое правило автоподхвата памяти из любой папки.
 - `docs/context-index.md` - карта всех источников контекста.
 - `docs/context-packs/` - собранные контекстные пакеты.
 - `docs/relationship-maps.md` - стандарт построения карт связей и индекс текущих графов.
@@ -75,6 +76,8 @@ AionUi, Paperclip и Hermes больше не используются как о
 - Ollama опциональна: без неё поиск работает в режиме FTS5 (по словам); семантика — только при запущенной Ollama.
 - `docs/memory-automation.md` - описание автоматизации памяти.
 - `docs/memory-autoprotocol.md` - правило автоматического поиска похожего контекста перед задачей.
+- `tools/agent-memory-bootstrap.ps1` - абсолютный bootstrap памяти: статус watcher, relationship-map query и excerpt context-pack из любой текущей папки.
+- `LOAD-SML-MEMORY.cmd` - ручной запуск того же bootstrap для проверки.
 
 ## Автоматизация
 
@@ -124,6 +127,8 @@ Claude Code — активный агент рядом с Codex и Gemini CLI.
 
 - `CLAUDE.md` - правила Claude Code для русского языка, SML, relationship-map и журналирования;
 - `.mcp.json` - проектный MCP-конфиг с сервером `sml`;
+- `C:\Users\koval\.claude\CLAUDE.md` - глобальные правила Claude Code для автоподхвата SML из любой папки;
+- user-scope MCP `sml` в Claude Code добавлен командой `claude mcp add --scope user ...`;
 - `OPEN-CLAUDE-SML.cmd` - запуск Claude из рабочей папки;
 - `CHECK-CLAUDE-SML.cmd` - базовая проверка auth/MCP после установки CLI.
 
@@ -131,15 +136,17 @@ Claude Code — активный агент рядом с Codex и Gemini CLI.
 
 - Claude Code установлен: `2.1.178`, авторизован, работает из `D:\AionUi-Paperclip`;
 - `claude mcp list` показывает `sml` как `Connected`;
+- 2026-06-18 `claude mcp list` из внешней папки `C:\Users\koval\Documents\Bitrix24` тоже показывает `sml` как `Connected`;
 - 2026-06-18 Claude Code выполнил содержательную работу (аудит проекта + правки P0/P1/P2/P3) и записал отчёт в `docs/agent-log/` — живой рабочий цикл подтверждён.
 
-Важно: Claude web, Claude Desktop projects/chats и OpenClaude/Cowork-сессии не получают общий SML-контекст автоматически. Общую память видит только тот Claude-клиент, который:
+Важно: Claude Code теперь имеет и проектное, и пользовательское подключение SML. Поэтому локальный Claude Code может подтягивать память из любой папки, если читает глобальные правила и выполняет bootstrap. Claude web, Claude Desktop projects/chats и OpenClaude/Cowork-сессии сами по себе не получают локальный SML-контекст автоматически.
 
-1. запущен из `D:\AionUi-Paperclip`;
-2. читает `CLAUDE.md`;
-3. видит проектный `.mcp.json`;
-4. имеет подключенный MCP-сервер `sml`;
-5. авторизован в Claude Code.
+Минимальное правило для Claude Code:
+
+1. прочитать `C:\Users\koval\.claude\CLAUDE.md` или проектный `CLAUDE.md`;
+2. выполнить `D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1`;
+3. использовать подключенный MCP-сервер `sml`, если он доступен;
+4. фиксировать итог в `docs/agent-log/`.
 
 Если Claude говорит, что видит только локальные Cowork-сессии и не имеет доступа к проектам/чатам Claude, значит используется не наш локальный Claude Code-контур SML, а отдельная оболочка.
 
@@ -164,10 +171,16 @@ VS Code добавлен в общий контекст как рабочая ID
 Перед любой содержательной задачей агент сам:
 
 1. определяет тему запроса;
-2. вызывает `sml.startup_pack`;
-3. ищет похожее через `sml.semantic_query`;
-4. если SML недоступен, ищет по `docs/context-packs/context-pack-latest.md` и `docs/`;
-5. учитывает найденное перед ответом или действием.
+2. запускает абсолютный bootstrap:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "<имя агента>" -Query "<тема>"
+```
+
+3. вызывает `sml.startup_pack`;
+4. ищет похожее через `sml.semantic_query`;
+5. если SML недоступен, ищет по `docs/context-packs/context-pack-latest.md` и `docs/`;
+6. учитывает найденное перед ответом или действием.
 
 ## Карты связей
 

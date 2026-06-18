@@ -23,6 +23,14 @@
 
 ## Источники контекста
 
+Глобальное правило: даже если агент запущен не из `D:\AionUi-Paperclip`, он должен считать эту папку главным корнем общей памяти и перед содержательной задачей выполнить:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "<имя агента>" -Query "<тема запроса>"
+```
+
+Каноническое описание правила: `D:\AionUi-Paperclip\docs\agent-memory-bootstrap.md`.
+
 Перед началом работы прочитай:
 
 1. `AGENTS.md`

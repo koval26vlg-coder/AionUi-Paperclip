@@ -419,3 +419,41 @@ curl ко всем эндпоинтам: `/api/sml-dashboard` (status=live, 230 
 
 ### Автор: Claude Code
 ### Теги: aion-vision, analytics, recharts, watcher, task-scheduler, heartbeat, encoding
+
+## 2026-06-18 - Глобальный bootstrap памяти для Codex, Claude Code и Gemini CLI
+
+### Контекст
+
+Пользователь уточнил, что агенты не должны подтягивать память только при запуске из `D:\AionUi-Paperclip` или после отдельной просьбы. Нужно, чтобы у каждого активного агента было правило/skill: автоматически искать общую память, контекст и похожие решения по теме запроса.
+
+### Решение
+
+Считать `D:\AionUi-Paperclip` абсолютным корнем общей памяти для активных агентов независимо от текущей рабочей папки. Добавлены:
+
+- `docs/agent-memory-bootstrap.md` — каноническое правило автоподхвата памяти;
+- `tools/agent-memory-bootstrap.ps1` — команда bootstrap из любой папки;
+- `LOAD-SML-MEMORY.cmd` — ручная проверка bootstrap;
+- Codex skill `C:\Users\koval\.codex\skills\sml-memory-bootstrap`;
+- глобальные инструкции `C:\Users\koval\.codex\AGENTS.md`, `C:\Users\koval\.claude\CLAUDE.md`, `C:\Users\koval\.gemini\GEMINI.md`;
+- user-scope MCP `sml` для Claude Code через `claude mcp add --scope user`.
+
+Перед содержательной задачей агент должен запускать:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "<имя агента>" -Query "<тема>"
+```
+
+Затем использовать `sml.startup_pack`, `sml.semantic_query`, context-pack, relationship-map и документы памяти.
+
+### Проверка
+
+- Bootstrap успешно запущен из внешней папки `C:\Users\koval\Documents\Bitrix24` и нашел context-pack + relationship-map.
+- `C:\Users\koval\.codex\skills\sml-memory-bootstrap` прошел `quick_validate.py`.
+- `claude mcp list` из внешней папки показывает `sml` как `Connected`.
+
+### Последствие
+
+Активный контур Codex + Claude Code + Gemini CLI больше не зависит только от запуска из рабочей папки. Cursor, Kiro и MiMo Code остаются выведенными из схемы и не возвращаются этим решением.
+
+### Автор: Codex
+### Теги: bootstrap, shared-memory, sml, codex, claude-code, gemini-cli

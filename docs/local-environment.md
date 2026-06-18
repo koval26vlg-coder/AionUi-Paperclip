@@ -1,6 +1,6 @@
 # Локальное окружение
 
-Дата последнего обновления: 2026-06-17
+Дата последнего обновления: 2026-06-18
 
 ## Рабочая папка
 
@@ -17,7 +17,7 @@ D:\AionUi-Paperclip
 | Cursor | `C:\Users\koval\AppData\Local\Programs\cursor\resources\app\bin\cursor.cmd` | Исторически настроен, но не активен в текущей схеме |
 | Kiro | `C:\Users\koval\AppData\Local\Programs\Kiro\Kiro.exe` | Исторически настроен, но не активен в текущей схеме |
 | Gemini CLI | `C:\Users\koval\AppData\Roaming\npm\gemini.cmd` | Проверено: `0.42.0`, авторизован, MCP `sml` подключен и показывает `Connected` |
-| MiMo Code | `C:\Users\koval\AppData\Roaming\npm\mimo.cmd` | Установлен, версия `0.1.1`; проектный MCP `sml` подключен, но `mimo providers list` показывает `0 credentials` |
+| MiMo Code | `C:\Users\koval\AppData\Roaming\npm\mimo.cmd` | Исторически устанавливался, но выведен из активной схемы 2026-06-18; проектные конфиги/запускатели не возвращать без отдельного решения |
 | OpenCode | Установлен ранее, версия проверялась как `1.14.33` | Может зависеть от PATH текущей сессии |
 | Hermes | Удален/отключен | Не используется в новой архитектуре |
 | AionUi | Удален пользователем | Не используется |
@@ -40,29 +40,17 @@ D:\AionUi-Paperclip
 
 Основной MCP-сервер памяти `sml` подключен к активным инструментам:
 
-- Codex CLI через `C:\Users\koval\.codex\config.toml`;
+- Codex через `C:\Users\koval\.codex\AGENTS.md`, skill `C:\Users\koval\.codex\skills\sml-memory-bootstrap` и проектные файлы `AGENTS.md`/SML;
+- Claude Code через проектный `.mcp.json`, `C:\Users\koval\.claude\CLAUDE.md` и user-scope MCP `sml`;
 - Gemini CLI через `C:\Users\koval\.gemini\settings.json` и `D:\AionUi-Paperclip\.gemini\settings.json`.
-- MiMo Code через `D:\AionUi-Paperclip\.mimocode\mimocode.json`.
 
-Исторические конфиги остаются в проекте:
+Исторические конфиги Cursor/Kiro/MiMo удалены из активного проекта. Историческая память о них хранится в `docs/agent-log/`, SML и `docs/specs/`.
 
-- Cursor через `.cursor/mcp.json`;
-- Kiro через `.kiro/settings/mcp.json`.
+Глобальный bootstrap для агентов:
 
-Сервер запускается через:
-
-```text
-C:\Program Files\PowerShell\7\pwsh.exe -NoProfile -File D:\AionUi-Paperclip\tools\sml\start-sml.ps1
+```powershell
+& "D:\AionUi-Paperclip\tools\agent-memory-bootstrap.ps1" -Agent "<имя агента>" -Query "<тема>"
 ```
-
-Для Kiro исторически были выставлены:
-
-- пользовательская локаль `ru`;
-- `kiroAgent.configureMCP = Enabled`;
-- проектный steering на русском языке.
-- установлен русский языковой пакет `ms-ceintl.vscode-language-pack-ru`;
-- рабочий запускатель: `D:\AionUi-Paperclip\OPEN-KIRO-RU.cmd`;
-- активный MCP-конфиг Kiro: `D:\AionUi-Paperclip\.kiro\settings\mcp.json`.
 
 Старый `aion-file-memory` оставлен только как legacy/reference в `tools/aion_memory_mcp.py` и не должен быть основным сервером в конфигурациях агентов.
 
@@ -103,33 +91,9 @@ D:\AionUi-Paperclip\CHECK-VSCODE-SML.cmd
 
 Внутри VS Code использовать `Terminal -> Run Task...` и задачи `SML:*` / `Claude:*`.
 
-## MiMo Code
+## Выведенные агенты
 
-MiMo Code установлен как экспериментальный агент поверх SML.
-
-Файлы:
-
-- `D:\AionUi-Paperclip\.mimocode\mimocode.json`;
-- `D:\AionUi-Paperclip\.mimocode\agents\sml-review.md`;
-- `D:\AionUi-Paperclip\.mimocode\agents\sml-plan.md`;
-- `D:\AionUi-Paperclip\.mimocode\agents\sml-build.md`;
-- `D:\AionUi-Paperclip\OPEN-MIMO-SML.cmd`;
-- `D:\AionUi-Paperclip\CHECK-MIMO-SML.cmd`;
-- `D:\AionUi-Paperclip\docs\mimo-code-integration.md`.
-
-Проверка:
-
-```powershell
-D:\AionUi-Paperclip\CHECK-MIMO-SML.cmd
-```
-
-Запуск:
-
-```powershell
-D:\AionUi-Paperclip\OPEN-MIMO-SML.cmd
-```
-
-Важно: провайдеры MiMo пока не авторизованы (`0 credentials`). Первый интерактивный запуск должен выбрать MiMo Auto, Xiaomi MiMo Platform, импорт Claude Code или custom provider. API-ключи не хранить в проектных файлах.
+Cursor, Kiro и MiMo Code не входят в активный рабочий цикл. Их старые настройки считаются историей и не должны использоваться как текущие инструкции запуска.
 
 ### VS Code IDE integration
 

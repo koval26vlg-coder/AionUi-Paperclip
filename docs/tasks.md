@@ -13,6 +13,7 @@
 
 ## Завершенные
 
+- 2026-06-18 (Codex) Добавлен глобальный bootstrap памяти для активных агентов: `docs/agent-memory-bootstrap.md`, `tools/agent-memory-bootstrap.ps1`, `LOAD-SML-MEMORY.cmd`, глобальный Codex skill `C:\Users\koval\.codex\skills\sml-memory-bootstrap`, глобальные правила `C:\Users\koval\.codex\AGENTS.md`, `C:\Users\koval\.claude\CLAUDE.md`, `C:\Users\koval\.gemini\GEMINI.md`; Claude Code получил user-scope MCP `sml`. Проверено: bootstrap работает из `C:\Users\koval\Documents\Bitrix24`, skill валиден, `claude mcp list` вне проекта показывает `sml Connected`.
 - 2026-06-18 (Claude Code) Aion Vision: постоянный HTTP-сервис `serve-sml.py` (stdlib) для прод-режима — статика `dist/` + API без dev-сервера; запускатель `START-AION-VISION-SERVE.cmd`. Проверено curl + Playwright (поиск «конверсия за неделю» → 10 результатов, 0 console errors).
 - 2026-06-18 (Claude Code) Aion Vision «мощнее»: живые данные через `/api/sml-dashboard` (откат на снимок) и семантический поиск по памяти прямо из UI (`/api/search` + `search-sml.py` с FTS5-фоллбэком, компонент `MemorySearch`). ESLint + build зелёные.
 - 2026-06-18 (Claude Code) Надёжность топ-3: FTS5-фоллбэк семантического поиска без Ollama (миграция БД v2, `mode=text`); heartbeat watcher + тревога в `status-memory-auto`; verify бэкапа (integrity + сверка записей); CI на GitHub Actions + unit-тест `normalize_author`. 163 теста зелёные.
@@ -50,7 +51,7 @@
 - Relationship-map подключен как автоматический слой памяти: watcher пересобирает карту вместе с context-pack, добавлены `tools/build-relationship-map.ps1` и `tools/query-relationship-map.py`.
 - Claude Code добавлен в активную схему общей памяти: созданы `CLAUDE.md`, проектный `.mcp.json`, `OPEN-CLAUDE-SML.cmd` и `CHECK-CLAUDE-SML.cmd`; CLI версии `2.1.178` найден через `C:\Users\koval\AppData\Roaming\npm\claude.cmd`, `sml` в `claude mcp list` подключен, но живой prompt/smoke-test ожидает `claude auth login`.
 - VS Code добавлен в общий контекст как IDE-оболочка SML: созданы `.vscode/settings.json`, `.vscode/tasks.json`, `OPEN-VSCODE-SML.cmd`, `CHECK-VSCODE-SML.cmd` и `docs/vscode-sml.md`; `Code.exe` версии `1.124.2` найден по прямому пути, но `code` не найден в PATH текущей PowerShell-сессии.
-- MiMo Code установлен и подключен к SML как экспериментальный агент: создан `.mimocode/mimocode.json`, агенты `sml-review/sml-plan/sml-build`, `OPEN-MIMO-SML.cmd`, `CHECK-MIMO-SML.cmd`; `mimo mcp list` показывает `sml connected`, но `mimo providers list` показывает `0 credentials`.
+- Исторически MiMo Code устанавливался как экспериментальный агент, но 2026-06-18 MiMo/Kiro/Cursor выведены из активной схемы; их рабочие конфиги и запускатели не возвращать без отдельного решения пользователя.
 
 
 ## Отложенные
