@@ -83,7 +83,7 @@ def build_prompt(wf_dir: Path, contract: dict[str, Any], task: str) -> str:
     headings = "\n".join(REQUIRED_HANDOFF_HEADINGS)
     return f"""Ты Antigravity CLI в изолированном review-only режиме.
 
-Критическое правило: не запускай команды, не читай локальные файлы, не пиши файлы, не меняй workflow state. У тебя уже есть весь нужный пакет ниже. Верни только markdown handoff.
+Критическое правило: не запускай команды, не читай локальные файлы, не пиши файлы, не меняй workflow state, не используй веб-поиск, интернет и любые внешние инструменты. У тебя уже есть весь нужный пакет ниже — отвечай только на его основе. Верни только markdown handoff.
 
 Задача уровня:
 {task}
@@ -160,6 +160,7 @@ def run_antigravity(prompt: str, cwd: Path, timeout: int) -> subprocess.Complete
         str(cwd),
         "--process-timeout-seconds",
         str(timeout),
+        "--review-only",
         single_line_prompt,
     ]
     return subprocess.run(command, text=True, capture_output=True, check=False)
@@ -200,6 +201,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 4
     if result.returncode != 0:
+        if result.returncode == 5:
+            print(
+                "Antigravity review rejected: review-only contract violated "
+                "(tool/command/search execution detected).",
+                file=sys.stderr,
+            )
         if result.stderr.strip():
             print(result.stderr.rstrip(), file=sys.stderr)
         if result.stdout.strip():

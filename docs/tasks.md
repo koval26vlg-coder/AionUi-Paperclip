@@ -12,10 +12,6 @@
 - Перезапустить MCP-сервер `sml` у активных агентов, чтобы нормализация `author_agent` применялась к новым записям (живой процесс держит старый код до перезапуска клиента).
 - NOI VPS (`147.90.11.165`) восстановлен 2026-07-07 как резервный зарубежный Antigravity-роут: SSH работает, `agy 1.0.16`, OAuth пройден, live smoke возвращает `ok`. Использовать как fallback, если региональный блокер вернётся и локальный Antigravity + `gemini-vertex` откажут. Проверка: `tools/check-antigravity-noi.ps1 -Smoke`.
 
-### Открытые дефекты
-
-- Antigravity L1/L2 runner: process-tree timeout, жёсткая session correlation, запрет tool-use/внешнего поиска в review-only режиме (историю блокера см. `docs/history/current-context-chronicle-2026-06-07.md`).
-
 ### Ждут решения пользователя
 
 - Telegram-канал «ИИ в дело» (`@iivdelo_ai`) — органический outreach на паузе, ждёт подтверждений `JOIN`/текстов. Детали и статус: workflow `docs/agent-workflows/2026-06-23-135910-435048-локальный-launch-bundle-ии-в-дело/` и записи `docs/agent-log/`.

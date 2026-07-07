@@ -57,4 +57,5 @@ def test_build_prompt_does_not_expose_workspace_absolute_path(tmp_path: Path) ->
 
     assert str(ROOT) not in prompt
     assert "не пиши файлы" in prompt
+    assert "не используй веб-поиск" in prompt
     assert "## Решение" in prompt

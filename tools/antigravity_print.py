@@ -4,10 +4,12 @@ import argparse
 import os
 import re
 import shutil
+import signal
 import sqlite3
 import subprocess
 import sys
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -20,6 +22,18 @@ TOOL_MARKERS = {
     "view_file",
     "write_to_file",
 }
+# Call-style tokens that indicate the agent actually invoked an external
+# search/browse tool rather than merely mentioning one in its reasoning.
+EXTERNAL_SEARCH_MARKERS = (
+    "google_search(",
+    "web_search(",
+    "search_web(",
+    "browse_url(",
+    "browse(",
+    "fetch_url(",
+    "http_request(",
+    "default_api.",
+)
 INTERNAL_MARKERS = (
     "**acknowledge",
     "**analyz",
@@ -257,9 +271,87 @@ def recent_conversation_dbs(conversations_dir: Path, started_at: float) -> list[
     if not conversations_dir.exists():
         return []
     dbs = [path for path in conversations_dir.glob("*.db") if path.is_file()]
-    recent = [path for path in dbs if path.stat().st_mtime >= started_at - 5]
-    candidates = recent or dbs
-    return sorted(candidates, key=lambda path: path.stat().st_mtime, reverse=True)[:10]
+    # Hard session correlation: only accept conversation DBs written during or
+    # after this run. The 2s slack absorbs filesystem mtime granularity, not a
+    # foreign workflow. The previous `recent or dbs` grab-all fallback let a
+    # stale answer from a *different* workflow leak in when this run wrote no DB;
+    # that fallback is deliberately removed.
+    recent = [path for path in dbs if path.stat().st_mtime >= started_at - 2]
+    return sorted(recent, key=lambda path: path.stat().st_mtime, reverse=True)[:10]
+
+
+def review_violation(text: str) -> str | None:
+    """Return a description if review-only text shows real tool/search use.
+
+    Fails closed on unambiguous execution signals only (a run_command payload,
+    or a call-style external search/browse token) so that mere mentions of tool
+    names in the model's reasoning trace do not trigger false rejections.
+    """
+    if "CommandLine" in text and "WaitMsBeforeAsync" in text:
+        return "command execution (run_command payload)"
+    lowered = text.lower()
+    for marker in EXTERNAL_SEARCH_MARKERS:
+        if marker in lowered:
+            return f"external search/tool call ({marker})"
+    return None
+
+
+@dataclass
+class ProcessResult:
+    stdout: str
+    stderr: str
+    returncode: int
+    timed_out: bool = False
+
+
+def _kill_process_tree(proc: subprocess.Popen[str]) -> None:
+    if proc.poll() is not None:
+        return
+    if os.name == "nt":
+        # taskkill /T walks the child PID tree, so orphaned agy/node children
+        # are killed too, not just the top process.
+        subprocess.run(
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    else:
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            proc.kill()
+
+
+def run_process_with_tree_timeout(
+    command: list[str],
+    *,
+    cwd: str | None,
+    env: dict[str, str] | None,
+    timeout: int,
+) -> ProcessResult:
+    popen_kwargs: dict[str, object] = {}
+    if os.name != "nt":
+        popen_kwargs["start_new_session"] = True
+    proc = subprocess.Popen(
+        command,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=cwd,
+        env=env,
+        **popen_kwargs,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+        return ProcessResult(stdout or "", stderr or "", proc.returncode or 0)
+    except subprocess.TimeoutExpired:
+        _kill_process_tree(proc)
+        try:
+            stdout, stderr = proc.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
+            stdout, stderr = "", ""
+        return ProcessResult(stdout or "", stderr or "", 124, timed_out=True)
 
 
 def recover_from_conversations(conversations_dir: Path, started_at: float) -> tuple[str | None, Path | None]:
@@ -283,6 +375,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cwd", default=str(Path.cwd()))
     parser.add_argument("--conversations-dir", type=Path, default=default_conversations_dir())
     parser.add_argument("--no-db-fallback", action="store_true")
+    parser.add_argument(
+        "--review-only",
+        action="store_true",
+        help="Fail closed if the run shows real tool/command/search execution.",
+    )
     return parser
 
 
@@ -297,21 +394,28 @@ def main(argv: list[str] | None = None) -> int:
 
     started_at = time.time()
     try:
-        result = subprocess.run(
+        result = run_process_with_tree_timeout(
             command,
-            text=True,
-            capture_output=True,
             cwd=args.cwd,
-            timeout=args.process_timeout_seconds,
-            check=False,
             env=stable_env(),
+            timeout=args.process_timeout_seconds,
         )
     except FileNotFoundError:
         print(f"agy executable not found: {args.agy}", file=sys.stderr)
         return 127
-    except subprocess.TimeoutExpired:
-        print("agy --print timed out", file=sys.stderr)
+
+    if result.timed_out:
+        print("agy --print timed out; killed process tree", file=sys.stderr)
         return 124
+
+    if args.review_only:
+        violation = review_violation(result.stdout) or review_violation(result.stderr)
+        if violation:
+            print(
+                f"review-only violation: Antigravity used {violation}; refusing result",
+                file=sys.stderr,
+            )
+            return 5
 
     stdout = result.stdout.strip()
     if stdout and not stdout_looks_recoverable_failure(stdout):
