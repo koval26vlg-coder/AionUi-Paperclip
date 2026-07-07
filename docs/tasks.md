@@ -10,14 +10,11 @@
 - Поддерживать рабочий цикл `Grok Build (L1) + Antigravity CLI (L2) + Codex (L3/L4) + Claude Code (L5)`, Gemini Vertex как fallback `gemini-vertex`: один агент выполняет, другой проверяет через SML, итог фиксируется в SML и `docs/agent-log/`.
 - Поддерживать иерархический workflow `docs/agent-workflows/`; дефолтный профиль `Роя` — `grok-antigravity`. Соблюдать `docs/agent-workflows/model-policy.md`: не подменять model alias тихо, mismatch фиксировать в handoff.
 - Перезапустить MCP-сервер `sml` у активных агентов, чтобы нормализация `author_agent` применялась к новым записям (живой процесс держит старый код до перезапуска клиента).
+- NOI VPS (`147.90.11.165`) восстановлен 2026-07-07 как резервный зарубежный Antigravity-роут: SSH работает, `agy 1.0.16`, OAuth пройден, live smoke возвращает `ok`. Использовать как fallback, если региональный блокер вернётся и локальный Antigravity + `gemini-vertex` откажут. Проверка: `tools/check-antigravity-noi.ps1 -Smoke`.
 
 ### Открытые дефекты
 
 - Antigravity L1/L2 runner: process-tree timeout, жёсткая session correlation, запрет tool-use/внешнего поиска в review-only режиме (историю блокера см. `docs/history/current-context-chronicle-2026-06-07.md`).
-
-### В работе
-
-- Antigravity NOI VPS (`147.90.11.165`) — восстановление почти завершено (проверено 2026-07-07). SSH снова работает (`SSH_OK`, banner читается), `agy 1.0.13` на месте — console/rescue больше не нужен. Остался один шаг: пользователю пройти Google OAuth через `tools/start-antigravity-noi-auth.ps1`, затем smoke `tools/check-antigravity-noi.ps1 -Smoke`. Runbook: `docs/history/noi-vps-recovery-runbook.md`.
 
 ### Ждут решения пользователя
 
