@@ -799,6 +799,21 @@ def cmd_submit_work(args: argparse.Namespace) -> int:
     require_allowed(contract, args.agent)
     executor = require_mutation_executor(args)
     assignment = current_assignment(contract)
+    # DEF-02: guard against submitting work into an unexpected level/assignment.
+    # An agent that expected to be handing off L1 must not silently write its
+    # handoff into a different level if the workflow moved underneath it.
+    expect_level = getattr(args, "expect_level", None)
+    if expect_level and assignment["level"] != expect_level:
+        raise WorkflowError(
+            f"expected level {expect_level!r} but current assignment is "
+            f"{assignment['level']!r} ({assignment['label']}); refusing to write handoff"
+        )
+    expect_assignment = getattr(args, "expect_assignment", None)
+    if expect_assignment and assignment["label"] != expect_assignment:
+        raise WorkflowError(
+            f"expected assignment {expect_assignment!r} but current assignment is "
+            f"{assignment['label']!r}; refusing to write handoff"
+        )
     level_data = contract["levels"][assignment["level"]]
     if assignment["data"]["status"] != "in_progress":
         raise WorkflowError(
@@ -1113,10 +1128,17 @@ def cmd_status(args: argparse.Namespace) -> int:
         for subagent in subagents:
             print(f"- {subagent['id']}: {subagent['name']} [{model_label(subagent)}]")
     print(f"last_event: {contract.get('last_event')}")
-    if contract.get("blockers"):
-        print("blockers:")
-        for blocker in contract["blockers"]:
+    # DEF-03: separate still-active blockers from ones already resolved,
+    # so a resolved blocker is never mistaken for a live one.
+    blockers = contract.get("blockers") or []
+    active_blockers = [b for b in blockers if not b.get("resolved")]
+    resolved_blockers = [b for b in blockers if b.get("resolved")]
+    if active_blockers:
+        print("active blockers:")
+        for blocker in active_blockers:
             print(f"- {blocker['level']}: {blocker['reason']}")
+    if resolved_blockers:
+        print(f"resolved blockers: {len(resolved_blockers)}")
     return 0
 
 
@@ -1168,6 +1190,14 @@ def build_parser() -> argparse.ArgumentParser:
     submit.add_argument("workflow_id")
     submit.add_argument("--agent", required=True)
     submit.add_argument("--handoff-file", required=True)
+    submit.add_argument(
+        "--expect-level",
+        help="Guard: fail if the current assignment level differs (e.g. L1).",
+    )
+    submit.add_argument(
+        "--expect-assignment",
+        help="Guard: fail if the current assignment label differs (e.g. L1.1).",
+    )
     add_executor_arg(submit)
     submit.set_defaults(func=cmd_submit_work)
 

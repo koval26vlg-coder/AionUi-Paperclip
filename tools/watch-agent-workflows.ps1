@@ -47,11 +47,17 @@ while ($true) {
         if ($contract.risk_gate.required -and $contract.risk_gate.status -ne "passed") {
           Write-Host "  risk:    required/$($contract.risk_gate.status)"
         }
-        if ($contract.blockers.Count -gt 0) {
-          Write-Host "  blockers:"
-          foreach ($blocker in $contract.blockers) {
+        # DEF-03: show only active blockers in full; report resolved ones as a count.
+        $activeBlockers = @($contract.blockers | Where-Object { -not $_.resolved })
+        $resolvedCount = @($contract.blockers | Where-Object { $_.resolved }).Count
+        if ($activeBlockers.Count -gt 0) {
+          Write-Host "  active blockers:"
+          foreach ($blocker in $activeBlockers) {
             Write-Host "    - $($blocker.level): $($blocker.reason)"
           }
+        }
+        if ($resolvedCount -gt 0) {
+          Write-Host "  resolved blockers: $resolvedCount"
         }
         Write-Host ""
       } catch {

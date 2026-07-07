@@ -447,3 +447,70 @@ def test_risk_workflow_cannot_finalize_without_risk_review(tmp_path: Path) -> No
     )
     assert finalized.returncode == 0, finalized.stderr
 
+
+def test_submit_work_expect_level_guard_rejects_wrong_level(tmp_path: Path) -> None:
+    # DEF-02: submit-work must refuse to write a handoff into an unexpected level.
+    workflow_id = new_workflow(tmp_path)
+    handoff = write_handoff(tmp_path, f"{workflow_id}-grok-handoff.md")
+    claimed = run_cli(
+        tmp_path, "claim", workflow_id, "--agent", "Grok Build", "--executor", "Codex"
+    )
+    assert claimed.returncode == 0, claimed.stderr
+
+    wrong = run_cli(
+        tmp_path,
+        "submit-work",
+        workflow_id,
+        "--agent",
+        "Grok Build",
+        "--handoff-file",
+        str(handoff),
+        "--expect-level",
+        "L2",
+        "--executor",
+        "Codex",
+    )
+    assert wrong.returncode != 0
+    assert "expected level" in wrong.stderr
+    # nothing was submitted: the workflow is still on L1 awaiting Grok Build
+    data = load_contract(tmp_path, workflow_id)
+    assert data["state"] != "waiting_for_approval"
+    assert data["allowed_next_agents"] == ["Grok Build"]
+
+    ok = run_cli(
+        tmp_path,
+        "submit-work",
+        workflow_id,
+        "--agent",
+        "Grok Build",
+        "--handoff-file",
+        str(handoff),
+        "--expect-level",
+        "L1",
+        "--executor",
+        "Codex",
+    )
+    assert ok.returncode == 0, ok.stderr
+
+
+def test_status_separates_active_and_resolved_blockers(tmp_path: Path) -> None:
+    # DEF-03: status must not present a resolved blocker as if it were active.
+    workflow_id = new_workflow(tmp_path)
+    contract_path = tmp_path / "agent-workflows" / workflow_id / "contract.json"
+    data = json.loads(contract_path.read_text(encoding="utf-8"))
+    data["blockers"] = [
+        {"level": "L1", "reason": "ACTIVE_BLOCKER_REASON", "resolved": False},
+        {"level": "L2", "reason": "OLD_RESOLVED_REASON", "resolved": True},
+    ]
+    contract_path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+    result = run_cli(tmp_path, "status", workflow_id)
+    assert result.returncode == 0, result.stderr
+    assert "active blockers:" in result.stdout
+    assert "ACTIVE_BLOCKER_REASON" in result.stdout
+    assert "resolved blockers: 1" in result.stdout
+    # the resolved blocker's reason must not appear as an active line
+    assert "OLD_RESOLVED_REASON" not in result.stdout
+
