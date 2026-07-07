@@ -7,18 +7,18 @@ where claude >nul 2>nul
 if errorlevel 1 set "CLAUDE_CMD=%APPDATA%\npm\claude.cmd"
 
 if not exist "%CLAUDE_CMD%" if "%CLAUDE_CMD%"=="%APPDATA%\npm\claude.cmd" (
-  echo Claude CLI not found in PATH.
-  echo Install Claude Code or add claude.exe/claude.cmd to PATH first.
+  echo CLI Claude не найден в PATH.
+  echo Установите Claude Code или сначала добавьте claude.exe/claude.cmd в PATH.
   pause
   exit /b 1
 )
 
-echo === Claude auth status ===
+echo === Статус авторизации Claude ===
 "%CLAUDE_CMD%" auth status
 echo.
-echo === Claude MCP list ===
+echo === Список MCP-серверов Claude ===
 "%CLAUDE_CMD%" mcp list
 echo.
-echo If sml is connected, ask Claude:
+echo Если sml подключен, спросите Claude:
 echo "Проверь MCP SML: вызови sml.ping и sml.startup_pack. Ответь по-русски, видишь ли ты общую память."
 pause

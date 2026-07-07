@@ -7,8 +7,8 @@ where claude >nul 2>nul
 if errorlevel 1 set "CLAUDE_CMD=%APPDATA%\npm\claude.cmd"
 
 if not exist "%CLAUDE_CMD%" if "%CLAUDE_CMD%"=="%APPDATA%\npm\claude.cmd" (
-  echo Claude CLI not found in PATH.
-  echo Install Claude Code or add claude.exe/claude.cmd to PATH, then run this file again.
+  echo CLI Claude не найден в PATH.
+  echo Установите Claude Code или добавьте claude.exe/claude.cmd в PATH, затем запустите этот файл снова.
   pause
   exit /b 1
 )

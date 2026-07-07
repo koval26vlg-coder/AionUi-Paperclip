@@ -13,6 +13,8 @@ eggs/
 .eggs/
 lib/
 lib64/
+!apps/aion-vision/src/lib/
+!apps/aion-vision/src/lib/**
 parts/
 sdist/
 var/
@@ -40,6 +42,7 @@ apps/aion-vision/node_modules/
 apps/aion-vision/dist/
 apps/aion-vision/.eslintcache
 apps/aion-vision/package-lock.json
+apps/aion-vision/data/
 
 # Browser/test artifacts
 .playwright-mcp/
@@ -56,6 +59,17 @@ memory-search-result.png
 .vscode/
 *.tmp
 *.bak
+
+# Локальные агентские конфиги (Grok эксперимент, выведенный MiMo)
+.grok/
+.mimocode/
+
+# Локальный мусор и кэши
+tmp/
+*.backup.*
+.mypy_cache/
+.hypothesis/
+.pytest_cache/
 
 # OS
 .DS_Store

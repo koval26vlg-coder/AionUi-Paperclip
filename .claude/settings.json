@@ -1,6 +1,6 @@
 {
   "language": "russian",
-  "model": "fable",
+  "model": "sonnet",
   "statusLine": {
     "type": "command",
     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/statusline.sh\""
