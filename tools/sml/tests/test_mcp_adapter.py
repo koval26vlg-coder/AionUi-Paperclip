@@ -37,11 +37,11 @@ def test_initialize_returns_server_info(server: SMLServer) -> None:
     assert response["result"]["serverInfo"]["name"] == "sml"
 
 
-def test_tools_list_contains_ten_tools(server: SMLServer) -> None:
+def test_tools_list_contains_legacy_tools_by_default(server: SMLServer) -> None:
     response = handle_request(server, {"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
     tools = response["result"]["tools"]
     names = {t["name"] for t in tools}
-    expected = {
+    legacy = {
         "sml.ping",
         "sml.write",
         "sml.read",
@@ -53,7 +53,23 @@ def test_tools_list_contains_ten_tools(server: SMLServer) -> None:
         "sml.build_context_pack",
         "sml.startup_pack",
     }
-    assert expected.issubset(names)
+    grok_safe = {name.replace(".", "_") for name in legacy}
+    assert legacy.issubset(names)
+    assert names.isdisjoint(grok_safe)
+    assert len(names) == 10
+
+
+def test_tools_list_can_expose_only_grok_safe_aliases(
+    server: SMLServer, monkeypatch
+) -> None:
+    monkeypatch.setenv("SML_MCP_TOOL_NAME_MODE", "grok-safe")
+
+    response = handle_request(server, {"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+    names = {t["name"] for t in response["result"]["tools"]}
+
+    assert "sml_ping" in names
+    assert "sml_startup_pack" in names
+    assert "sml.semantic_query" not in names
     assert len(names) == 10
 
 
@@ -102,6 +118,13 @@ def test_ping_happy_path(server: SMLServer) -> None:
     assert body["uptime_seconds"] >= 0
     assert body["records_total"] == 0
     assert body["degraded"] is False
+
+
+def test_grok_safe_alias_calls_canonical_tool(server: SMLServer) -> None:
+    body = _call(server, "sml_ping", {})
+
+    assert body["ok"] is True
+    assert body["version"].startswith("sml-")
 
 
 # --- sml.write + sml.read ---

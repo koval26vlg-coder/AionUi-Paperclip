@@ -4,7 +4,7 @@ $root = Split-Path -Parent $PSScriptRoot
 
 Write-Host "Workspace: $root"
 
-# Активная связка на 2026-06-18: Codex + Claude Code + Gemini CLI.
+# Активная связка на 2026-06-19: Codex + Claude Code + Antigravity CLI.
 # Cursor, Kiro и MiMo Code выведены из схемы.
 
 # VS Code как общая IDE-оболочка SML.

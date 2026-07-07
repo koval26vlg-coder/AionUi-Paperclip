@@ -26,8 +26,19 @@ function Write-Heartbeat {
     # Метка живости watcher: обновляется каждый цикл, даже без изменений.
     # status-memory-auto.ps1 проверяет её свежесть и поднимает тревогу,
     # если watcher молча умер (Task Scheduler уронил процесс и т.п.).
+    # Файл параллельно читают status-скрипты, поэтому запись идет с retry
+    # и не имеет права ронять watcher: пропущенный heartbeat лучше мертвой памяти
+    # (авария 2026-06-30: одна блокировка файла убила watcher на несколько суток).
     $ts = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "Z"
-    Set-Content -LiteralPath $heartbeatPath -Value $ts -Encoding UTF8
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+        try {
+            Set-Content -LiteralPath $heartbeatPath -Value $ts -Encoding UTF8 -ErrorAction Stop
+            return
+        } catch {
+            Start-Sleep -Milliseconds (200 * $attempt)
+        }
+    }
+    Write-MemoryLog "Heartbeat write failed after 5 retries: $heartbeatPath"
 }
 
 function Get-MemoryFiles {
@@ -130,6 +141,14 @@ function Build-MemoryLayers {
     Build-RelationshipMap
     Build-DashboardData
     Backup-SmlDatabase
+}
+
+# Одновременно должен работать только один watcher: два экземпляра
+# дерутся за heartbeat-файл и роняют друг друга.
+$script:watcherMutex = New-Object System.Threading.Mutex($false, "Global\AionMemoryWatcher")
+if (-not $script:watcherMutex.WaitOne(0)) {
+    Write-MemoryLog "Watcher already running. Duplicate instance exits."
+    exit 0
 }
 
 Write-MemoryLog "Memory watcher started. Root: $root. Interval: $IntervalSeconds sec."

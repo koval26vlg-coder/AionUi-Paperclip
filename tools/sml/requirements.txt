@@ -4,3 +4,4 @@ sqlite-utils
 watchdog
 requests
 pydantic>=2
+google-genai

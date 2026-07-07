@@ -294,6 +294,37 @@ _TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
 }
 
 
+GROK_SAFE_TOOL_ALIASES = {name.replace(".", "_"): name for name in _TOOL_SCHEMAS}
+
+
+def _tool_name_mode() -> str:
+    mode = os.environ.get("SML_MCP_TOOL_NAME_MODE", "legacy").strip().lower()
+    if mode not in {"legacy", "grok-safe", "compat"}:
+        return "legacy"
+    return mode
+
+
+def _all_tool_schemas() -> dict[str, dict[str, Any]]:
+    mode = _tool_name_mode()
+    if mode == "legacy":
+        return dict(_TOOL_SCHEMAS)
+
+    schemas = {} if mode == "grok-safe" else dict(_TOOL_SCHEMAS)
+    for alias, canonical in GROK_SAFE_TOOL_ALIASES.items():
+        schema = dict(_TOOL_SCHEMAS[canonical])
+        schema["description"] = (
+            f"Grok-compatible alias for `{canonical}`. " + schema["description"]
+        )
+        schemas[alias] = schema
+    return schemas
+
+
+def _canonical_tool_name(name: Any) -> Any:
+    if isinstance(name, str):
+        return GROK_SAFE_TOOL_ALIASES.get(name, name)
+    return name
+
+
 # ---------------------------------------------------------------------------
 # Реализация инструментов
 # ---------------------------------------------------------------------------
@@ -843,13 +874,14 @@ def handle_request(server: SMLServer, request: dict[str, Any]) -> Optional[dict[
                 "description": schema["description"],
                 "inputSchema": schema["input_schema"],
             }
-            for name, schema in _TOOL_SCHEMAS.items()
+            for name, schema in _all_tool_schemas().items()
         ]
         return _rpc_result({"tools": tools_manifest}, id_)
     if method == "tools/call":
         tool_name = params.get("name")
+        canonical_tool_name = _canonical_tool_name(tool_name)
         tool_args = params.get("arguments") or {}
-        if tool_name not in TOOL_IMPL:
+        if canonical_tool_name not in TOOL_IMPL:
             op_id = server.next_op_id()
             return _rpc_result(
                 _mcp_tool_result(
@@ -862,7 +894,7 @@ def handle_request(server: SMLServer, request: dict[str, Any]) -> Optional[dict[
             )
         op_id = server.next_op_id()
         try:
-            result_payload = TOOL_IMPL[tool_name](server, tool_args, op_id)
+            result_payload = TOOL_IMPL[canonical_tool_name](server, tool_args, op_id)
         except SMLError as exc:
             return _rpc_result(_mcp_tool_result(error_response(exc, op_id)), id_)
         except (ValueError, TypeError) as exc:
@@ -870,7 +902,12 @@ def handle_request(server: SMLServer, request: dict[str, Any]) -> Optional[dict[
             # мапим в категорию validation (Req 2.5, Req 4.3).
             server.op_log.log(
                 agent=server.default_agent,
-                op="write" if tool_name in {"sml.write", "sml.add_decision", "sml.add_log"} else "read",
+                op=(
+                    "write"
+                    if canonical_tool_name
+                    in {"sml.write", "sml.add_decision", "sml.add_log"}
+                    else "read"
+                ),
                 result="rejected",
                 reason_category="validation",
                 operation_id=op_id,
