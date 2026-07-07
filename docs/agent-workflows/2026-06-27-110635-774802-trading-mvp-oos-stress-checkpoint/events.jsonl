@@ -1,0 +1,14 @@
+{"time": "2026-06-27T11:06:35+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-27T11:08:09+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T11:08:18+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T11:08:33+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-27T11:08:46+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T11:09:27+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T11:09:49+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-27T11:21:57+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T11:22:07+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T11:22:23+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-27T11:22:50+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T11:22:59+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T11:25:12+03:00", "event": "risk_approved", "agent": "Claude Code", "executor": "Codex", "summary": "Research-only risk gate passed: no live orders, no API keys, no leverage/margin, no investment advice, no hidden long run. Strategy remains rejected on current data; paper/live and confirmed long collect remain blocked until explicit user approval and future gates."}
+{"time": "2026-06-27T11:25:26+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Codex"}

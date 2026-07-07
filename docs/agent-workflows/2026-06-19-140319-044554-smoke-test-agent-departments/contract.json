@@ -1,0 +1,77 @@
+{
+  "workflow_id": "2026-06-19-140319-044554-smoke-test-agent-departments",
+  "title": "Smoke test agent departments",
+  "state": "done",
+  "created_at": "2026-06-19T14:03:19+03:00",
+  "updated_at": "2026-06-19T14:03:20+03:00",
+  "created_by": "Codex",
+  "principal": "User",
+  "current_level": "L5",
+  "allowed_next_agents": [],
+  "levels": {
+    "L1": {
+      "name": "Исполнители",
+      "agent": "Gemini CLI",
+      "status": "approved",
+      "handoff": "levels/L1/handoff.md",
+      "approved_by": "Codex",
+      "submitted_at": "2026-06-19T14:03:19+03:00",
+      "approved_at": "2026-06-19T14:03:19+03:00"
+    },
+    "L2": {
+      "name": "Руководитель отдела",
+      "agent": "Codex",
+      "status": "approved",
+      "handoff": "levels/L2/handoff.md",
+      "approved_by": "Codex",
+      "submitted_at": "2026-06-19T14:03:19+03:00",
+      "approved_at": "2026-06-19T14:03:19+03:00"
+    },
+    "L3": {
+      "name": "Смежный инженерный отдел",
+      "agent": "Codex",
+      "status": "approved",
+      "handoff": "levels/L3/handoff.md",
+      "approved_by": "Claude Code",
+      "submitted_at": "2026-06-19T14:03:20+03:00",
+      "approved_at": "2026-06-19T14:03:20+03:00"
+    },
+    "L4": {
+      "name": "Вышестоящий руководитель",
+      "agent": "Claude Code",
+      "status": "approved",
+      "handoff": "levels/L4/handoff.md",
+      "approved_by": "Codex",
+      "submitted_at": "2026-06-19T14:03:20+03:00",
+      "approved_at": "2026-06-19T14:03:20+03:00"
+    },
+    "L5": {
+      "name": "Финальная инстанция для пользователя",
+      "agent": "Codex",
+      "status": "approved",
+      "handoff": "final-report.md",
+      "approved_by": "Codex",
+      "submitted_at": null,
+      "approved_at": "2026-06-19T14:03:20+03:00"
+    }
+  },
+  "risk_flags": {
+    "trading": false,
+    "writes_external_system": false,
+    "long_running": false,
+    "uses_secrets": false,
+    "destructive": false
+  },
+  "risk_gate": {
+    "required": false,
+    "status": "skipped",
+    "agent": null,
+    "summary": null,
+    "approved_at": null,
+    "approved_by": null
+  },
+  "blockers": [],
+  "last_event": "finalized",
+  "last_handoff": "levels/L4/handoff.md",
+  "final_report": "final-report.md"
+}

@@ -1,0 +1,14 @@
+{"time": "2026-06-27T13:42:09+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-27T13:43:00+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T13:43:22+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T13:43:22+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-27T13:43:36+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T13:44:05+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T13:44:15+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-27T13:49:35+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T13:49:36+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T13:49:36+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-27T13:49:59+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T13:49:59+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T13:51:35+03:00", "event": "risk_approved", "agent": "Claude Code", "executor": "Codex", "summary": "Research-only status-command alignment; no collectors/backtests/replay/grid/live/API/leverage; actual WS collect still requires explicit user confirmation and -ConfirmedLongRun."}
+{"time": "2026-06-27T13:51:35+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Codex"}

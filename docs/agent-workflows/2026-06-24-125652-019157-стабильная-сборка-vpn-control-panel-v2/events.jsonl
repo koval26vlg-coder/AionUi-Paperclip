@@ -1,0 +1,4 @@
+{"time": "2026-06-24T12:56:52+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-24T12:59:16+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-24T13:03:16+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-24T13:10:36+03:00", "event": "escalated", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "target_level": "L2", "reason": "Antigravity CLI L1 returned empty stdout; moving workflow forward one level while Codex performs urgent local stabilization based on repository evidence."}

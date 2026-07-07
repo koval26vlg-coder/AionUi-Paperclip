@@ -1,0 +1,2 @@
+{"time": "2026-07-02T09:46:02+03:00", "event": "workflow_created", "agent": "Codex"}
+{"ts":"2026-07-02T09:47:29.4832170+03:00","type":"swarm_limited","agent":"Codex","reason":"Antigravity CLI returned empty stdout and no DB response; fallback to manual Codex until agent runtime recovers.","file":"swarm_limited.md"}

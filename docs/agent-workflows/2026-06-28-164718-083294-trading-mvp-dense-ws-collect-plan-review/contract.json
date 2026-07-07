@@ -1,0 +1,300 @@
+{
+  "workflow_id": "2026-06-28-164718-083294-trading-mvp-dense-ws-collect-plan-review",
+  "title": "trading-mvp-dense-ws-collect-plan-review",
+  "state": "in_progress",
+  "created_at": "2026-06-28T16:47:18+03:00",
+  "updated_at": "2026-06-28T16:59:08+03:00",
+  "created_by": "Codex",
+  "principal": "User",
+  "current_level": "L1",
+  "current_subrole": null,
+  "allowed_next_agents": [
+    "Antigravity CLI"
+  ],
+  "levels": {
+    "L1": {
+      "name": "Исследовательский отдел",
+      "agent": "Antigravity CLI",
+      "subagents": [
+        {
+          "id": "antigravity-source-verifier",
+          "name": "Проверяющий фактов",
+          "role": "Сверить brief, handoff, события и доступные источники перед передачей на инженерную проверку.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-context-expander",
+          "name": "Расширитель контекста",
+          "role": "Добавить недостающие альтернативы, ограничения, зависимости и edge cases.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "Low"
+          }
+        },
+        {
+          "id": "antigravity-noise-filter",
+          "name": "Фильтр шума",
+          "role": "Убрать неподтвержденные или лишние идеи, чтобы L1 не передал искажение выше.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "Low"
+          }
+        },
+        {
+          "id": "antigravity-handoff-editor",
+          "name": "Редактор L1-handoff",
+          "role": "Собрать проверенный handoff с явным решением approve/revise/escalate/block.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "Medium"
+          }
+        }
+      ],
+      "status": "in_progress",
+      "handoff": null,
+      "approved_by": null,
+      "submitted_at": null,
+      "approved_at": null
+    },
+    "L2": {
+      "name": "Инженерная проверка",
+      "agent": "Antigravity CLI",
+      "subagents": [
+        {
+          "id": "antigravity-engineering-reviewer",
+          "name": "Инженерный ревьюер",
+          "role": "Проверить применимость L1-выводов к реальной реализации.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-constraint-checker",
+          "name": "Проверяющий ограничений",
+          "role": "Сверить решение с brief, контрактом, risk flags, allowed_next_agents и контекстными лимитами.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-edge-case-scout",
+          "name": "Разведчик крайних случаев",
+          "role": "Найти скрытые сценарии, неполные данные, конфликтующие требования и слабые места.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-revision-gate",
+          "name": "Gate ревизии",
+          "role": "Решить, можно ли передавать работу на Codex L3 или нужно вернуть на доработку.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        }
+      ],
+      "status": "pending",
+      "handoff": null,
+      "approved_by": null,
+      "submitted_at": null,
+      "approved_at": null
+    },
+    "L3": {
+      "name": "Декомпозиция реализации, тесты и automation",
+      "agent": "Codex",
+      "subagents": [
+        {
+          "id": "codex-implementation-decomposer",
+          "name": "Декомпозитор реализации",
+          "role": "Разбить задачу на исполнимые шаги, файлы, интерфейсы и критерии готовности.",
+          "model": {
+            "provider": "OpenAI Codex",
+            "name": "codex-5.3",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-test-planner",
+          "name": "Планировщик тестов",
+          "role": "Определить unit/smoke/integration проверки и негативные сценарии.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-automation-builder",
+          "name": "Инженер automation",
+          "role": "Предложить или реализовать CLI/скрипты/мониторы для повторяемого выполнения.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.4 mini",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-integration-checker",
+          "name": "Проверяющий интеграции",
+          "role": "Проверить совместимость с существующей структурой, SML, файлами памяти и политиками запуска.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.4",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "pending",
+      "handoff": null,
+      "approved_by": null,
+      "submitted_at": null,
+      "approved_at": null
+    },
+    "L4": {
+      "name": "Архитектурный синтез",
+      "agent": "Codex",
+      "subagents": [
+        {
+          "id": "codex-architecture-synthesizer",
+          "name": "Архитектурный синтезатор",
+          "role": "Собрать L1-L3 в целостное техническое решение без противоречий.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-contract-auditor",
+          "name": "Аудитор контракта",
+          "role": "Проверить, что contract, handoff, events и итоговые выводы согласованы.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-risk-gate",
+          "name": "Risk gate",
+          "role": "Отдельно оценить риски trading/long-running/secrets/external writes/destructive действий.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-maintainability-reviewer",
+          "name": "Ревьюер сопровождения",
+          "role": "Оценить простоту поддержки, расширения и передачи следующему агенту.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "pending",
+      "handoff": null,
+      "approved_by": null,
+      "submitted_at": null,
+      "approved_at": null
+    },
+    "L5": {
+      "name": "Финальная инстанция для пользователя",
+      "agent": "Claude Code",
+      "subagents": [
+        {
+          "id": "claude-executive-summarizer",
+          "name": "Executive summarizer",
+          "role": "Сжато объяснить пользователю итог, решение и оставшиеся риски.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Opus 4.7 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-technical-verifier",
+          "name": "Финальный техпроверяющий",
+          "role": "Независимо проверить техническую связность L1-L4 перед финальным отчетом.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Haiku 4.5 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-anti-distortion-auditor",
+          "name": "Аудитор против искажения",
+          "role": "Сверить final-report с brief, handoff и events, чтобы не было испорченного телефона.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Sonnet 4.6 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-final-decision-writer",
+          "name": "Автор заключения",
+          "role": "Сформировать final-report.md для пользователя с понятным решением approve/revise/escalate/block.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Opus 4.8 alias",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "pending",
+      "handoff": null,
+      "approved_by": null,
+      "submitted_at": null,
+      "approved_at": null
+    }
+  },
+  "risk_flags": {
+    "trading": true,
+    "writes_external_system": false,
+    "long_running": true,
+    "uses_secrets": false,
+    "destructive": false
+  },
+  "risk_gate": {
+    "required": true,
+    "status": "pending",
+    "agent": "Claude Code",
+    "summary": null,
+    "approved_at": null,
+    "approved_by": null
+  },
+  "blockers": [
+    {
+      "level": "L1",
+      "assignment": "L1",
+      "reason": "Antigravity L1 output was irrelevant to dense WS collect checkpoint; retry returned empty stdout/no DB response. Codex manual fallback is allowed by Trading Swarm Rule until agents are available again.",
+      "requested_by": "Codex",
+      "time": "2026-06-28T16:59:08+03:00",
+      "resolved": false,
+      "type": "swarm_limited"
+    }
+  ],
+  "last_event": "swarm_limited",
+  "last_handoff": null,
+  "final_report": null
+}

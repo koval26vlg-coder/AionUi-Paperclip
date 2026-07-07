@@ -1,0 +1,7 @@
+{"time": "2026-06-20T20:05:42+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-20T20:09:18+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-20T20:09:43+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-20T20:10:02+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.0", "next_level": "L1", "next_assignment": "L1.1"}
+{"time": "2026-06-20T20:12:52+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-20T20:17:52+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-20T20:17:59+03:00", "event": "revision_requested", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1", "reason": "L1.1 Antigravity CLI did not produce a valid handoff: first run returned clarifying/readiness output, second isolated run exceeded 180 seconds and required process cleanup. Need runner/runtime fix before continuing above L1."}

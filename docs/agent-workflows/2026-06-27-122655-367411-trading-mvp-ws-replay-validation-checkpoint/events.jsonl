@@ -1,0 +1,14 @@
+{"time": "2026-06-27T12:26:55+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-27T12:28:31+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T12:28:31+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-27T12:28:31+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-27T12:29:19+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T12:29:19+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-27T12:29:28+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-27T12:36:10+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T12:36:10+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-27T12:36:10+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-27T12:37:15+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T12:37:15+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-27T12:39:21+03:00", "event": "risk_approved", "agent": "Claude Code", "executor": "Codex", "summary": "L5 Claude approved: research-only guarded WS replay validation wrapper, no live/orders/API keys/leverage, replay/grid only after explicit PostprocessPath, replay_allowed=true and ConfirmedResearchRun."}
+{"time": "2026-06-27T12:39:21+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Codex"}

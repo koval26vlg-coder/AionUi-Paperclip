@@ -1,0 +1,2 @@
+{"time": "2026-06-28T17:33:23+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time":"2026-06-28T17:35:37+03:00","event":"swarm_limited","agent":"Codex","reason":"agy --print returned empty stdout and no DB response was recovered","evidence":"tmp-l1-antigravity-runtime-failure.md"}

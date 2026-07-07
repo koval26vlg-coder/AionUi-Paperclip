@@ -1,0 +1,4 @@
+{"time": "2026-06-28T16:47:18+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time":"2026-06-28T16:53:25+03:00","event":"risk_flags_corrected","agent":"Codex","reason":"Workflow brief is trading/long-running research context; corrected metadata before L1 review. No collector/backtest/live action started.","risk_flags":{"trading":true,"long_running":true,"writes_external_system":false,"uses_secrets":false,"destructive":false},"risk_gate":{"required":true,"status":"pending","agent":"Claude Code"}}
+{"time": "2026-06-28T16:53:51+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time":"2026-06-28T16:56:23+03:00","event":"swarm_limited","agent":"Codex","reason":"Antigravity L1 output was irrelevant to dense WS collect checkpoint; retry returned empty stdout/no DB response.","artifact":"tmp-l1-antigravity-relevance-failure.md","fallback":"Codex manual review under gate rules"}

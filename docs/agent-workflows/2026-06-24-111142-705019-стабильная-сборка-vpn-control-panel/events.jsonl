@@ -1,0 +1,4 @@
+{"time": "2026-06-24T11:11:42+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-24T11:45:11+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "executor": "Codex", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-24T11:59:00+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "executor": "Codex", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-24T12:02:43+03:00", "event": "revision_requested", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.0", "reason": "L1.1 Antigravity runtime failure: DB fallback returned irrelevant old workflow, no-db fallback returned empty stdout, raw agy --print returned no content. Need repeat L1.1 after runtime fix or explicit user-approved Codex fallback."}

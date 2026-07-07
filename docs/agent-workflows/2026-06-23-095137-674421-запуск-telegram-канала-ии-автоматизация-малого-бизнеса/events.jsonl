@@ -1,0 +1,19 @@
+{"time": "2026-06-23T09:51:37+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-23T09:52:28+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T09:55:35+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T13:19:41+03:00", "event": "revision_requested", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.0", "reason": "L1.0 runtime failure was caused by incorrect MiMo invocation: model was not explicitly set and prompt was multi-line. Repeat L1.0 with mimo run -m mimo/mimo-auto and a single-line prompt."}
+{"time": "2026-06-23T13:19:49+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T13:27:17+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "executor": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T13:27:17+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.0", "next_level": "L1", "next_assignment": "L1.1"}
+{"time": "2026-06-23T13:27:17+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-23T13:27:17+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-23T13:27:17+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-23T13:27:18+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-23T13:29:33+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Claude Code"}

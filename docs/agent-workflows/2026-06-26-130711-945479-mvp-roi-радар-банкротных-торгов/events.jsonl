@@ -1,0 +1,14 @@
+{"time": "2026-06-26T13:07:11+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-26T13:08:21+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-26T13:16:41+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-26T13:16:49+03:00", "event": "escalated", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "target_level": "L2", "reason": "L1 did not produce a substantive Antigravity review because agy --print returned unusable/empty output; model policy forbids silent fallback, so escalation records the runtime issue and leaves the next gate explicit."}
+{"time": "2026-06-26T13:59:34+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-26T14:06:15+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-26T14:06:35+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-26T15:19:09+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-26T15:19:17+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-26T15:19:32+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-26T15:28:11+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-26T15:28:18+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-26T15:31:15+03:00", "event": "risk_approved", "agent": "Claude Code", "executor": "Codex", "summary": "Claude Code L5 approved: MVP remains offline paper-trading; no real bids, deposits, e-signature, applications, payments, secrets, external writes, or long collectors. Next step is offline/read-only source adapters with fixtures and tests only."}
+{"time": "2026-06-26T15:31:26+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Codex"}

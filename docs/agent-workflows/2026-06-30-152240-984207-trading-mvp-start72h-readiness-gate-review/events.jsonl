@@ -1,0 +1,4 @@
+{"time": "2026-06-30T15:22:40+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-30T15:25:26+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-30T15:25:26+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1"}
+{"time": "2026-06-30T15:27:21+03:00", "event": "revision_requested", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1", "reason": "swarm_limited: Antigravity CLI returned empty stdout and no DB fallback response; do not treat L1 as approved"}

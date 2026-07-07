@@ -1,0 +1,4 @@
+{"time": "2026-06-30T12:14:40+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time":"2026-06-30T13:20:17+03:00","event":"risk_flags_corrected","agent":"Codex","executor":"Codex","reason":"Trading-related checkpoint workflow was created without RiskTrading; corrected before isolated L1 review."}
+{"time":"2026-06-30T13:21:34+03:00","event":"swarm_limited","agent":"Codex","executor":"Codex","reason":"Antigravity isolated L1 review failed: agy --print returned empty stdout and no DB response was recovered."}
+{"time":"2026-06-30T14:05:32+03:00","event":"swarm_limited","agent":"Codex","executor":"Codex","reason":"Antigravity isolated L1 retry failed: agy --print returned empty stdout and no DB response was recovered."}

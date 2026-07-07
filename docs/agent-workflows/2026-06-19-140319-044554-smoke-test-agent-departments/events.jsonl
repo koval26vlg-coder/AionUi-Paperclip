@@ -1,0 +1,13 @@
+{"time": "2026-06-19T14:03:19+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_claimed", "agent": "Gemini CLI", "level": "L1"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_submitted", "agent": "Gemini CLI", "level": "L1"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_approved", "agent": "Codex", "level": "L1", "next_level": "L2"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_claimed", "agent": "Codex", "level": "L2"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_submitted", "agent": "Codex", "level": "L2"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_approved", "agent": "Codex", "level": "L2", "next_level": "L3"}
+{"time": "2026-06-19T14:03:19+03:00", "event": "level_claimed", "agent": "Codex", "level": "L3"}
+{"time": "2026-06-19T14:03:20+03:00", "event": "level_submitted", "agent": "Codex", "level": "L3"}
+{"time": "2026-06-19T14:03:20+03:00", "event": "level_approved", "agent": "Claude Code", "level": "L3", "next_level": "L4"}
+{"time": "2026-06-19T14:03:20+03:00", "event": "level_claimed", "agent": "Claude Code", "level": "L4"}
+{"time": "2026-06-19T14:03:20+03:00", "event": "level_submitted", "agent": "Claude Code", "level": "L4"}
+{"time": "2026-06-19T14:03:20+03:00", "event": "finalized", "agent": "Codex"}

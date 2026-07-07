@@ -1,0 +1,349 @@
+{
+  "workflow_id": "2026-06-20-091104-901407-drift-agent-dashboard-reference-renders",
+  "title": "Drift-agent dashboard reference renders",
+  "state": "done",
+  "created_at": "2026-06-20T09:11:04+03:00",
+  "updated_at": "2026-06-20T10:06:33+03:00",
+  "created_by": "Codex",
+  "principal": "Пользователь",
+  "current_level": "L5",
+  "allowed_next_agents": [],
+  "levels": {
+    "L1": {
+      "name": "Нижний авто-уровень и исследовательский отдел",
+      "agent": "Antigravity CLI",
+      "subagents": [],
+      "status": "approved",
+      "handoff": "levels/L1/L1.1/handoff.md",
+      "approved_by": "Antigravity CLI",
+      "submitted_at": "2026-06-20T09:30:49+03:00",
+      "approved_at": "2026-06-20T09:30:56+03:00",
+      "subroles": [
+        {
+          "id": "L1.0",
+          "name": "AUTO-первичная разведка",
+          "agent": "MiMo AUTO",
+          "mode": "AUTO",
+          "purpose": "Быстрый нижний проход: зацепки, первичные гипотезы, очевидные риски.",
+          "subagents": [
+            {
+              "id": "mimo-intake-scanner",
+              "name": "Сканер постановки",
+              "role": "Вытащить исходную цель, ограничения, входные данные и явные критерии успеха.",
+              "model": {
+                "provider": "Xiaomi",
+                "name": "MiMo AUTO",
+                "mode": "Xiaomi API AUTO",
+                "effort": "AUTO"
+              }
+            },
+            {
+              "id": "mimo-hypothesis-generator",
+              "name": "Генератор первичных гипотез",
+              "role": "Дать быстрые варианты решения, не выдавая их за проверенные выводы.",
+              "model": {
+                "provider": "Xiaomi",
+                "name": "MiMo AUTO",
+                "mode": "Xiaomi API AUTO",
+                "effort": "AUTO"
+              }
+            },
+            {
+              "id": "mimo-risk-sentinel",
+              "name": "Сигнальщик очевидных рисков",
+              "role": "Отметить пробелы, противоречия, опасные допущения и что нельзя потерять дальше.",
+              "model": {
+                "provider": "Xiaomi",
+                "name": "MiMo AUTO",
+                "mode": "Xiaomi API AUTO",
+                "effort": "AUTO"
+              }
+            }
+          ],
+          "status": "approved",
+          "handoff": "levels/L1/L1.0/handoff.md",
+          "approved_by": "Antigravity CLI",
+          "submitted_at": "2026-06-20T09:26:05+03:00",
+          "approved_at": "2026-06-20T09:26:35+03:00"
+        },
+        {
+          "id": "L1.1",
+          "name": "Исследовательский lead",
+          "agent": "Antigravity CLI",
+          "mode": "reviewed",
+          "purpose": "Проверить MiMo AUTO, расширить факты, убрать шум и подготовить L1-handoff.",
+          "subagents": [
+            {
+              "id": "antigravity-source-verifier",
+              "name": "Проверяющий фактов",
+              "role": "Сверить тезисы MiMo с brief, handoff, событиями и доступными источниками.",
+              "model": {
+                "provider": "Google Antigravity",
+                "name": "Antigravity CLI AUTO",
+                "effort": "High"
+              }
+            },
+            {
+              "id": "antigravity-context-expander",
+              "name": "Расширитель контекста",
+              "role": "Добавить недостающие альтернативы, ограничения, зависимости и edge cases.",
+              "model": {
+                "provider": "Google Antigravity",
+                "name": "Antigravity CLI AUTO",
+                "effort": "Low"
+              }
+            },
+            {
+              "id": "antigravity-noise-filter",
+              "name": "Фильтр шума",
+              "role": "Убрать неподтвержденные или лишние идеи, чтобы L1 не передал искажение выше.",
+              "model": {
+                "provider": "Google Antigravity",
+                "name": "Antigravity CLI AUTO",
+                "effort": "Low"
+              }
+            },
+            {
+              "id": "antigravity-handoff-editor",
+              "name": "Редактор L1-handoff",
+              "role": "Собрать проверенный handoff с явным решением approve/revise/escalate/block.",
+              "model": {
+                "provider": "Google Antigravity",
+                "name": "Antigravity CLI AUTO",
+                "effort": "Medium"
+              }
+            }
+          ],
+          "status": "approved",
+          "handoff": "levels/L1/L1.1/handoff.md",
+          "approved_by": "Antigravity CLI",
+          "submitted_at": "2026-06-20T09:30:49+03:00",
+          "approved_at": "2026-06-20T09:30:56+03:00"
+        }
+      ]
+    },
+    "L2": {
+      "name": "Инженерная проверка",
+      "agent": "Antigravity CLI",
+      "subagents": [
+        {
+          "id": "antigravity-engineering-reviewer",
+          "name": "Инженерный ревьюер",
+          "role": "Проверить применимость L1-выводов к реальной реализации.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-constraint-checker",
+          "name": "Проверяющий ограничений",
+          "role": "Сверить решение с brief, контрактом, risk flags, allowed_next_agents и контекстными лимитами.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-edge-case-scout",
+          "name": "Разведчик крайних случаев",
+          "role": "Найти скрытые сценарии, неполные данные, конфликтующие требования и слабые места.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        },
+        {
+          "id": "antigravity-revision-gate",
+          "name": "Gate ревизии",
+          "role": "Решить, можно ли передавать работу на Codex L3 или нужно вернуть на доработку.",
+          "model": {
+            "provider": "Google Antigravity",
+            "name": "Antigravity CLI AUTO",
+            "effort": "High"
+          }
+        }
+      ],
+      "status": "approved",
+      "handoff": "levels/L2/handoff.md",
+      "approved_by": "Codex",
+      "submitted_at": "2026-06-20T09:32:53+03:00",
+      "approved_at": "2026-06-20T09:40:28+03:00"
+    },
+    "L3": {
+      "name": "Декомпозиция реализации, тесты и automation",
+      "agent": "Codex",
+      "subagents": [
+        {
+          "id": "codex-implementation-decomposer",
+          "name": "Декомпозитор реализации",
+          "role": "Разбить задачу на исполнимые шаги, файлы, интерфейсы и критерии готовности.",
+          "model": {
+            "provider": "OpenAI Codex",
+            "name": "codex-5.3",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-test-planner",
+          "name": "Планировщик тестов",
+          "role": "Определить unit/smoke/integration проверки и негативные сценарии.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-automation-builder",
+          "name": "Инженер automation",
+          "role": "Предложить или реализовать CLI/скрипты/мониторы для повторяемого выполнения.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.4 mini",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-integration-checker",
+          "name": "Проверяющий интеграции",
+          "role": "Проверить совместимость с существующей структурой, SML, файлами памяти и политиками запуска.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.4",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "approved",
+      "handoff": "levels/L3/handoff.md",
+      "approved_by": "Codex",
+      "submitted_at": "2026-06-20T09:57:42+03:00",
+      "approved_at": "2026-06-20T09:58:01+03:00"
+    },
+    "L4": {
+      "name": "Архитектурный синтез",
+      "agent": "Codex",
+      "subagents": [
+        {
+          "id": "codex-architecture-synthesizer",
+          "name": "Архитектурный синтезатор",
+          "role": "Собрать L1-L3 в целостное техническое решение без противоречий.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-contract-auditor",
+          "name": "Аудитор контракта",
+          "role": "Проверить, что contract, handoff, events и итоговые выводы согласованы.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-risk-gate",
+          "name": "Risk gate",
+          "role": "Отдельно оценить риски trading/long-running/secrets/external writes/destructive действий.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "codex-maintainability-reviewer",
+          "name": "Ревьюер сопровождения",
+          "role": "Оценить простоту поддержки, расширения и передачи следующему агенту.",
+          "model": {
+            "provider": "OpenAI",
+            "name": "gpt-5.5",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "approved",
+      "handoff": "levels/L4/handoff.md",
+      "approved_by": "Claude Code",
+      "submitted_at": "2026-06-20T09:59:43+03:00",
+      "approved_at": "2026-06-20T10:06:33+03:00"
+    },
+    "L5": {
+      "name": "Финальная инстанция для пользователя",
+      "agent": "Claude Code",
+      "subagents": [
+        {
+          "id": "claude-executive-summarizer",
+          "name": "Executive summarizer",
+          "role": "Сжато объяснить пользователю итог, решение и оставшиеся риски.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Opus 4.7 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-technical-verifier",
+          "name": "Финальный техпроверяющий",
+          "role": "Независимо проверить техническую связность L1-L4 перед финальным отчетом.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Haiku 4.5 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-anti-distortion-auditor",
+          "name": "Аудитор против искажения",
+          "role": "Сверить final-report с brief, handoff и events, чтобы не было испорченного телефона.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Sonnet 4.6 alias",
+            "effort": "xhigh"
+          }
+        },
+        {
+          "id": "claude-final-decision-writer",
+          "name": "Автор заключения",
+          "role": "Сформировать final-report.md для пользователя с понятным решением approve/revise/escalate/block.",
+          "model": {
+            "provider": "Anthropic",
+            "name": "Claude Opus 4.8 alias",
+            "effort": "xhigh"
+          }
+        }
+      ],
+      "status": "approved",
+      "handoff": "final-report.md",
+      "approved_by": "Claude Code",
+      "submitted_at": null,
+      "approved_at": "2026-06-20T10:06:33+03:00"
+    }
+  },
+  "risk_flags": {
+    "trading": false,
+    "writes_external_system": false,
+    "long_running": false,
+    "uses_secrets": false,
+    "destructive": false
+  },
+  "risk_gate": {
+    "required": false,
+    "status": "skipped",
+    "agent": null,
+    "summary": null,
+    "approved_at": null,
+    "approved_by": null
+  },
+  "blockers": [],
+  "last_event": "finalized",
+  "last_handoff": "levels/L4/handoff.md",
+  "final_report": "final-report.md"
+}

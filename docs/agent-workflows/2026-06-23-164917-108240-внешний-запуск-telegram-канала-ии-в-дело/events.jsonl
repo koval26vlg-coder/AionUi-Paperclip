@@ -1,0 +1,17 @@
+{"time": "2026-06-23T16:49:17+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-23T16:49:40+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "executor": "Codex", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T16:49:40+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "executor": "Codex", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-23T17:16:21+03:00", "event": "risk_approved", "agent": "Claude Code", "executor": "Codex", "summary": "Approved narrow external-write scope after explicit user confirmation: create Telegram channel ИИ в дело and set basic profile/description/username only. Do not publish pinned post or posts, do not change Google Doc link sharing, do not buy ads, do not send messages without separate explicit confirmation of exact text."}
+{"time": "2026-06-23T17:16:58+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.0", "next_level": "L1", "next_assignment": "L1.1"}
+{"time": "2026-06-23T17:16:58+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-23T17:16:58+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-23T17:16:58+03:00", "event": "level_approved", "agent": "Antigravity CLI", "executor": "Codex", "level": "L1", "assignment": "L1.1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-23T17:16:58+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-23T17:16:59+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "executor": "Codex", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-23T17:16:59+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-23T17:17:14+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-23T17:27:20+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-23T17:27:30+03:00", "event": "level_approved", "agent": "Codex", "executor": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-23T17:27:37+03:00", "event": "level_claimed", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-23T17:27:46+03:00", "event": "level_submitted", "agent": "Codex", "executor": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-23T17:32:45+03:00", "event": "finalized", "agent": "Claude Code", "executor": "Codex"}

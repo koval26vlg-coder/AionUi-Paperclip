@@ -1,0 +1,313 @@
+{
+  "checked_at": "2026-06-19T16:17:19.344034+00:00",
+  "criteria": {
+    "origin": "VOG",
+    "destination": "MNL",
+    "depart_date_from": "2026-07-01",
+    "depart_date_to": "2026-12-31",
+    "duration_nights_min": 5,
+    "duration_nights_max": 9,
+    "passengers": {
+      "adults": 2
+    },
+    "currency": "RUB"
+  },
+  "pricing_note": "Aviasales calendar API returns calendar fare value without explicit passenger count. Estimated two-adult total is price_calendar_rub * 2 and must be rechecked at checkout.",
+  "source_note": "Exact Aviasales ticket-search endpoint was unavailable/403 in this environment; calendar endpoints were reachable from the Aviasales web app surface.",
+  "top_candidates": [
+    {
+      "depart_date": "2026-07-15",
+      "return_date": "2026-07-23",
+      "duration_nights": 8,
+      "price_calendar_rub": 73914,
+      "estimated_two_adults_rub": 147828,
+      "source": "api_v6_calendar",
+      "state": "EXISTS",
+      "day_score": null,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1507MNL23072"
+    },
+    {
+      "depart_date": "2026-07-15",
+      "return_date": "2026-07-24",
+      "duration_nights": 9,
+      "price_calendar_rub": 73914,
+      "estimated_two_adults_rub": 147828,
+      "source": "api_v6_calendar",
+      "state": "EXISTS",
+      "day_score": null,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1507MNL24072"
+    },
+    {
+      "depart_date": "2026-07-15",
+      "return_date": "2026-07-23",
+      "duration_nights": 8,
+      "price_calendar_rub": 73915,
+      "estimated_two_adults_rub": 147830,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1507MNL23072"
+    },
+    {
+      "depart_date": "2026-07-15",
+      "return_date": "2026-07-24",
+      "duration_nights": 9,
+      "price_calendar_rub": 73915,
+      "estimated_two_adults_rub": 147830,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1507MNL24072"
+    },
+    {
+      "depart_date": "2026-07-16",
+      "return_date": "2026-07-23",
+      "duration_nights": 7,
+      "price_calendar_rub": 74850,
+      "estimated_two_adults_rub": 149700,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00033,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1607MNL23072"
+    },
+    {
+      "depart_date": "2026-07-16",
+      "return_date": "2026-07-24",
+      "duration_nights": 8,
+      "price_calendar_rub": 74850,
+      "estimated_two_adults_rub": 149700,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1607MNL24072"
+    },
+    {
+      "depart_date": "2026-07-16",
+      "return_date": "2026-07-25",
+      "duration_nights": 9,
+      "price_calendar_rub": 74850,
+      "estimated_two_adults_rub": 149700,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1607MNL25072"
+    },
+    {
+      "depart_date": "2026-07-14",
+      "return_date": "2026-07-23",
+      "duration_nights": 9,
+      "price_calendar_rub": 75456,
+      "estimated_two_adults_rub": 150912,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1407MNL23072"
+    },
+    {
+      "depart_date": "2026-07-17",
+      "return_date": "2026-07-26",
+      "duration_nights": 9,
+      "price_calendar_rub": 77645,
+      "estimated_two_adults_rub": 155290,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00032,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1707MNL26072"
+    },
+    {
+      "depart_date": "2026-07-17",
+      "return_date": "2026-07-23",
+      "duration_nights": 6,
+      "price_calendar_rub": 77803,
+      "estimated_two_adults_rub": 155606,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00031,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1707MNL23072"
+    },
+    {
+      "depart_date": "2026-07-17",
+      "return_date": "2026-07-24",
+      "duration_nights": 7,
+      "price_calendar_rub": 77803,
+      "estimated_two_adults_rub": 155606,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.00031,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1707MNL24072"
+    },
+    {
+      "depart_date": "2026-07-17",
+      "return_date": "2026-07-25",
+      "duration_nights": 8,
+      "price_calendar_rub": 77803,
+      "estimated_two_adults_rub": 155606,
+      "source": "city_calendar_by_departure",
+      "state": null,
+      "day_score": 0.0003,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG1707MNL25072"
+    },
+    {
+      "depart_date": "2026-10-25",
+      "return_date": "2026-10-31",
+      "duration_nights": 6,
+      "price_calendar_rub": 163265,
+      "estimated_two_adults_rub": 326530,
+      "source": "api_v6_calendar",
+      "state": "EXISTS",
+      "day_score": null,
+      "search_url_two_adults": "https://www.aviasales.ru/search/VOG2510MNL31102"
+    }
+  ],
+  "candidate_count": 13,
+  "errors": [],
+  "source_call_count": 185,
+  "source_calls_sample": [
+    {
+      "url": "https://explore-api.aviasales.com/api/v6/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "origin_type": "airport",
+        "destination_type": "airport",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date_from": "2026-07-01",
+        "depart_date_to": "2026-12-31"
+      },
+      "ok": true,
+      "rows": 244
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-07-01"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-07-02"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-07-03"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-07-04"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "omitted": 175
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-12-27"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-12-28"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-12-29"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-12-30"
+      },
+      "ok": true,
+      "rows": 0
+    },
+    {
+      "url": "https://explore-api.aviasales.com/aggregated/v2/web/aviasales/city/calendar.json",
+      "params": {
+        "origin_iata": "VOG",
+        "destination_iata": "MNL",
+        "brand": "AS",
+        "locale": "ru_RU",
+        "currency": "RUB",
+        "one_way": "false",
+        "depart_date": "2026-12-31"
+      },
+      "ok": true,
+      "rows": 0
+    }
+  ]
+}

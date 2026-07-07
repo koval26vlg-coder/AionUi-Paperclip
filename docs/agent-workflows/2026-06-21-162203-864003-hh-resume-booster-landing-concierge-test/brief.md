@@ -1,0 +1,1 @@
+Сделать landing/concierge test на 2 недели с тремя офферами: avatar-only, full resume audit, vacancy response pack. Нужны рабочий экран в Aion Vision, локальный сбор lead/paid intent, экспорт данных и runbook сравнения paid intent по офферам. Без внешних записей, без hh.ru login/API/scraping/auto-response.

@@ -1,0 +1,16 @@
+{"time": "2026-06-19T18:25:22+03:00", "event": "workflow_created", "agent": "Codex"}
+{"time": "2026-06-19T18:25:47+03:00", "event": "level_claimed", "agent": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-19T18:26:39+03:00", "event": "level_submitted", "agent": "MiMo AUTO", "level": "L1", "assignment": "L1.0"}
+{"time": "2026-06-19T18:26:58+03:00", "event": "level_approved", "agent": "Antigravity CLI", "level": "L1", "assignment": "L1.0", "next_level": "L1", "next_assignment": "L1.1"}
+{"time": "2026-06-19T18:27:20+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-19T18:28:24+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "level": "L1", "assignment": "L1.1"}
+{"time": "2026-06-19T18:28:27+03:00", "event": "level_approved", "agent": "Antigravity CLI", "level": "L1", "assignment": "L1.1", "next_level": "L2", "next_assignment": "L2"}
+{"time": "2026-06-19T18:28:36+03:00", "event": "level_claimed", "agent": "Antigravity CLI", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-19T18:31:29+03:00", "event": "level_submitted", "agent": "Antigravity CLI", "level": "L2", "assignment": "L2"}
+{"time": "2026-06-19T18:32:18+03:00", "event": "level_approved", "agent": "Codex", "level": "L2", "assignment": "L2", "next_level": "L3", "next_assignment": "L3"}
+{"time": "2026-06-19T18:32:18+03:00", "event": "level_claimed", "agent": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-19T18:32:59+03:00", "event": "level_submitted", "agent": "Codex", "level": "L3", "assignment": "L3"}
+{"time": "2026-06-19T18:33:09+03:00", "event": "level_approved", "agent": "Codex", "level": "L3", "assignment": "L3", "next_level": "L4", "next_assignment": "L4"}
+{"time": "2026-06-19T18:33:09+03:00", "event": "level_claimed", "agent": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-19T18:33:44+03:00", "event": "level_submitted", "agent": "Codex", "level": "L4", "assignment": "L4"}
+{"time": "2026-06-19T18:35:59+03:00", "event": "finalized", "agent": "Claude Code"}
