@@ -1,0 +1,124 @@
+{
+  "checked_at": "2026-06-27T06:55:32.755770+00:00",
+  "window_days": 7,
+  "config_path": "D:\\AionUi-Paperclip\\docs\\agent-limits\\limits-config.json",
+  "agents": [
+    {
+      "agent": "Codex",
+      "source": "C:\\Users\\koval\\.codex\\state_5.sqlite",
+      "status": "measured_local",
+      "measured": {
+        "window_days": 7,
+        "threads": 25,
+        "observed_tokens": 772906145,
+        "delta_tokens_since_previous_snapshot": 772906145,
+        "cumulative_tokens_updated_threads": 2204347768,
+        "thread_token_snapshot": {
+          "019ddf50-82dd-7313-bae7-55d545bf0b1b": 352300564,
+          "019e3c5b-551a-7de3-a930-55f88c2e36be": 87257078,
+          "019e54af-5ce9-76d3-ad1b-bc4c57db02ec": 15126403,
+          "019e738a-b37c-7a33-ae04-6cc80739f184": 658799235,
+          "019e8dcc-398e-7371-a5c8-cfdc83f337c6": 52712119,
+          "019e8dd7-15ea-7e03-a57e-a6dfc7cd8200": 63572989,
+          "019e8ddd-4b10-7cb1-8ba7-43f1f6a30b47": 73133317,
+          "019e8ddd-f93e-7b71-8182-08b7d5e09606": 52129802,
+          "019e8e44-e621-7321-abb0-e655a9af75e3": 23116678,
+          "019e8e45-63a0-7ae2-84bc-9fc92fef6ad0": 22442769,
+          "019eb1d5-e3be-7392-b2e3-c27d0790a955": 179322906,
+          "019ede98-7f13-7fc2-8f6c-546b70f0f15a": 355167440,
+          "019eea37-eb5e-7f72-a482-2a3043b197cf": 86522076,
+          "019ef329-24bf-7533-a025-0ca1740c1555": 134296991,
+          "019ef390-acf9-75c2-b215-be04d83b2f96": 601351,
+          "019ef413-a3bc-7b13-8df1-1b7900079340": 13399513,
+          "019ef481-0e3e-7151-8171-d306fa273008": 3341202,
+          "019ef947-3990-73a0-8fb4-af4a39235438": 2592401,
+          "019efe08-8f86-7572-9f82-4f1427fc95c4": 3241648,
+          "019efe2b-34fe-7223-8b1e-0e7823fe1d3e": 3376606,
+          "019efeb7-dc37-70e3-9785-1c24551c5f93": 1108460,
+          "019f030b-3e4a-7df0-bd14-6486dbaa5ff1": 3795277,
+          "019f0352-a133-7d02-bde6-8e9ff4259e2e": 9734098,
+          "019f0366-645b-7cf3-be95-44585cad2343": 6679343,
+          "019f0367-47d7-7e20-8257-be10eba2b39f": 577502
+        },
+        "models": {
+          "gpt-5.5": 2204347768
+        },
+        "updated_after": "2026-06-20T06:55:32.313114+00:00"
+      },
+      "limits": {
+        "token_limit": null,
+        "token_remaining": null,
+        "cost_limit_usd": null,
+        "cost_remaining_usd": null,
+        "message_limit": null,
+        "message_remaining": null,
+        "reset_at": null,
+        "reset_in_hours": null,
+        "source": "manual_config"
+      },
+      "notes": [
+        "Codex observed_tokens is a delta against the previous latest.json snapshot.",
+        "Local Codex thread tokens come from state_5.sqlite; account quota/remaining/reset is not exposed locally."
+      ]
+    },
+    {
+      "agent": "Claude Code",
+      "source": "C:\\Users\\koval\\.claude\\projects",
+      "status": "measured_local",
+      "measured": {
+        "window_days": 7,
+        "requests": 505,
+        "observed_tokens": 101341768,
+        "input_tokens": 87900,
+        "output_tokens": 584076,
+        "cache_creation_input_tokens": 2537685,
+        "cache_read_input_tokens": 98132107,
+        "models": {
+          "claude-opus-4-8": 92068785,
+          "claude-sonnet-4-6": 9260868,
+          "claude-haiku-4-5-20251001": 12115,
+          "<synthetic>": 0
+        }
+      },
+      "limits": {
+        "token_limit": null,
+        "token_remaining": null,
+        "cost_limit_usd": null,
+        "cost_remaining_usd": null,
+        "message_limit": null,
+        "message_remaining": null,
+        "reset_at": null,
+        "reset_in_hours": null,
+        "source": "manual_config"
+      },
+      "notes": [
+        "Claude Code usage is parsed from local JSONL request usage fields and deduplicated by requestId."
+      ]
+    },
+    {
+      "agent": "Antigravity CLI",
+      "source": "C:\\Users\\koval\\.gemini\\antigravity-cli",
+      "status": "partial_no_usage",
+      "measured": {
+        "window_days": 7,
+        "conversation_dbs": 24,
+        "latest_quota_event": "I0626 14:05:08.255840 29992 quota_manager.go:72] quotaRefreshLoop: starting reload (force=true)",
+        "observed_tokens": null
+      },
+      "limits": {
+        "token_limit": null,
+        "token_remaining": null,
+        "cost_limit_usd": null,
+        "cost_remaining_usd": null,
+        "message_limit": null,
+        "message_remaining": null,
+        "reset_at": null,
+        "reset_in_hours": null,
+        "source": "manual_config"
+      },
+      "notes": [
+        "Antigravity CLI logs quota refresh events but no numeric token usage/remaining/reset was found locally."
+      ]
+    }
+  ]
+}

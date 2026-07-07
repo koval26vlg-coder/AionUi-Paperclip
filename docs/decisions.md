@@ -1,5 +1,26 @@
 # Журнал решений
 
+## 2026-06-20 - Spec Kit и Task Master добавлены как осторожный agent-tooling слой
+
+### Контекст
+
+Пользователь попросил перейти от оценки полезности Context7, Playwright MCP, Spec Kit, Task Master и Cloud Code Router к практической установке рекомендованного набора.
+
+### Решение
+
+Spec Kit установлен как `specify` и закреплен на релизе `github/spec-kit@v0.9.5`, потому что floating `main` установился как `0.11.4.dev0`, но падал на `specify --help` из-за отсутствующего `specify_cli.bundler.lib`. Для Codex, Claude Code и shared `agent-skills` созданы skills `spec-kit`.
+
+Task Master установлен как глобальный CLI `task-master` версии `0.43.1`, но не подключен как глобальный MCP. Для него созданы skills `task-master-pilot`, которые требуют включать MCP только по отдельной команде и начинать с reduced mode `TASK_MASTER_TOOLS=core`.
+
+Cloud Code Router не устанавливался: это не skill/MCP, а прокси маршрутизации моделей, который добавляет риск ключей, логов, несовместимости инструментов и не нужен без явного давления по стоимости/лимитам.
+
+### Последствие
+
+Текущая активная связка остается `Codex + Claude Code + Antigravity CLI`. Context7 и Playwright MCP остаются базовыми усилителями качества кода/фронтенда; Spec Kit становится стандартным способом превращать размытую задачу в spec/plan/tasks; Task Master используется только для больших проектов с явным persistent task graph.
+
+### Автор: Codex
+### Теги: agent-tooling, spec-kit, task-master, mcp, codex, claude-code
+
 ## 2026-05-10 - Базовая архитектура
 
 Решение: использовать Codex, Cursor и Kiro как три основных агента.
@@ -457,3 +478,490 @@ curl ко всем эндпоинтам: `/api/sml-dashboard` (status=live, 230 
 
 ### Автор: Codex
 ### Теги: bootstrap, shared-memory, sml, codex, claude-code, gemini-cli
+## 2026-06-19 - Иерархические agent-workflows вместо параллельной рассылки запросов
+
+### Контекст
+Пользователь уточнил, что цель — запускать отдельную задачу через разные уровни агентов и субагентов, где каждый уровень выполняет свою роль, передает структурированный handoff выше, а финальная инстанция видит всю историю без искажения смысла.
+
+### Решение
+Для сложных задач использовать иерархическую схему отделов L1-L5: Gemini CLI выполняет первичную аналитику, Codex проверяет и прорабатывает инженерные уровни L2/L3, Claude Code делает архитектурный синтез L4, Codex формирует финальный отчет пользователю L5. Один запрос в несколько моделей не является целевой постоянной схемой.
+
+### Статус
+Заменено решением от 2026-06-19 "Очередность agent-workflow изменена: Gemini L2, Codex L3/L4, Claude L5".
+
+### Автор: Codex
+### Теги: agent-workflows, codex, gemini-cli, claude-code, coordination
+
+## 2026-06-19 - MiMo AUTO добавлен как нижний подшаг L1.0
+
+### Контекст
+Пользователь попросил добавить MIMO от Xiaomi в режиме AUTO на самый первый, нижний уровень иерархической схемы. Ранее MiMo Code был выведен из общей активной схемы, поэтому нужно было не откатить старую интеграцию целиком, а добавить узкое исключение.
+
+### Решение
+В `docs/agent-workflows/` использовать `MiMo AUTO` только как логический подшаг `L1.0`: он делает первичный AUTO-проход, после чего `Gemini CLI` как `L1.1` обязан проверить, расширить и очистить результат перед передачей на `L2 Codex`. Старые проектные конфиги `.mimocode/`, запускатели и собственная MiMo-память не возвращаются.
+
+### Последствие
+Новый стандартный путь workflow: `MiMo AUTO L1.0 -> Gemini CLI L1.1 -> Codex L2 -> Codex L3 -> Claude Code L4 -> Codex L5`. `contract.json.allowed_next_agents` остается gate-механизмом: каждый подшаг ждет своего разрешенного следующего участника.
+
+### Статус
+Порядок уровней заменен решением от 2026-06-19 "Очередность agent-workflow изменена: Gemini L2, Codex L3/L4, Claude L5". Ограничение про MiMo AUTO только как `L1.0` остается актуальным.
+
+### Автор: Codex
+### Теги: agent-workflows, mimo-auto, gemini-cli, codex, claude-code
+
+## 2026-06-19 - Очередность agent-workflow изменена: Gemini L2, Codex L3/L4, Claude L5
+
+### Контекст
+Пользователь явно задал новую последовательность: `L1.0 MiMo AUTO -> L1.1 Gemini CLI -> L2 Gemini CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`. Также нужно прописать субагентов под каждый уровень.
+
+### Решение
+Стандартный workflow теперь идет в такой очередности:
+
+- `L1.0 MiMo AUTO` — первичный AUTO-проход.
+- `L1.1 Gemini CLI` — проверка MiMo, расширение фактов, чистый L1 handoff.
+- `L2 Gemini CLI` — инженерная проверка, ограничения, edge cases, revision gate.
+- `L3 Codex` — декомпозиция реализации, тесты, automation, integration readiness.
+- `L4 Codex` — архитектурный синтез, contract audit, risk gate, maintainability review.
+- `L5 Claude Code` — независимая финальная техническая проверка и `final-report.md` для пользователя.
+
+Субагенты записываются в `contract.json` как role metadata уровня. Они не являются отдельными workflow-ходами, кроме явных подшагов `L1.0` и `L1.1`.
+
+### Автор: Codex
+### Теги: agent-workflows, subagents, mimo-auto, gemini-cli, codex, claude-code
+
+## 2026-06-19 - Model policy закреплена для всех субагентов workflow
+
+### Контекст
+Пользователь задал конкретные модели и effort для каждого субагента в иерархическом workflow.
+
+### Решение
+Считать `docs/agent-workflows/model-policy.md` источником истины по model aliases субагентов. Новые `contract.json` через `tools/agent_workflow.py` должны включать `subagent.model` для каждого субагента.
+
+Ключевая матрица:
+
+- `L1.0 MiMo AUTO`: все субагенты используют `MiMo AUTO / Xiaomi API AUTO`.
+- `L1.1 Gemini CLI`: `Gemini 3.1 Pro` для source/context, `Gemini 3.5 Flash` для noise/handoff с effort `High/Low/Medium` по роли.
+- `L2 Gemini CLI`: все engineering-review субагенты используют `Gemini 3.5 Flash / High`.
+- `L3 Codex`: `codex-5.3`, `gpt-5.5`, `gpt-5.4 mini`, `gpt-5.4` с effort `xhigh` по роли.
+- `L4 Codex`: все архитектурные субагенты используют `gpt-5.5 / xhigh`.
+- `L5 Claude Code`: `Claude Opus 4.7 alias`, `Claude Haiku 4.5 alias`, `Claude Sonnet 4.6 alias`, `Claude Opus 4.8 alias` с effort `xhigh` по роли.
+
+### Последствие
+Если реальный CLI/провайдер не поддерживает указанный alias, агент не должен молча подменять модель. Нужно записать mismatch в handoff и запросить approved fallback.
+
+### Автор: Codex
+### Теги: agent-workflows, model-policy, subagents, gemini, codex, claude, mimo
+
+## 2026-06-19 - Antigravity CLI заменяет Gemini CLI в активном workflow
+
+### Контекст
+Официальный `@google/gemini-cli` был восстановлен, но Google login для Gemini Code Assist повторно блокировался ошибкой `UNSUPPORTED_LOCATION`. Пользователь предложил перейти на Antigravity и попросил после успешного теста удалить Gemini CLI.
+
+### Решение
+Считать активной связкой `Codex + Claude Code + Antigravity CLI`. В `docs/agent-workflows/` уровни `L1.1` и `L2` теперь выполняет `Antigravity CLI`; `Gemini CLI` выведен из активного runtime.
+
+Удалены активные Gemini CLI артефакты: глобальные npm-пакеты `@google/gemini-cli` и `codex-gemini-helper`, shims `gemini`/`ask-gemini`, проектная `.gemini/`, `GEMINI.md`, Gemini launchers, `docs/gemini-sml.md`, `docs/cursor-gemini-model.md`, старый каталог `D:\Gemini`, root-файлы `C:\Users\koval\.gemini` без удаления `C:\Users\koval\.gemini\antigravity-cli`.
+
+### Последствие
+Новый стандартный путь workflow: `MiMo AUTO L1.0 -> Antigravity CLI L1.1 -> Antigravity CLI L2 -> Codex L3 -> Codex L4 -> Claude Code L5`.
+
+`agy` live smoke-test прошел на уровне авторизации/model call: в логах есть keyring auth и `streamGenerateContent`, в conversation DB найден ответ `OK`. Ограничение: `agy --print` завершился с кодом 0, но stdout пустой, поэтому для полностью автоматического handoff нужен wrapper или другой надежный способ извлечения ответа.
+
+### Автор: Codex
+### Теги: agent-workflows, antigravity-cli, agy, gemini-cli, codex, claude-code
+
+## 2026-06-19 - Antigravity labels переведены на runtime AUTO
+
+### Контекст
+Тестовый workflow показал, что уровни `L1.1` и `L2` уже выполняет `Antigravity CLI`, но `contract.json`, `status` и `final-report.md` новых workflow продолжали показывать старые labels `Gemini 3.1/3.5`.
+
+### Решение
+Для субагентов `L1.1` и `L2` закреплен model label `Antigravity CLI AUTO` с прежними effort (`High`, `Low`, `Medium`). Это не named model Gemini, а runtime alias для текущего `agy`.
+
+Добавлен `tools/antigravity_print.py`: wrapper запускает raw `agy --print`, а при пустом stdout восстанавливает свежий ответ из Antigravity conversation DB.
+
+### Последствие
+Новые workflow больше не создают Antigravity subagents со старыми Gemini labels. Если позже `agy models` стабильно покажет точные named models, их можно закрепить отдельным решением и обновить `docs/agent-workflows/model-policy.md`.
+
+### Автор: Codex
+### Теги: agent-workflows, model-policy, antigravity-cli, agy
+
+## 2026-06-21 - HH avatar-only не выбран как основной продукт
+
+### Контекст
+Пользователь попросил через workflow проверить российский рынок идеи: сервис улучшения аватарки резюме для HeadHunter, занятость ниши, востребованность, конкуренцию и возможные альтернативы.
+
+### Решение
+Не считать standalone "улучшатель аватарки для hh.ru" основной ставкой продукта. Фото в резюме важно, но avatar-only value легко заменяется generic AI headshot/photo editor инструментами.
+
+Основной MVP формулировать как `HH Resume Booster`: модуль фото + аудит резюме + адаптация под вакансию + сопроводительное письмо + чеклист перед откликом.
+
+### Последствие
+Перед разработкой нужен validation sprint: landing с тремя офферами (`avatar-only`, `full resume audit`, `vacancy response pack`), concierge MVP на 30 пользователях, замер paid intent и user-reported views/invitations.
+
+### Автор: Codex
+### Теги: product, headhunter, market-analysis, resume-booster, agent-workflows
+
+## 2026-06-21 - HH Resume Booster validation test запускается local-only
+
+### Контекст
+После market workflow был выполнен практический шаг: подготовить 14-дневный landing/concierge test для трех офферов.
+
+### Решение
+Первый validation surface реализован в Aion Vision как local-only экран `/#hh-booster`. Данные заявок хранятся только в `localStorage` браузера под ключом `aion.hhResumeBooster.leads.v1`, экспортируются JSON и считаются через `tools/hh_resume_booster_metrics.py`.
+
+Strong paid intent считается только явный выбор `Готов оплатить`. Фото и резюме в этом прототипе не собираются, чтобы не расширять privacy scope.
+
+### Последствие
+До публичного запуска нужен отдельный privacy/delete policy и нормальное хранилище. До фактического 14-дневного сбора данных цель не считается полностью завершенной.
+
+### Автор: Codex
+### Теги: product, headhunter, validation, privacy, aion-vision
+
+## 2026-06-23 - Локальный agent-workflow-router принят как маршрутизатор рабочих режимов
+
+### Контекст
+После установки frontend/design, Superpowers, verification, security и skill-creator пользователь спросил, что из этого реально полезно, и согласился сделать общий рабочий протокол выбора навыков.
+
+### Решение
+Создан локальный skill `agent-workflow-router`. Он должен использоваться как легкий первый шаг для инженерных задач: классифицировать тип работы и риск, выбрать минимальный достаточный набор downstream skills/MCP, затем завершать работу через свежую проверку `verification-before-completion`.
+
+Skill установлен в Codex, Claude Code, `.agents` и shared `agent-skills`.
+
+### Последствие
+Новый стандарт для задач: не грузить все навыки подряд, а маршрутизировать по типу задачи. UI-задачи идут через frontend/design route, баги через systematic debugging/TDD, security через codex-security/Semgrep/Snyk/CodeQL по scope, повторяемые процессы через skill-creator.
+
+### Автор: Codex
+### Теги: agent-skills, workflow-router, codex, claude-code, antigravity-cli, verification
+
+## 2026-06-23 - Единая команда запуска роя агентов
+
+### Контекст
+Пользователь спросил, можно ли сделать одно написание/команду, по которой чат понимает, что нужно запускать Codex и общий рой агентов.
+
+### Решение
+Считать `Рой: <задача>`, `Рой, <задача>`, `РОЙ: <задача>`, `РОЙ, <задача>`, `рой: <задача>`, `/swarm <задача>`, `Запусти рой: <задача>` и `Workflow: <задача>` явными триггерами иерархического agent workflow. Регистр слова `Рой` не важен.
+
+Для локального терминального запуска добавлены:
+
+- `tools/start-agent-swarm.ps1`
+- `START-AGENT-SWARM.cmd`
+- `docs/agent-workflows/SWARM-COMMAND.md`
+
+Триггер создает auditable workflow через `tools/agent_workflow.py new`, выполняет Aion SML bootstrap, сохраняет исходный brief, показывает `workflow_id`, текущий уровень и следующего разрешенного агента.
+
+### Последствие
+Пользователь может писать в чате `Рой: ...`, а агент обязан включить workflow-протокол. Из терминала можно запускать:
+
+```powershell
+.\START-AGENT-SWARM.cmd -Title "<название>" -Brief "<задача>"
+```
+
+Команда не означает параллельный запрос во все модели, не обходит `allowed_next_agents`, не запускает long-running/external/destructive действия без risk gate и явного подтверждения пользователя.
+
+### Автор: Codex
+### Теги: agent-workflows, swarm-trigger, codex, claude-code, antigravity-cli, mimo-auto
+
+## 2026-06-24 - MiMo AUTO выведен из новых agent-workflows
+
+### Контекст
+Пользователь попросил убрать MiMo, потому что с 2026-06-25 он становится платным. Ранее `MiMo AUTO` был добавлен как нижний подшаг `L1.0`, но это было временное исключение поверх уже выведенного MiMo Code.
+
+### Решение
+Отменить исключение `MiMo AUTO L1.0` для новых workflow. Стандартная цепочка теперь:
+
+```text
+L1 Antigravity CLI -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Новые `contract.json` не должны содержать `L1.0`, `L1.1`, `MiMo AUTO` или Xiaomi model aliases. `tools/agent_limit_monitor.py` больше не вызывает `mimo stats` в дефолтном сборе лимитов. `tools/check-agent-runtimes.ps1` больше не проверяет `mimo`, `tools/install-agent-cli-shims.ps1` больше не создает `mimo.cmd`, глобальный npm-пакет `@mimo-ai/cli` удален. Задачу по исправлению MiMo headless runtime считать obsolete, а не активным блокером.
+
+### Последствие
+Старые workflow с `L1.0 MiMo AUTO` не переписывать: это архивная история и доказательства прошлых прогонов. На 2026-06-24 новые workflow, команда `Рой:` и документы политики стартовали с `Antigravity CLI L1`; это решение superseded решением 2026-07-02 о дефолтном `gemini-vertex` и решением 2026-07-03 о case-insensitive `РОЙ`.
+
+### Автор: Codex
+### Теги: agent-workflows, mimo-auto, antigravity-cli, codex, claude-code, limits
+
+## 2026-06-24 - Telegram default layer: Bot API project first, MCP/MTProto only read-only pilot
+
+### Контекст
+После установки `telegram-workflow-router` и локальной инвентаризации пользователь подтвердил рабочий порядок: использовать текущий Bot API проект как основной Telegram-слой, Telegram Web как QA/manual слой, а MCP/MTProto оставлять только для отдельного read-only pilot, когда Bot API реально не хватает.
+
+### Решение
+Основной Telegram runtime для агентской работы: `C:\Users\koval\Documents\New project`.
+
+Порядок выбора:
+
+```text
+Bot API via existing local project -> Telegram Web QA/manual evidence -> n8n/Make for concrete no-code workflow -> MCP/MTProto read-only pilot only when Bot API is insufficient
+```
+
+`telegram-workflow-router` должен направлять текущие Telegram bot/channel/group/Mini App/Web/MCP задачи через этот порядок. MCP/MTProto не добавлять в default setup, не создавать user-account session и не выполнять send/edit/delete/publish без отдельного явного подтверждения пользователя.
+
+### Последствие
+Перед Telegram-работой агенты должны читать `telegram-workflow-router` и проверять setup командой:
+
+```powershell
+& "C:\Program Files\PowerShell\7\pwsh.exe" -NoProfile -ExecutionPolicy Bypass -File "C:\Users\koval\Documents\Codex\2026-05-18\npx-skills-add-anthropics-claude-code\agent-skills\scripts\verify-telegram-bot-api-setup.ps1" -ProjectRoot "C:\Users\koval\Documents\New project" -CheckHealth
+```
+
+Для рестартов использовать только visible monitor flow проекта. Telegram Web остается подтверждающим/ручным слоем. MCP/MTProto оформлять отдельной задачей с allowlist, read-only first probe и отдельным risk gate.
+
+### Автор: Codex
+### Теги: telegram, bot-api, mcp, mtproto, agent-skills, safety
+## 2026-07-02 - automation-3: writer выбирает месячный лист по metadata
+
+### Контекст
+Запуск 2026-07-02 показал, что `write_daily.py` был привязан к `Июнь 2026 ОП`/sheetId 1165391656 и возвращал run_date_not_found_in_calendar для 2026-07-02.
+
+### Решение
+Для automation-3 writer должен получать metadata всех листов и выбирать месячный лист по дате запуска, например `Июль 2026 ОП` для июля; старый июньский sheetId использовать только как fallback. Не возвращаться к single-sheet календарю.
+
+### Автор: Codex
+### Теги: okru, automation-3, google-sheets, calendar, monthly-sheet
+
+## 2026-07-02 - Default workflow L1/L2 переведен на Gemini Vertex
+
+### Контекст
+Antigravity OAuth был восстановлен, но live model call продолжает падать с `FAILED_PRECONDITION (code 400): User location is not supported for the API use`. Проверки через HAPP/proxy показали, что это не только отсутствие авторизации и не простое игнорирование proxy. Параллельно Vertex Gemini уже прошел live smoke через Google ADC, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` и модель `gemini-2.5-flash`.
+
+### Решение
+Новые agent-workflows и команда `Рой:` по умолчанию используют профиль `gemini-vertex`:
+
+```text
+L1 Gemini Vertex -> L2 Gemini Vertex -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Профиль `antigravity` сохранен для явного запуска (`--profile antigravity` / `-Profile antigravity`) только после свежего успешного Antigravity smoke. Gemini CLI не возвращается в активную схему; используется именно Vertex AI runtime через `tools/gemini_vertex_workflow_review.py`.
+
+### Последствие
+`tools/agent_workflow.py new` и `tools/start-agent-swarm.ps1` создают новые workflow с `workflow_profile: gemini-vertex` и `allowed_next_agents: ["Gemini Vertex"]`. `Gemini Vertex` и `Antigravity CLI` считаются review-only участниками: handoff генерируется отдельным runner, а state mutations выполняет Codex через `--executor Codex`.
+
+### Автор: Codex
+### Теги: agent-workflows, gemini-vertex, antigravity-cli, codex, claude-code
+
+## 2026-07-03 - Antigravity optional profile smoke восстановлен, команда РОЙ нормализована
+
+### Контекст
+Пользователь попросил проверить доступ к Antigravity, корректировки workflow и настроить запуск через команду `РОЙ`.
+
+### Решение
+Свежий локальный smoke Antigravity считать успешным:
+
+- `tools/check-agent-runtimes.ps1` видит `agy`;
+- `tools/antigravity_print.py --process-timeout-seconds 90 "Ответь ровно одним словом: OK"` вернул `OK`;
+- `tools/antigravity_workflow_review.py` на временном workflow профиля `antigravity` вернул валидный handoff с `## Решение approve`.
+
+При этом дефолтная команда `Рой` / `РОЙ` остается на профиле `gemini-vertex`:
+
+```text
+L1 Gemini Vertex -> L2 Gemini Vertex -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Antigravity включается только явно через `-Profile antigravity` / `--profile antigravity`.
+
+### Последствие
+Триггеры `Рой:`, `Рой,`, `РОЙ:`, `РОЙ,`, `рой:`, `/swarm`, `Запусти рой:` и `Workflow:` считаются запуском иерархического workflow. Регистр слова `Рой` не важен. Документы политики и запускатель синхронизированы с этим правилом.
+
+### Автор: Codex
+### Теги: agent-workflows, swarm-trigger, antigravity-cli, gemini-vertex, codex
+
+## 2026-07-03 - Default workflow возвращен на Antigravity/agy, Gemini Vertex стал fallback
+
+### Контекст
+Пользователь явно попросил сделать запуск через `agy`/Antigravity дефолтным, а Gemini Vertex оставить запасным вариантом. До этого 2026-07-02 default был временно переведен на `gemini-vertex` из-за Antigravity regional/eligibility blocker, но свежий локальный smoke 2026-07-03 уже подтвердил доступность `agy`.
+
+### Решение
+Новые agent-workflows и команда `Рой:` / `РОЙ:` по умолчанию используют профиль `antigravity`:
+
+```text
+L1 Antigravity CLI -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Профиль `gemini-vertex` остается резервным явным запуском:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\start-agent-swarm.ps1" -Title "<задача>" -Brief "<brief>" -Profile gemini-vertex
+```
+
+### Последствие
+`tools/agent_workflow.py new` и `tools/start-agent-swarm.ps1` создают новые workflow с `workflow_profile: antigravity` и `allowed_next_agents: ["Antigravity CLI"]`, если профиль не задан явно. `Antigravity CLI` и `Gemini Vertex` остаются review-only участниками: handoff генерируется отдельным isolated runner, а state mutations выполняет Codex/Claude через trusted executor.
+
+### Автор: Codex
+### Теги: agent-workflows, antigravity-cli, agy, gemini-vertex, swarm-trigger
+
+## 2026-07-06 - Grok Build 0.2.87 добавлен как кандидат, не как активный workflow-уровень
+
+### Контекст
+Пользователь сообщил, что появился новый агент `Grok 0.2.87`. Официальная страница xAI CLI описывает Grok Build как terminal/coding agent с поддержкой `AGENTS.md`, MCP servers, skills, hooks и memory, что делает его совместимым с концепцией общей SML-памяти.
+
+### Решение
+Зафиксировать `Grok Build 0.2.87` как нового кандидата/резервного агента, но не включать его в дефолтный `Рой` и не заменять им Antigravity CLI или Gemini Vertex до локального smoke-теста.
+
+Минимальный gate перед активацией:
+
+- команда `grok --version` доступна из PowerShell;
+- auth завершен без записи секретов в docs/SML;
+- запуск из `D:\AionUi-Paperclip` читает `AGENTS.md`;
+- Grok выполняет SML bootstrap или использует MCP `sml`;
+- короткий тест на русском оставляет отчет в `docs/agent-log/`;
+- долгие процессы соблюдают Visible Run Rule.
+
+### Последствие
+Текущая активная связка остается `Codex + Antigravity CLI + Claude Code`, `Gemini Vertex` остается fallback profile `gemini-vertex`. Grok учитывается в реестре и задачах как кандидат на отдельный fallback/profile после проверки.
+
+### Автор: Codex
+### Теги: grok-build, xai-cli, agent-workflows, sml, candidate-agent
+
+## 2026-07-06 - Добавлен experimental profile grok-gemini для Роя
+
+### Контекст
+Пользователь уточнил, что Grok не должен заменять других агентов. Нужна цепочка, где Grok является самым нижним/первым уровнем, затем Gemini, затем Codex, затем Claude.
+
+### Решение
+Добавить отдельный workflow profile `grok-gemini`:
+
+```text
+L1 Grok Build -> L2 Gemini Vertex -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Grok Build получает собственный набор L1-субагентов:
+
+- `grok-memory-bootstrapper`;
+- `grok-problem-framer`;
+- `grok-source-scout`;
+- `grok-handoff-editor`.
+
+Grok Build, как и Gemini Vertex/Antigravity CLI, является review-only агентом для workflow state mutations. Codex остается trusted executor для `claim`, `submit-work`, `approve-level`.
+
+### Последствие
+Профиль можно создать командой:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\start-agent-swarm.ps1" -Title "<задача>" -Brief "<brief>" -Profile grok-gemini
+```
+
+Дефолтный `Рой` пока не переключается на `grok-gemini`, потому что локальный `grok` CLI еще не найден и не прошел auth/smoke. После `grok version`, auth, `grok inspect` и успешного русского smoke можно отдельно решить, делать ли `grok-gemini` дефолтом.
+
+### Автор: Codex
+### Теги: grok-build, grok-gemini, agent-workflows, swarm-trigger, gemini-vertex, codex, claude-code
+
+## 2026-07-06 - Grok Build runtime подтвержден для experimental profile grok-gemini
+
+### Контекст
+После добавления профиля `grok-gemini` нужно было пройти live gate: установка CLI, авторизация, проверка модели, подключение SML и smoke L1 runner.
+
+### Решение
+Считать локальный runtime `Grok Build 0.2.87` подтвержденным для явного экспериментального профиля `grok-gemini`.
+
+Проверено:
+
+- установлен `@xai-official/grok@0.2.87`, `grok version` вернул `grok 0.2.87`;
+- auth через `grok.com` завершен, `grok models` показывает `grok-build`;
+- проектный MCP `sml` добавлен в `D:\AionUi-Paperclip\.grok\config.toml`;
+- для совместимости с Grok SML публикует alias-имена `sml_ping`, `sml_startup_pack`, `sml_semantic_query` и т.д. через `SML_MCP_TOOL_NAME_MODE=grok-safe`;
+- `sml_ping` из Grok вернул `ok=true`, `version sml-0.1.0`, `degraded=false`;
+- `tools/grok_build_workflow_review.py` использует `grok-build`, `--prompt-file`, `--disable-web-search`, `--no-subagents`, подставляет PATH для Git/Node и фильтрует внешний MCP stderr-шум на успешном запуске;
+- smoke workflow `2026-07-06-225247-147230-smoke-grok-gemini` получил валидный русский L1 handoff и перешел в `waiting_for_approval` с `allowed_next_agents=["Gemini Vertex"]`.
+
+### Последствие
+`grok-gemini` можно запускать явно:
+
+```powershell
+& "D:\AionUi-Paperclip\tools\start-agent-swarm.ps1" -Title "<задача>" -Brief "<brief>" -Profile grok-gemini
+```
+
+Дефолтный `Рой` не изменяется и остается `antigravity`. Grok Build остается review-only участником: state mutations выполняет Codex/Claude через trusted executor.
+
+### Автор: Codex
+### Теги: grok-build, grok-gemini, xai-cli, sml, mcp, workflow-smoke
+
+## 2026-07-07 - find-skills становится discovery-слоем для agent skills
+
+### Контекст
+После разбора YouTube Short `XfifNCHY93I` выяснено, что речь идет о `find-skills` из `vercel-labs/skills`: скилле и CLI-маршруте для поиска существующих agent skills в open skills ecosystem.
+
+### Решение
+Установить `find-skills` и использовать его как первый discovery/ranking слой, когда пользователь просит найти, выбрать, установить или сравнить skill/tool/workflow под задачу.
+
+Политика:
+
+- искать через `find-skills` / `npx skills find`;
+- не устанавливать найденные skills вслепую;
+- перед установкой проверять источник, install count, repo/SKILL.md, scripts/MCP/network behavior и локальную пользу;
+- для неизвестных авторов, низких install count или сетевых/MCP/scripts capabilities сначала делать review, а не auto-install.
+
+### Последствие
+`agent-workflow-router` получил `Skill Discovery Route Detail`. `find-skills` установлен в `.agents`, `.claude`, `.codex` и shared `agent-skills`.
+
+### Автор: Codex
+### Теги: find-skills, vercel-labs-skills, agent-skills, skill-discovery, supply-chain
+
+## 2026-07-07 - Default РОЙ переведен на Grok -> Antigravity -> Codex -> Claude
+
+### Контекст
+Пользователь уточнил, что по команде `Рой` нужна не прежняя цепочка с Antigravity на L1 и не legacy `grok-gemini`, а последовательность:
+
+```text
+L1 Grok -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+### Решение
+Сделать workflow profile `grok-antigravity` профилем по умолчанию для новых workflow и для `tools/start-agent-swarm.ps1` / `START-AGENT-SWARM.cmd`.
+
+Текущая default-цепочка:
+
+```text
+L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code
+```
+
+Профили сохранены:
+
+- `antigravity` - явный запуск `L1/L2 Antigravity CLI`;
+- `gemini-vertex` - fallback через Google Vertex AI;
+- `grok-gemini` - legacy route `L1 Grok Build -> L2 Gemini Vertex`.
+
+`Grok Build`, `Antigravity CLI` и `Gemini Vertex` остаются review-only участниками для workflow state mutations; `Codex` или `Claude Code` выполняют `claim`, `submit-work`, `approve-level` как trusted executor.
+
+### Проверка
+
+- `py_compile` для `tools/agent_workflow.py`, `tools/grok_build_workflow_review.py`, `tools/antigravity_workflow_review.py`, `tools/gemini_vertex_workflow_review.py` прошел.
+- `pytest` для workflow/runner тестов: `33 passed`.
+- Smoke без явного `-Profile`: `tmp/swarm-default-grok-antigravity-smoke/2026-07-07-130352-778636-рой-default-grok-antigravity-smoke`.
+- Smoke contract подтвердил `workflow_profile=grok-antigravity`, `L1=Grok Build`, `L2=Antigravity CLI`, `L3=Codex`, `L4=Codex`, `L5=Claude Code`.
+
+### Последствие
+Команды `Рой: <задача>`, `Рой, <задача>` и прямой запуск `tools/start-agent-swarm.ps1` без `-Profile` должны создавать именно `grok-antigravity`. Для возврата к старым цепочкам нужен явный `-Profile`.
+
+### Автор: Codex
+### Теги: roy, swarm, grok-antigravity, grok-build, antigravity-cli, codex, claude-code
+
+## 2026-07-07 - РОЙ получил явный run-next вместо скрытого полного автопрогона
+
+### Контекст
+После переключения default `Рой` на `grok-antigravity` пользователь увидел, что в консоли "как будто ничего не происходит". Диагностика показала, что `tools/start-agent-swarm.ps1` создавал workflow и оставлял его в `planned`, но не запускал `Grok Build L1`.
+
+### Решение
+Добавить отдельный one-step runner:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File D:\AionUi-Paperclip\tools\run-agent-workflow-next.ps1 -Root D:\AionUi-Paperclip\docs\agent-workflows -WorkflowId <workflow-id>
+```
+
+`tools/start-agent-swarm.ps1` теперь печатает `Run L1` command и поддерживает `-RunNext`.
+
+Политика выполнения:
+
+- `start-agent-swarm.ps1` без `-RunNext` только создает workflow и показывает команды;
+- `-RunNext` выполняет первый текущий шаг в той же консоли;
+- `run-agent-workflow-next.ps1` выполняет ровно один текущий шаг по `allowed_next_agents`;
+- скрытый полный автопрогон L1-L5 не включать по умолчанию, чтобы не жечь лимиты и не обходить gates.
+
+### Проверка
+
+- PowerShell AST parse прошел для `run-agent-workflow-next.ps1` и `start-agent-swarm.ps1`.
+- `pytest` для workflow/Grok tests: `21 passed`.
+- Smoke `run-agent-workflow-next.ps1` на `tmp/swarm-default-grok-antigravity-smoke/2026-07-07-130352-778636-рой-default-grok-antigravity-smoke` выполнил `Grok Build L1`, submit-work и перевел state в `waiting_for_approval`, next agent `Antigravity CLI`.
+
+### Автор: Codex
+### Теги: roy, run-next, workflow-ux, grok-build, antigravity-cli

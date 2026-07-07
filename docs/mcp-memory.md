@@ -6,7 +6,7 @@
 sml
 ```
 
-`sml` — это Shared_Memory_Layer из `tools/sml/`. Он заменяет старый `aion-file-memory` как основной канал чтения и записи памяти для активной связки Codex + Gemini CLI.
+`sml` — это Shared_Memory_Layer из `tools/sml/`. Он заменяет старый `aion-file-memory` как основной канал чтения и записи памяти для активной связки Codex + Claude Code + Antigravity CLI.
 
 ## Что делает SML
 

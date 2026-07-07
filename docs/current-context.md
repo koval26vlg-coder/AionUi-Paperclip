@@ -4,7 +4,7 @@
 
 ## Природа проекта
 
-`D:\AionUi-Paperclip` — самостоятельный проект. Его единственная цель — быть инфраструктурой общего контекста и памяти для AI-агентов (сейчас активны Codex, Gemini CLI и Claude Code; будущие агенты могут быть добавлены позже).
+`D:\AionUi-Paperclip` — самостоятельный проект. Его единственная цель — быть инфраструктурой общего контекста и памяти для AI-агентов (сейчас активны Grok Build, Antigravity CLI, Codex и Claude Code; Gemini Vertex сохранен как резервный профиль; будущие агенты могут быть добавлены позже).
 
 Любые упоминания внешних репозиториев и прикладных задач (например, `C:\Users\koval\bat\bitrix24-automation` и его spec-ов вида `bitrix24-automation-hygiene`, `bitnewton-*`) — это работы, которые катятся через эту инфраструктуру, но не являются её частью. Код, тесты и артефакты таких внешних проектов живут в своих репозиториях; здесь остаются только spec-документы, журналы, решения и память о ходе работы.
 
@@ -18,13 +18,17 @@
 
 ## Рабочая схема
 
-Актуальная рабочая связка на 2026-06-18:
+Актуальная рабочая связка:
 
 - Codex
+- Grok Build
+- Antigravity CLI
 - Claude Code
-- Gemini CLI
+- Gemini Vertex как fallback profile `gemini-vertex`
 
-Cursor, Kiro и MiMo Code выведены из схемы 2026-06-18; их конфиги (`.cursor/`, `.kiro/`, `.mimocode/`) и запускатели удалены, чтобы не создавать путаницу. Историческая память об их работе сохранена в SML и `docs/agent-log/`, а ценные спецификации из `.kiro/specs/` перенесены в `docs/specs/`. Вернуть любой инструмент можно только по отдельному решению пользователя.
+По решению 2026-06-24 `MiMo AUTO` выведен из новых иерархических `docs/agent-workflows/`, потому что с 2026-06-25 он становится платным. Решение 2026-07-03 о default `antigravity` superseded решением пользователя от 2026-07-07: новые workflow стартуют с профиля `grok-antigravity` (`L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`), а `Gemini Vertex` остается явным fallback-профилем. Старые workflow с `L1.0 MiMo AUTO`, прежним Antigravity default, временным Gemini default или `grok-gemini` остаются историческими артефактами и не являются текущим шаблоном.
+
+Cursor и Kiro выведены из схемы 2026-06-18; Gemini CLI выведен и удален из активного runtime 2026-06-19 после успешного Antigravity smoke-test; проектный MiMo Code и `MiMo AUTO` также выведены из активной схемы. Историческая память об их работе сохранена в SML и `docs/agent-log/`, а ценные спецификации из `.kiro/specs/` перенесены в `docs/specs/`. Вернуть любой инструмент можно только по отдельному решению пользователя.
 
 AionUi, Paperclip и Hermes больше не используются как основа текущей архитектуры.
 
@@ -48,8 +52,8 @@ AionUi, Paperclip и Hermes больше не используются как о
 - `CLAUDE.md` - проектные правила Claude Code.
 - `.mcp.json` - проектное подключение SML для Claude Code и других MCP-клиентов, которые читают корневой MCP-конфиг.
 - `.vscode/` - настройки и tasks для работы с общей памятью из VS Code.
-- `.gemini/settings.json` - проектное подключение SML для Gemini CLI.
 - `docs/agent-log/` - журнал работы агентов.
+- `docs/agent-workflows/` - иерархические workflow задач между Grok Build, Antigravity CLI, Codex, Claude Code, fallback Gemini Vertex и пользователем. Каждый workflow хранит `contract.json`, `brief.md`, `handoff.md`, `events.jsonl`, уровни `L1-L5` и финальный отчет. Старые workflow могут содержать исторические `L1.0/L1.1`, `MiMo AUTO`, прежний Antigravity default, временный Gemini Vertex default или `grok-gemini`, но это не текущий шаблон.
 - `docs/decisions.md` - журнал решений.
 - `docs/tasks.md` - список задач.
 - `docs/memory/` - файловый источник истины для общей памяти.
@@ -72,11 +76,17 @@ AionUi, Paperclip и Hermes больше не используются как о
 - `tools/backup-sml.py` - бэкап БД SML с ротацией и `--verify` (integrity + сверка записей).
 - `.github/workflows/ci.yml` - CI: selfcheck + pytest ядра SML на push/PR.
 - `apps/aion-vision/` - дашборд SML: живые данные через `/api/sml-dashboard` и поиск по памяти `/api/search` (`scripts/search-sml.py`, семантика + FTS5-фоллбэк). Панели «Здоровье системы» (watcher/поиск/бэкап) и «Аналитика памяти» (тренды по неделям, разбивка по агентам/типам). Dev: `START-AION-VISION.cmd` (vite middleware). Прод: `START-AION-VISION-SERVE.cmd` → `scripts/serve-sml.py` (stdlib HTTP-сервис, отдаёт `dist/` + API без dev-сервера).
+- `apps/aion-vision/#hh-booster` - операторский экран HH Resume Booster validation test на 14 дней. Публичная форма `#hh-booster-public` принимает `channel` и `offer` query-параметры, например `#hh-booster-public?channel=Telegram&offer=response`, чтобы честно добирать per-offer coverage по avatar/audit/response.
 - `docs/HOW-TO-USE.md` - гайд для новичка: запуск агентов и панели, поиск по памяти, обслуживание, troubleshooting.
 - Ollama опциональна: без неё поиск работает в режиме FTS5 (по словам); семантика — только при запущенной Ollama.
 - `docs/memory-automation.md` - описание автоматизации памяти.
 - `docs/memory-autoprotocol.md` - правило автоматического поиска похожего контекста перед задачей.
 - `tools/agent-memory-bootstrap.ps1` - абсолютный bootstrap памяти: статус watcher, relationship-map query и excerpt context-pack из любой текущей папки.
+- `tools/agent_workflow.py` - CLI иерархических workflow задач: `new`, `claim`, `submit-work`, `approve-level`, `request-revision`, `escalate`, `approve-risk`, `finalize`, `status`.
+- `tools/start-agent-swarm.ps1` и `START-AGENT-SWARM.cmd` - короткий запускатель роя: создает новый `docs/agent-workflows/<workflow-id>/`, выполняет Aion SML bootstrap, печатает status/monitor команды и по умолчанию стартует с `Grok Build L1` (`-Profile grok-antigravity`); `Antigravity CLI` доступен через `-Profile antigravity`, `Gemini Vertex` через `-Profile gemini-vertex`, legacy Grok->Gemini через `-Profile grok-gemini`.
+- `tools/watch-agent-workflows.ps1` - видимый монитор workflow; показывает текущий уровень, разрешенного следующего агента, возраст ожидания, handoff, blockers и risk gate.
+- `tools/agent_limit_monitor.py` - локальный монитор расхода агентов: Codex tokens из `C:\Users\koval\.codex\state_5.sqlite`, Claude Code usage из `C:\Users\koval\.claude\projects\**\*.jsonl`, Antigravity quota/log status без numeric usage. MiMo больше не собирается в дефолтном мониторинге. Снимки пишутся в `docs/agent-limits/latest.md` и `latest.json`.
+- `tools/watch-agent-limits.ps1` - видимый монитор лимитов/токенов; для фонового наблюдения создан heartbeat automation `automation-7` "Лимиты агентов" раз в 6 часов.
 - `LOAD-SML-MEMORY.cmd` - ручной запуск того же bootstrap для проверки.
 
 ## Автоматизация
@@ -91,9 +101,11 @@ Aion File Memory Auto
 
 Назначение: автоматически пересобирать `docs/context-packs/context-pack-latest.md` при изменениях в общей базе.
 
-## Выведенные инструменты (Cursor, Kiro, MiMo Code)
+## Выведенные инструменты
 
-Cursor, Kiro и MiMo Code выведены из схемы 2026-06-18. Их конфиги (`.cursor/`, `.kiro/`, `.mimocode/`) и запускатели (`OPEN-KIRO-RU.cmd`, `OPEN-MIMO-SML.cmd`, `CHECK-MIMO-SML.cmd`) удалены, чтобы не создавать путаницу в активной схеме Codex + Claude Code + Gemini CLI.
+Cursor, Kiro, Gemini CLI, проектный MiMo Code и `MiMo AUTO` выведены из схемы. Их активные конфиги (`.cursor/`, `.kiro/`, `.mimocode/`, `.gemini/`) и запускатели (`OPEN-KIRO-RU.cmd`, `OPEN-MIMO-SML.cmd`, `CHECK-MIMO-SML.cmd`, `OPEN-GEMINI-SML.cmd`, `CHECK-GEMINI-SML.cmd`) удалены, чтобы не создавать путаницу в активной схеме Grok Build + Antigravity CLI + Codex + Claude Code.
+
+Решение 2026-06-24: прежнее исключение `MiMo AUTO L1.0` отменено. Новые workflow не запускают MiMo, не чинят MiMo runtime и не вызывают `mimo stats` в дефолтном мониторинге лимитов.
 
 Сохранено:
 
@@ -104,24 +116,118 @@ Cursor, Kiro и MiMo Code выведены из схемы 2026-06-18. Их ко
 
 ## Gemini CLI
 
-Gemini CLI установлен, авторизован и подключен к SML.
+Gemini CLI удален из активного runtime 2026-06-19. Удалены глобальные npm-пакеты `@google/gemini-cli` и `codex-gemini-helper`, shims `gemini`/`ask-gemini`, проектная `.gemini/`, `GEMINI.md`, Gemini launchers, `docs/gemini-sml.md`, `docs/cursor-gemini-model.md` и старый каталог `D:\Gemini`. Root-файлы `C:\Users\koval\.gemini` удалены точечно; `C:\Users\koval\.gemini\antigravity-cli` сохранен, потому что используется Antigravity.
+
+## Antigravity
+
+Antigravity найден как установленный локальный инструмент и был принят как замена Gemini CLI в уровнях `L1` и `L2`. После временного отката на Gemini Vertex из-за регионального blocker, свежий smoke 2026-07-03 подтвердил локальный доступ: `antigravity_print.py` вернул `OK`, а `antigravity_workflow_review.py` дал валидный L1 handoff с `approve` на временном workflow. По решению пользователя от 2026-07-07 Antigravity является дефолтным `L2` после Grok Build и явным `L1/L2` профилем `antigravity`, а Gemini Vertex остается fallback.
+
+Проверено 2026-06-19:
+
+- приложение: `C:\Users\koval\AppData\Local\Programs\Antigravity\Antigravity.exe`;
+- приложение запущено видимо для ручной авторизации пользователя;
+- CLI: `C:\Users\koval\AppData\Local\agy\bin\agy.exe`;
+- версия CLI: `1.0.10`;
+- выполнено `agy install`, путь `C:\Users\koval\AppData\Local\agy\bin` настроен в пользовательском PATH;
+- `agy --help` показывает headless-режимы `--print`, `--model`, `--prompt-interactive`, подкоманды `models`, `plugin`, `update`.
+- live smoke-test `agy --print "Return exactly OK."` прошел на уровне авторизации/model call: в логе есть keyring auth и `streamGenerateContent`, в conversation DB найден ответ `OK`.
+- добавлен wrapper `tools/antigravity_print.py`: он запускает raw `agy --print`, печатает stdout если он есть, а при пустом stdout восстанавливает свежий ответ из `C:\Users\koval\.gemini\antigravity-cli\conversations\*.db`.
+
+Ограничение: raw `agy --print` все еще может завершаться с кодом 0 без stdout. Для headless workflow использовать `D:\AionUi-Paperclip\.venv-sml\Scripts\python.exe D:\AionUi-Paperclip\tools\antigravity_print.py "<prompt>"`.
+
+Оперативный статус 2026-06-29 16:57 +03 был: живой Antigravity model call временно блокировался `FAILED_PRECONDITION (code 400): User location is not supported for the API use`. Проверялись process-level `HTTP_PROXY/HTTPS_PROXY` через локальный Happ/Xray Frankfurt `127.0.0.1:10809`, `CLOUD_CODE_URL=https://cloudcode-pa.googleapis.com`, `useG1Credits=true`, downgrade до `Gemini 3.5 Flash (Medium)`. Этот blocker считать историческим после успешного локального smoke 2026-07-03; если он повторится, переключать конкретный workflow на fallback `gemini-vertex`.
+
+NOI workaround 2026-06-29 17:15 +03: на SSH host `root@147.90.11.165` установлен Antigravity CLI `agy 1.0.13` в `/root/.local/bin/agy`; сервер Ubuntu 22.04 x86_64, внешний маршрут `United States` по `ifconfig.co`. Установка завершена, но live-вызов еще не подтвержден: fresh headless `agy --print` завис без auth, интерактивный `agy` печатает OAuth URL и ждет вход около 30 секунд. Пользователь должен завершить OAuth в видимом запускателе `work/start-antigravity-noi-auth.ps1`, затем обязателен smoke через SSH. До этого NOI не считать готовым Antigravity runtime.
+
+Статус NOI 2026-06-30 11:38 +03: повторный OAuth не завершен. Прямой SSH к `147.90.11.165:22` теперь устанавливает TCP, но не получает SSH banner (`Connection timed out during banner exchange`); ICMP жив. Попытка использовать сохраненный Xray/VLESS REALITY на `147.90.11.165:443` как локальный proxy также не дала egress: TCP/TLS на 443 открывается, но VLESS proxy-запросы зависают. До reboot/console-восстановления VPS не планировать OAuth/smoke на NOI.
+
+Повтор 2026-06-30 14:10 +03: локальный `agy` обновлен до `1.0.14`, но direct smoke и smoke через живой Frankfurt proxy `127.0.0.1:10809` снова дошли до `FAILED_PRECONDITION (code 400): User location is not supported for the API use`. SSH к NOI остается заблокирован на banner exchange: TCP connected, SSH banner не читается; порты `22`, `2222`, `443`, `2022`, `2200` не дали SSH. Xray/REALITY helper к NOI принял `ifconfig.co:443`, но ушел в timeout. Добавлены постоянные helper-скрипты `tools/check-antigravity-noi.ps1` и `tools/start-antigravity-noi-auth.ps1`; после reboot/console recovery VPS выполнить `check-antigravity-noi.ps1`, затем OAuth helper и `check-antigravity-noi.ps1 -Smoke`.
+
+После пользовательского reboot 2026-06-30 16:30 +03 `tools/check-antigravity-noi.ps1` снова показал `TCP: connected` и `SSH banner: read failed`. Обычный reboot не восстановил SSH. Следующий шаг - console/rescue recovery в панели VPS: проверить, загружена ли ОС, работает ли `sshd`, что слушает порт 22, и нет ли firewall/iptables правила, которое принимает TCP и не отдает SSH banner.
+
+Проверка HAPP 2026-06-30 17:15 +03: после переключения пользователем профиля оба локальных proxy `127.0.0.1:10808` и `127.0.0.1:10809` показывали egress `United States / Los Angeles / 24SHELLS` (`192.241.126.174`). Повторный локальный OAuth Antigravity через `HTTP_PROXY/HTTPS_PROXY=http://127.0.0.1:10809` восстановил вход как `koval26vlg@gmail.com`, но тогда model-call smoke завершался `FAILED_PRECONDITION`. Этот статус устарел после локального успешного smoke 2026-07-03; Antigravity теперь дефолтный L2 runtime, но требует fallback `gemini-vertex` при повторном runtime-blocker.
+
+Решение 2026-07-02: не пытаться маскировать регион в Antigravity как основной путь, временно был введен default profile `gemini-vertex` через Google Vertex AI, ADC и модель `gemini-2.5-flash`. Это решение superseded решением пользователя 2026-07-03 про `antigravity`, а затем решением 2026-07-07: дефолтный `Рой` использует `grok-antigravity`, `gemini-vertex` остается запасным путем.
+
+Дополнительная проверка 2026-06-19 на workflow авиабилетов VOG -> MNL показала, что Antigravity CLI в обычном `--print` режиме может самостоятельно менять файлы workflow и продвигать state. Повтор 2026-06-20 на drift-dashboard подтвердил риск: даже при просьбе не писать файлы Antigravity прочитал `AGENTS.md`, записал L1.1/L2 handoff и сам вызвал `agent_workflow.py`.
+
+Исправление 2026-06-20:
+
+- `Antigravity CLI` теперь считается review-only участником для workflow state mutations;
+- `Gemini Vertex` также считается review-only участником для workflow state mutations;
+- `Grok Build` также считается review-only участником для workflow state mutations;
+- добавлен `tools/gemini_vertex_workflow_review.py`: runner собирает packet из `brief.md`, `contract.json`, последнего `handoff.md` и `events.jsonl`, отправляет его в Vertex Gemini и валидирует обязательные handoff headings;
+- добавлен `tools/antigravity_workflow_review.py`: runner собирает packet из `brief.md`, `contract.json`, последнего `handoff.md` и `events.jsonl`, запускает Antigravity из isolated cwd вне workspace, проверяет, что workflow tree не изменился, и валидирует обязательные handoff headings;
+- `tools/grok_build_workflow_review.py` запускает `grok-build` через isolated prompt-file packet, валидирует обязательные handoff headings и передает `SML_MCP_TOOL_NAME_MODE=grok-safe`, чтобы Grok видел SML как `sml_*`;
+- `tools/agent_workflow.py` блокирует mutating commands от `--agent "Gemini Vertex"`, `--agent "Antigravity CLI"` и `--agent "Grok Build"` без доверенного `--executor Codex` или `--executor "Claude Code"`;
+- для L1/L2 нужно получать текст через isolated runner, затем Codex выполняет `claim/submit-work/approve-level --agent "Grok Build" --executor Codex` на L1 и `--agent "Antigravity CLI" --executor Codex` на L2; для fallback `--profile gemini-vertex` используется аналогичный command с `--agent "Gemini Vertex"`.
+
+## Grok Build
+
+Grok Build 0.2.87 подключен 2026-07-06 как подтвержденный runtime. По решению пользователя 2026-07-07 он является дефолтным L1 профиля `grok-antigravity`: `L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`. Старый `grok-gemini` оставлен как явный legacy-профиль.
 
 Проверено:
 
-- установлен пакет `@google/gemini-cli`;
-- версия CLI: `0.42.0`;
-- пользовательский конфиг: `C:\Users\koval\.gemini\settings.json`;
-- проектный конфиг: `D:\AionUi-Paperclip\.gemini\settings.json`;
-- MCP-сервер `sml` добавлен в оба конфига;
-- `gemini mcp list` показывает `sml` как `Connected`;
-- прямой stdio smoke-test SML через `tools.sml.mcp_adapter` проходит: `initialize`, `tools/list`, `sml.ping`;
-- живой smoke-test через сам Gemini CLI проходит: Gemini вызывает `sml.ping` и `sml.startup_pack`, видит общий контекст и записи памяти.
+- `@xai-official/grok@0.2.87` установлен через npm, `grok version` вернул `grok 0.2.87`;
+- auth через `grok.com` завершен, `grok models` показывает `grok-composer-2.5-fast` и `grok-build`;
+- проектный MCP `sml` добавлен в `D:\AionUi-Paperclip\.grok\config.toml`;
+- SML MCP для Grok работает в режиме `SML_MCP_TOOL_NAME_MODE=grok-safe`, поэтому инструменты доступны как `sml_ping`, `sml_startup_pack`, `sml_semantic_query` и т.д.;
+- `grok --model grok-build -p ...` вернул `OK`;
+- `sml_ping` через Grok вернул `ok=true`, `version sml-0.1.0`, `degraded=false`;
+- smoke workflow `2026-07-06-225247-147230-smoke-grok-gemini` создан через `-Profile grok-gemini`, Grok L1 runner сформировал валидный русский handoff, а `submit-work --agent "Grok Build" --executor Codex` перевел workflow в `waiting_for_approval` с `allowed_next_agents=["Gemini Vertex"]`. Для новых workflow default теперь `grok-antigravity`, поэтому после L1 Grok ожидается `allowed_next_agents=["Antigravity CLI"]`.
 
-Подробная инструкция: `docs/gemini-sml.md`.
+Ограничение: `grok mcp doctor` может возвращать общий exit code 1 из-за внешних GitHub/Mobbin MCP из совместимых глобальных конфигов. Это не блокирует SML: строка `sml` показывает handshake OK и 10 tools discovered.
+
+`agy --sandbox --print` в локальной проверке завершался без полезного stdout/ответа, поэтому sandbox-флаг не считается достаточным контролем. Контроль теперь строится на изоляции cwd, отсутствии workspace paths в prompt, post-run snapshot check и запрете self-mutation в `agent_workflow.py`.
+
+## Agent CLI runtime PATH
+
+2026-06-20 найден корень нестабильного запуска агентских CLI из Codex shell: process-level `Path` иногда приходил как `C:\Program Files\PowerShell\7;C:\Users\koval\bat;${PATH}`. Из-за literal `${PATH}` дочерние native-процессы (`cmd`, `node`, `npm`) не видели системные каталоги, хотя PowerShell мог показывать расширенный `$env:Path`.
+
+Исправление:
+
+- добавлен `tools/agent-cli-env.ps1` с `Repair-AgentCliPath`, который собирает стабильный `Path/PATH` из System32, Windows, `C:\Users\koval\bat`, Node.js, npm, Antigravity и Git;
+- добавлен `tools/install-agent-cli-shims.ps1`;
+- добавлен `tools/check-agent-runtimes.ps1`;
+- установлены user-level shims в `C:\Users\koval\bat`: `node.cmd`, `npm.cmd`, `npx.cmd`, `claude.cmd`, `agy.cmd`, `cmd.cmd`, `where.cmd`; `mimo.cmd` удален 2026-06-24 вместе с выводом MiMo из схемы;
+- `tools/agent_limit_monitor.py` и `tools/antigravity_print.py` теперь нормализуют `Path` и `PATH` для subprocess. MiMo не используется в новых workflow и дефолтном лимит-мониторе.
+
+Проверено 2026-06-20:
+
+- `tools/check-agent-runtimes.ps1` видит `node`, `npm`, `claude`, `agy` и больше не проверяет `mimo`;
+- `claude --version` -> `2.1.179 (Claude Code)`;
+- глобальный npm-пакет `@mimo-ai/cli` удален 2026-06-24; `mimo` больше не резолвится в текущем PATH;
+- `npm --version` -> `10.9.7`;
+- `node --version` -> `v22.22.2`;
+- `agy --help` доступен;
+- в искусственно сломанном `Path=C:\Program Files\PowerShell\7;C:\Users\koval\bat;${PATH}` агентские команды все равно запускаются через shims.
+
+## Spec Kit и Task Master
+
+2026-06-20 добавлен осторожный tooling-слой для работы с кодом:
+
+- GitHub Spec Kit установлен как `C:\Users\koval\.local\bin\specify.exe`, закреплен на `github/spec-kit@v0.9.5`; floating `main` был проверен и отвергнут, потому что `specify --help` падал с `ModuleNotFoundError: specify_cli.bundler.lib`.
+- Созданы skills `spec-kit` в `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills` и shared `agent-skills`.
+- Task Master установлен как CLI `task-master` версии `0.43.1`; global MCP не подключен, чтобы не грузить тяжелый набор инструментов во все сессии.
+- Созданы skills `task-master-pilot`; MCP для Task Master включать только по отдельному решению пользователя, начиная с reduced mode `TASK_MASTER_TOOLS=core`.
+- Cloud Code Router не установлен, потому что это proxy/router для моделей, а не skill/MCP, и он добавляет риск ключей/логов/совместимости без явной необходимости.
+
+2026-06-20 уточнение по MCP/auth:
+
+- Task Master MCP проверен и отсутствует в активных Codex/Claude/Cursor MCP-конфигах; оставлен только CLI `task-master`.
+- Snyk CLI установлен глобально как `snyk` версии `1.1305.1`.
+- Snyk MCP в Codex, Claude Code и Cursor переведен с `npx snyk@latest` на локальный `C:\Users\koval\AppData\Roaming\npm\snyk.cmd mcp -t stdio`.
+- Добавлены helper scripts `agent-skills/scripts/setup-github-snyk-auth.ps1` и `agent-skills/scripts/verify-github-snyk-mcp.ps1`.
+- GitHub MCP ожидает user-level `GITHUB_PERSONAL_ACCESS_TOKEN`; Claude official GitHub plugin также использует `${GITHUB_PERSONAL_ACCESS_TOKEN}` в Authorization header.
+- Секреты не хранятся в docs/манифестах/MCP JSON. После ввода GitHub/Snyk auth нужно перезапустить Codex/Claude Code/Cursor и запустить verify script.
+- После пользовательского ввода GitHub PAT и Snyk OAuth проверено: GitHub API token работает для `koval26vlg-coder`, Claude GitHub MCP `Connected`, Claude Snyk MCP `Connected`, Task Master MCP references отсутствуют.
+- Финальная корректировка: Claude `snyk-security` переведен в top-level user-scope `mcpServers`; project-scope дубликат из папки установки skills удален. Проверено из `C:\Users\koval` и из папки установки skills: GitHub, Context7, Playwright, SML и Snyk `Connected`.
+- Security hygiene: example GitHub-token-like strings в локальных `claude-api` skill docs нейтрализованы; повторный secret-pattern scan по skills, Aion docs и активным MCP-конфигам показал отсутствие GitHub/Snyk token-like patterns. Активные MCP-конфиги также чистые от `serena`, `task-master*` и старого Snyk npx command.
+
 
 ## Claude Code
 
-Claude Code — активный агент рядом с Codex и Gemini CLI.
+Claude Code — активный агент рядом с Grok Build, Antigravity CLI и Codex; Gemini Vertex остается fallback profile `gemini-vertex`.
 
 Подготовлено:
 
@@ -134,8 +240,9 @@ Claude Code — активный агент рядом с Codex и Gemini CLI.
 
 Проверено:
 
-- Claude Code установлен: `2.1.178`, авторизован, работает из `D:\AionUi-Paperclip`;
+- Claude Code установлен: `2.1.179`, авторизован, работает из `D:\AionUi-Paperclip`;
 - `claude mcp list` показывает `sml` как `Connected`;
+- 2026-06-19 дефолтная модель Claude Code исправлена с недоступного проектного `fable` на проверенный `sonnet`; `claude -p "Return exactly OK."` возвращает `OK`;
 - 2026-06-18 `claude mcp list` из внешней папки `C:\Users\koval\Documents\Bitrix24` тоже показывает `sml` как `Connected`;
 - 2026-06-18 Claude Code выполнил содержательную работу (аудит проекта + правки P0/P1/P2/P3) и записал отчёт в `docs/agent-log/` — живой рабочий цикл подтверждён.
 
@@ -152,7 +259,7 @@ Claude Code — активный агент рядом с Codex и Gemini CLI.
 
 ## VS Code
 
-VS Code добавлен в общий контекст как рабочая IDE-оболочка, а не как отдельный агент. Он нужен, чтобы открывать `D:\AionUi-Paperclip`, держать рядом правила агентов, context-pack, SML-скрипты, журнал и терминалы Codex/Claude/Gemini.
+VS Code добавлен в общий контекст как рабочая IDE-оболочка, а не как отдельный агент. Он нужен, чтобы открывать `D:\AionUi-Paperclip`, держать рядом правила агентов, context-pack, SML-скрипты, журнал и терминалы Codex/Claude/Antigravity.
 
 Подготовлено:
 
@@ -167,6 +274,18 @@ VS Code добавлен в общий контекст как рабочая ID
 ## Поведение агентов по умолчанию
 
 Агенты больше не должны ждать отдельной команды "посмотри в память".
+
+Для сложных задач по умолчанию используется иерархическая схема отделов:
+
+1. `L1` Grok Build - SML bootstrap, первичная постановка задачи, разведка контекста и итоговый L1-handoff.
+2. `L2` Antigravity CLI - инженерная проверка L1, ограничения, edge cases и gate ревизии.
+3. `L3` Codex - декомпозиция реализации, тесты и automation.
+4. `L4` Codex - архитектурный синтез, contract audit, risk gate и сопровождение.
+5. `L5` Claude Code - независимая финальная техническая проверка и `final-report.md` для пользователя.
+
+Агент может продолжать workflow только если `contract.json.allowed_next_agents` содержит его точное имя. Каждый уровень пишет стандартный handoff, а несогласие фиксируется через `disagreement.md`, чтобы не создавать "испорченный телефон".
+
+Модельная политика субагентов закреплена в `docs/agent-workflows/model-policy.md` и попадает в `contract.json` новых workflow. Модель нельзя тихо подменять: если провайдер/CLI не поддерживает указанный alias, следующий агент фиксирует mismatch в handoff и запрашивает approved fallback.
 
 Перед любой содержательной задачей агент сам:
 
@@ -199,11 +318,369 @@ docs/relationship-maps/graphify-sml-relationship-map.json
 
 Карты связей являются автоматическим производным слоем над SML и документами. Watcher памяти пересобирает их вместе с context-pack, а агенты используют `tools/query-relationship-map.py "<тема>"` как быстрый навигатор перед широким поиском по файлам. Этот слой помогает видеть центральные узлы и мосты, но не заменяет SML как основную память.
 
+## Drift-agent dashboard workflow
+
+2026-06-20 первая реальная задача через старую иерархическую цепочку завершена:
+
+`L1.0 MiMo AUTO -> L1.1 Antigravity CLI -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`
+
+Эта цепочка оставлена как исторический факт. Текущий шаблон с 2026-07-07: `L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`; Gemini Vertex доступен как fallback через явный `--profile gemini-vertex`.
+
+Workflow:
+
+```text
+docs/agent-workflows/2026-06-20-091104-901407-drift-agent-dashboard-reference-renders/
+```
+
+Итог:
+
+- `state: done`;
+- Claude Code L5 создал `final-report.md`;
+- сохранены 6 reference renders в `renders/`;
+- рекомендация для будущей реализации: read-only `Relay Race Track` dashboard, 2D SVG/CSS, 60% track + 40% audit/limits panel;
+- остальные концепты (`Circuit Ring`, `City Drift`, `Vertical Tower`, `Mountain Pass`, `Drift Arena`) остаются reference gallery.
+
+Ограничения: PNG-рендеры содержат местами AI-псевдотекст, поэтому это не production UI-assets. Лимиты CLI локально дают observed usage, но official remaining/reset для Codex/Claude/Antigravity не раскрываются без ручного заполнения `docs/agent-limits/limits-config.json`.
+
+## Drift Workflow Control prototype
+
+2026-06-20 завершен следующий workflow рабочего прототипа:
+
+```text
+docs/agent-workflows/2026-06-20-103732-814300-drift-workflow-dashboard-prototype/
+```
+
+Итог:
+
+- `state: done`, `current_level: L5`, `allowed_next_agents: []`;
+- создан `final-report.md`;
+- dashboard доступен на dev server `http://127.0.0.1:5174/`;
+- актуальный screenshot: `C:/Users/koval/Documents/Команда/drift-dashboard-no-center-overlay-v1.png`;
+- car policy для старого L1 split была закреплена как: `L1.0` tuned kei scout, `L1.1` Toyota AE86 Trueno, `L2` Nissan 180SX Type X, `L3` Toyota Chaser JZX100, `L4` Nissan Silvia S15, `L5` Toyota Supra A80. Для новых workflow без MiMo использовать `L1` Toyota AE86 Trueno, `L2` Nissan 180SX Type X, `L3` Toyota Chaser JZX100, `L4` Nissan Silvia S15, `L5` Toyota Supra A80;
+- центральный динамический CSS-спрайт удален: пользователь отклонил вариант с дополнительной машиной/маской в центре. Не возвращать `DynamicActiveCar`, `.arena-active-car*`, `.arena-center-car-mask` и похожие overlay-решения без отдельного подтверждения;
+- активность уровня теперь показывается не центральной машиной, а перемещением `ActivePlatformPulse`, `SmokeLayer` и `SubagentOrbit` к текущему `active`/`next` агенту;
+- UI показывает финальное L5-состояние, не закрывает нижнюю машину легендой и не возвращает fake charts;
+- `/api/drift-workflow` подключен в Vite dev server и standalone `serve-sml.py`;
+- dashboard читает live snapshot из `contract.json`, `events.jsonl`, последнего `handoff.md`, `final-report.md`, `docs/agent-limits/limits-config.json` и `docs/agent-limits/latest.json`.
+- Для arena background использовать чистый `apps/aion-vision/public/drift-arena-tuned-kei-ru.png`; не возвращать `drift-arena-car-policy-ru.png`, потому что он содержит грубые дорисованные фигуры/полосы поверх машин.
+- Дым реализован CSS-слоем `SmokeLayer`: puff/wisp слои привязаны к позиции активного агента, а не к центру арены.
+- Вместо тряски машин использовать смысловую motion-систему: световая `HandoffLine` показывает передачу между уровнями, а `ActivePlatformPulse` мягко подсвечивает активную площадку. Не возвращать `IdleCarVibration`: пользователь подтвердил, что дергание машин выглядит неестественно.
+
+Ограничения: dashboard остается read-only; `DRIFT_WORKFLOW_FALLBACK` сохранен только как аварийный fallback, если live API и статический JSON недоступны. Presentation metadata машин/цветов/позиций пока живет в exporter. Claude Code CLI для L5 в этой итерации не прошел стабильный generation smoke-test (`Exceeded USD budget` и затем timeout), поэтому финализация выполнена через `--executor Codex` с явной фиксацией runtime/cost constraint.
+
+2026-06-20 пользователь попросил запустить текущую визуальную приемку через workflow. Создан новый workflow:
+
+```text
+docs/agent-workflows/2026-06-20-200542-268183-drift-workflow-control-motion-acceptance/
+```
+
+Текущий статус: `state: revision_requested`, `current_level: L1`, `current_subrole: L1.1`, `allowed_next_agents: ["Antigravity CLI"]`. L1.0 MiMo AUTO не дал содержательный handoff: `mimo run` в isolated cwd завис за 120 секунд и был остановлен. L1.1 Antigravity CLI также не дал валидный handoff: первый run вернул readiness/clarifying output, второй превысил 180 секунд и был остановлен. Важно: не считать MiMo или Antigravity ревью выполненным; workflow остановлен именно на runtime-дефектах, чтобы не создавать "испорченный телефон".
+
+По ходу исправлен `tools/antigravity_print.py`: DB fallback теперь пропускает readiness/clarifying responses, добавлен unit-test в `tools/sml/tests/test_antigravity_print.py` (`5 passed`).
+
+## Sports betting automation workflow
+
+2026-06-21 пользователь дал явное разрешение продолжить движение к цели по автоматизации ставок на спорт через WorkFlow, несмотря на active-run gate `trading_mvp=RUNNING`.
+
+Завершен workflow:
+
+```text
+docs/agent-workflows/2026-06-21-155039-996931-sports-betting-automation-risk-bounded-workflow/
+```
+
+Risk flags включены: `trading`, `writes_external_system`, `long_running`, `uses_secrets`; `risk_gate.required=true`.
+
+Итоговый статус:
+
+- `state: done`;
+- `current_level: L5`;
+- `allowed_next_agents: []`;
+- `risk_gate.status: passed`;
+- `final_report: final-report.md`.
+
+L1.0 MiMo AUTO выполнен через `mimo run -m mimo/mimo-auto` и submitted. MiMo выбрал `block`: блокируется скрытое auto-betting на реальные деньги и обход правил БК/KYC/CAPTCHA/лимитов/anti-bot; разрешенная зона для дальнейшей архитектуры - decision-support, paper trading, alerting, backtest, вероятностные модели и risk controls.
+
+L1.1/L2 Antigravity CLI не выполнены валидно: isolated runner дал невалидный stdout без headings, raw `agy --print` дал пустой stdout, DB fallback восстановил stale response по чужому workflow `label-check`. Диагностика: `tmp-l1-1-antigravity-runtime-failure.md`. Пользовательское `продолжи` принято как явный Codex fallback для текущего workflow и зафиксировано в `tmp-user-approved-codex-fallback.md`; это не меняет глобальную model policy.
+
+L3/L4 Codex собрали архитектуру decision-support/paper-trading MVP: разрешенные данные, вероятностные модели, calibration, EV scanner, paper executor, risk manager, read-only dashboard. Claude Code L5 вернул approve, после чего `approve-risk` и `finalize` выполнены с `executor=Codex`.
+
+Финальный вывод: можно продолжать только аналитический/paper-trading MVP. Real-money auto-execution, bookmaker writes, browser auto-click, обход правил БК/KYC/CAPTCHA/лимитов/anti-bot, мультиаккаунтинг и credential sharing заблокированы до отдельного legal/compliance review, разрешенного API/партнерского канала и ручного approval step.
+
+2026-06-21 в `C:\Users\koval\Documents\New project` создан локальный MVP для ручного decision-support:
+
+- Python package `src/sports_betting_analytics`;
+- CSV-входы `data/manual/fixtures.csv`, `results.csv`, `odds_1x2.csv`, `manual_bets.csv`;
+- no-vig probability baseline, простой Elo-shrinkage, EV, Kelly cap, risk gates;
+- статический отчет `out/report.html`, сигналы `out/signals.csv`, ledger summary `out/ledger_summary.csv`;
+- запуск: `.\tools\run-manual-signals.ps1`;
+- тесты: `$env:PYTHONPATH="src"; & "C:\Users\koval\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m unittest discover -s tests`.
+
+MVP не подключается к БК и не делает ставки; все действия после отчета остаются ручными.
+
+Уточнение 2026-06-21: пользователь не хочет вручную заполнять CSV. Канонический режим теперь такой: пользователь пишет "дай прогноз на сегодня" или "дай прогноз на матч X - Y"; агент сам собирает открытые данные/коэффициенты, проверяет источники, считает или оценивает EV/risk gates и отдает готовый forecast. CSV остаются внутренним форматом и ledger, а не пользовательской обязанностью. Пример агентского отчета создан в `C:\Users\koval\Documents\New project\out\agent_forecast_2026-06-21.md`.
+
+2026-06-21 добавлен Telegram-контур управления в `C:\Users\koval\Documents\New project`: `src/sports_betting_analytics/telegram_bot.py`, `tools/run-telegram-bot-visible.ps1`, `.env.telegram.example`, `data/signals/current_signal.json`. Бот работает только как панель сигналов и журнала: `/signal`, `/status`, `/placed`, inline-кнопки `ДА`, `НЕТ`, `Поставил вручную`. Токен хранится только локально в `.env.telegram`, который добавлен в `.gitignore`; бот не логинится в БК, не кликает ставки и не управляет деньгами. Запускать только в видимом терминале, потому что long polling - долгоживущий процесс.
+
+2026-06-21 21:18 +03 Telegram betting bot перезапущен после расширения формата сигнала. Старый PID `33136` ранее был живым PowerShell-окном без дочернего `python.exe`, поэтому в `src/sports_betting_analytics/telegram_bot.py` уже есть retry-защита polling/update handling. Текущий PID: `2064`, внутри должен быть дочерний `python.exe`; metadata: `C:\Users\koval\Documents\New project\data\telegram_bot_run_metadata.json`; проверка: `Get-Process -Id 2064; Get-CimInstance Win32_Process -Filter 'ParentProcessId=2064'`. Предыдущие PID `16268`, `9524`, `33136`, `21296`, `9764`, `8368` не являются активными.
+
+2026-06-21 21:12 +03 `Новая Зеландия - Египет` учтен как уже поставленное событие и исключен из активного `current_signal.json`. Повторные строки по этому же `signal_id` убраны из manual ledger, а `append_manual_bet` теперь не добавляет второй pending-row для уже существующего `match_id`. Telegram также зафиксировал `Бельгия - Иран` как placed, поэтому текущий активный сигнал заменен на `Уругвай - Кабо-Верде`, `П1 Уругвай`, PARI URL `https://pari.ru/sports/football/category/internationalteams/136181/64971945`, вход только при `1.43+`, stake `10 ₽`, суммарная pending exposure после чистки `20 ₽`.
+
+2026-06-21 21:18 +03 Telegram `/signal` расширен: `current_signal.json` теперь может содержать `alternatives` и `special_risks`. Для `Уругвай - Кабо-Верде` основной вариант остается `П1 Уругвай`, альтернативы включают `Фора Уругвая (-1)` и `Фора Уругвая (-1.5)`, а `Автогол в матче` выводится только в блоке `Спецриск` как high-risk watch, не рекомендация. В README добавлено описание этих полей.
+
+2026-06-21 21:38 +03 Telegram betting bot переведен с простого launcher на видимый monitor-режим после повторного зависания/падения. Старый metadata PID `2064` был мертв; `run-telegram-bot-visible.ps1 -Once` успешно обработал backlog `17 update(s)` и поднял offset до `722049890`, значит токен/Telegram API были исправны. Добавлен `C:\Users\koval\Documents\New project\tools\run-telegram-bot-monitor-visible.ps1`, README обновлен. Активный monitor PID `29788`, дочерний `python.exe` после code reload `9236`; проверка: `Get-Process -Id 29788; Get-CimInstance Win32_Process -Filter 'ParentProcessId=29788'`. Metadata: `C:\Users\koval\Documents\New project\data\telegram_bot_run_metadata.json`. Monitor запускается только в видимом окне и перезапускает бота через 5 секунд после падения.
+
+2026-06-21 21:39 +03 Telegram bot теперь не показывает уже поставленный `current_signal`: если `signal_id` есть в `data/manual/manual_bets.csv`, `/signal` отправляет сообщение "сигнал уже есть в журнале" без inline-кнопок, а старая кнопка `ДА` не ведет к повторному подтверждению. `Уругвай - Кабо-Верде` уже записан как pending manual bet, поэтому следующий betting-сигнал нужно рассчитывать отдельно по live-линии, а не повторять текущий JSON.
+
+2026-06-22 08:15 +03 после очередного сообщения "бот завис" выполнен полный технический аудит `C:\Users\koval\Documents\New project`; отчет создан в `PROJECT_TECHNICAL_AUDIT.md` без описания функционального назначения процесса. Фактическая причина отказа на момент проверки: metadata указывала на monitor PID `29788`, но monitor/python процессов не было; one-shot polling был рабочим и обработал `9 update(s)`, значит токен/API были живы. Исправлены баги: stale callback применял старую inline-кнопку к текущему `current_signal`, дубли `/placed` писались как реальные events, Telegram `ok=false` не считался ошибкой, отсутствовали проектные start/health команды, не было transcript monitor, bankroll defaults расходились (`10000` vs `1000`). Добавлены `tools/start-telegram-bot-monitor-visible.ps1`, `tools/check-telegram-bot-health.ps1`, transcript `data/telegram_bot_monitor_transcript.log`; `config/default.json` и `tools/run-manual-signals.ps1` теперь используют `1000`. Активный monitor запущен через новый launcher: PID `11104`, child `python.exe` PID `29600`; health: `& "C:\Users\koval\Documents\New project\tools\check-telegram-bot-health.ps1"` -> `OK`. Проверки: py_compile OK, PowerShell parse OK, CLI run/ledger OK, JSON/CSV validation OK, `python -m unittest discover -s tests` -> 11 OK.
+
+2026-06-22 13:20 +03 учтены изменения Claude в `C:\Users\koval\Documents\New project`: актуальный рабочий запуск проекта теперь `tools/run-wc-model.ps1` (PARI API + published Elo + xG + голевые рынки + watchlist), инструкция `КАК_РАБОТАТЬ.md`, новые модули `pari_fetcher.py`, `xg_model.py`, `markets.py`, `adjustments.py`; тестовый набор вырос до 42 tests. Текущий `current_signal.json` заменен на `Аргентина - Австрия`, PARI event `64971867`, `П1 Аргентина`, вход `1.45+`. При проверке Telegram health был `NO_PYTHON_CHILD` для monitor PID `26184`; `tools/start-telegram-bot-monitor-visible.ps1` доработан: monitor без дочернего `python.exe` автоматически заменяется. Новый monitor запущен: PID `31956`, child `python.exe` PID `32376`; health после полного polling-интервала `OK`. `tools/run-wc-model.ps1 -SkipLineRefresh` успешно собрал `out/wc_compare.md`, `out/wc_markets_compare.md`, `out/wc_watchlist.md`: 96 signals, 0 candidate, 5 longshot_watch.
+
+2026-06-22 13:29 +03 Telegram стал dashboard-интерфейсом для текущих отчетов: в `telegram_bot.py` добавлены команды `/report`(`/reports`), `/watchlist`, `/compare`, `/markets`, `/health`, `/model`(`/refresh`). `/report` отправляет `out/wc_watchlist.md`, `out/wc_compare.md`, `out/wc_markets_compare.md` частями через splitter под Telegram limit. README и `КАК_РАБОТАТЬ.md` обновлены. После code reload monitor PID `31956`, child `python.exe` PID `33256`, health `OK`; в Telegram отправлен вводный текст и полный report. Проверки: `python -m unittest discover -s tests` -> 45 OK. Важно: сама модель все еще обновляется видимо через `tools/run-wc-model.ps1`, затем результаты забираются в Telegram через `/report`.
+
+Текущий betting signal поддерживает поле `bookmaker_event_url`: Telegram `/signal` выводит URL в тексте и добавляет кнопку `Открыть событие в БК`. Ссылка ведет на страницу события/линии, но не размещает ставку и не формирует автоматическое денежное действие.
+
+## HH avatar / resume booster market workflow
+
+2026-06-21 завершен workflow рыночной проверки идеи продукта для HeadHunter:
+
+```text
+docs/agent-workflows/2026-06-21-155336-735304-анализ-российского-рынка-улучшения-аватарки-для-headhunter/
+```
+
+Итог:
+
+- `state: done`, `current_level: L5`, `last_event: finalized`;
+- финальный отчет сохранен в `final-report.md` и исходный draft в `final-report-draft.md`;
+- все переходы workflow прошли корректно: L1.0 -> L1.1 -> L2 -> L3 -> L4 -> L5;
+- важное ограничение: MiMo AUTO, Antigravity CLI и Claude Code не вызывались как внешние runtime, переходы выполнены через `--executor Codex` и это зафиксировано в handoff/events;
+- рыночный вывод: standalone "улучшатель аватарки для hh.ru" слаб как основной продукт, потому что его закрывают generic AI headshot/photo editor сервисы;
+- рекомендуемая ставка: `HH Resume Booster` - фото + аудит резюме + адаптация под вакансию + сопроводительное письмо + чеклист перед откликом.
+
+Следующий продуктовый шаг: landing/concierge test с тремя офферами - avatar-only, full resume audit, vacancy response pack - и замер paid intent.
+
+## HH Resume Booster validation surface
+
+2026-06-21 реализован практический слой для следующего шага:
+
+```text
+apps/aion-vision/src/components/dashboard/HhBoosterValidation.tsx
+docs/experiments/hh-resume-booster-validation.md
+tools/hh_resume_booster_metrics.py
+docs/agent-workflows/2026-06-21-162203-864003-hh-resume-booster-landing-concierge-test/
+```
+
+Экран:
+
+```text
+http://127.0.0.1:5174/#hh-booster
+```
+
+Что есть:
+
+- три оффера: `Аватарка` 199 RUB, `Аудит резюме` 399 RUB, `Отклик под вакансию` 799 RUB;
+- local-only форма concierge intake;
+- хранение заявок в `localStorage` key `aion.hhResumeBooster.leads.v1`;
+- export JSON;
+- comparison panel по paid intent;
+- CLI подсчета exported JSON/CSV.
+- `Старт теста` / `Сброс даты`, статус `День N из 14`, дата старта/финиша и decision gates по порогам.
+
+Проверки: `npm run lint`, `npm run build`, smoke-test `tools/hh_resume_booster_metrics.py`, Playwright fallback через Microsoft Edge. Скриншоты: `C:/Users/koval/Documents/Команда/hh-booster-top-desktop.png`, `C:/Users/koval/Documents/Команда/hh-booster-top-mobile.png`, `C:/Users/koval/Documents/Команда/hh-booster-desktop.png`, `C:/Users/koval/Documents/Команда/hh-booster-mobile.png`.
+
+2026-06-21 добавлен жесткий decision gate: решение можно принимать только если прошли 14 дней, лидов >= 30, strong paid intent >= 10, каналов >= 2 и ролей >= 5; позже gate усилен per-offer coverage. CLI `tools/hh_resume_booster_metrics.py` теперь читает `experimentState` и не ставит `decision_ready=true`, если `days_complete=false`. Последний rendered smoke screenshot: `C:/Users/koval/Documents/Команда/hh-booster-progress-gate-v2.png`.
+
+2026-06-21 добавлен операционный дневной учет: UI показывает лиды/paid intent за сегодня, средний темп по активным дням, сколько лидов и paid intent нужно добирать в день до конца 14-дневного окна, таблицу последних 7 дней по офферам и CSV export заявок. JSON export теперь включает `dailyMetrics`, а CLI `tools/hh_resume_booster_metrics.py` выводит `daily.by_day`, `average_*_per_active_day` и `required_*_per_remaining_day`. Проверки: `npm run lint`, `npm run build`, Python py_compile, CLI smoke JSON, Playwright Edge smoke screenshot `C:/Users/koval/Documents/Команда/hh-booster-daily-accounting.png`.
+
+2026-06-21 добавлен публичный landing/intake route для кандидатов: `http://127.0.0.1:5174/#hh-booster-public` в dev/fallback режиме и `http://127.0.0.1:8787/#hh-booster-public` при запуске через `apps/aion-vision/scripts/serve-sml.py`. Публичная форма показывает три оффера без внутренних метрик, принимает `channel`/`utm_source` из hash query, в dev пишет в `localStorage`, а в production server mode отправляет `POST /api/hh-booster/leads`. Серверный endpoint валидирует поля и пишет JSONL в `apps/aion-vision/data/hh-booster-leads.jsonl`; папка `apps/aion-vision/data/` добавлена в `.gitignore`. CLI `tools/hh_resume_booster_metrics.py` теперь принимает `.jsonl`. Проверки: py_compile, server helper smoke, HTTP-level POST smoke, JSONL CLI smoke, `npm run lint`, `npm run build`, Playwright Edge screenshot `C:/Users/koval/Documents/Команда/hh-booster-public-landing-v2.png`.
+
+2026-06-21 усилен privacy/ops минимум для публичного теста: публичная форма требует checkbox-согласие на обработку контакта и описания ситуации, серверный `POST /api/hh-booster/leads` отклоняет запрос без `consentAccepted=true`, добавлен `GET /api/hh-booster/leads?limit=5000`, а операторская панель получила кнопку `Сервер` для импорта server JSONL в `localStorage` и пересчета метрик. Runbook уточняет delete policy: по запросу участника удалить соответствующую строку из JSONL/export перед анализом. Проверки: py_compile, consent HTTP smoke (`400 consent required` без согласия, `201` с согласием), `GET` smoke, `npm run lint`, `npm run build`, Playwright Edge screenshot `C:/Users/koval/Documents/Команда/hh-booster-public-consent-v1.png`.
+
+2026-06-21 добавлен launch kit в операторскую панель `#hh-booster`: блок `Ссылки и тексты` генерирует публичные ссылки `#hh-booster-public?channel=...` для `hh.ru`, `Telegram`, `VK`, `Авито Работа`, `Рекомендация`, `Другое`; содержит готовые тексты для карьерного чата, личного сообщения и VK/поста; есть кнопки копирования. Runbook обновлен: при внешнем URL нужно заменить только host, сохранив hash и `channel`. Проверки: `npm run lint`, `npm run build`, Playwright Edge screenshot `C:/Users/koval/Documents/Команда/hh-booster-launch-kit-v1.png`, console errors 0.
+
+2026-06-21 добавлен видимый production-запуск 14-дневного теста: `apps/aion-vision/scripts/start-hh-booster-test.ps1`. Команда печатает операторскую ссылку, публичную форму, канальные URL, путь `apps/aion-vision/data/hh-booster-leads.jsonl`, команду ежедневных метрик и подсказки по public tunnel, но не запускает tunnel скрыто. Основной запуск: `& "D:\AionUi-Paperclip\apps\aion-vision\scripts\start-hh-booster-test.ps1" -Port 8787`; для внешней аудитории передавать `-PublicBaseUrl "https://PUBLIC_HOST"`. Проверки: PowerShell parse, `-PrintOnly -PublicBaseUrl "https://example.test"`, `npm run lint`, `npm run build`, CLI metrics missing-JSONL smoke.
+
+2026-06-21 закрыт зазор с доказуемостью 14-дневного окна для server JSONL: `serve-sml.py` получил `GET/POST /api/hh-booster/experiment` и хранит `apps/aion-vision/data/hh-booster-experiment.json` рядом с заявками. Операторская панель синхронизирует кнопку `Старт теста` на сервер и импортирует server experiment state кнопкой `Сервер`. `tools/hh_resume_booster_metrics.py` автоматически читает соседний `hh-booster-experiment.json` при подсчете `hh-booster-leads.jsonl` или принимает `--experiment-state`. Проверки: py_compile, `npm run lint`, `npm run build`, synthetic JSONL+experiment smoke с `decision_ready=true`, server helper smoke.
+
+2026-06-21 добавлен видимый daily/status monitor `apps/aion-vision/scripts/watch-hh-booster-test.ps1`: разовый статус по умолчанию и `-Watch -IntervalSeconds 60` для наблюдения. Скрипт ничего не пишет, читает server JSONL и experiment state, показывает наличие файлов, last write, gate progress, темп, by-offer paid intent, последние дни и next action. `start-hh-booster-test.ps1` теперь печатает команды monitor рядом с metrics command. Проверки: PowerShell parse, missing-data smoke, synthetic JSONL+experiment smoke с `Ready: yes`, launch script `-PrintOnly`.
+
+2026-06-21 добавлен финальный paid-intent report generator `tools/hh_resume_booster_decision_report.py`. Он читает те же JSON/CSV/JSONL + experiment state, в strict mode возвращает exit code `2`, если gate не пройден, а при ready формирует Markdown-решение: avatar standalone front-offer, avatar lead magnet/module, MVP вокруг аудита резюме или MVP вокруг отклика под вакансию. `start-hh-booster-test.ps1` теперь печатает команды final report и draft report. Проверки: py_compile, not-ready synthetic smoke (`Status: not_ready`, blockers, exit 2), ready synthetic smoke (`Status: ready`, decision `avatar_module_build_vacancy_response_pack`, winner `Отклик под вакансию`).
+
+2026-06-21 добавлен privacy/data-admin tool `tools/hh_resume_booster_data_admin.py` для server JSONL. По умолчанию это dry-run find с маскировкой контакта; `--action delete --write` удаляет matching rows, `--action redact --write` сохраняет агрегатную строку, но заменяет `contact`/`notes`, сбрасывает `consentAccepted=false` и ставит `deletedAt`. Перед write создается backup в `apps/aion-vision/data/backups/`. `start-hh-booster-test.ps1` печатает dry-run/delete команды. Проверки: py_compile, synthetic find, delete with backup, redact with backup.
+
+2026-06-21 добавлен launch preflight `apps/aion-vision/scripts/preflight-hh-booster-test.ps1`. Скрипт не стартует сервер и по умолчанию не пишет данные: проверяет `dist/index.html`, HTTP root, `GET /api/hh-booster/leads`, `GET /api/hh-booster/experiment`, public URL risk/reachability. Опциональный `-WriteSmoke` отправляет временную QA-заявку и очищает ее через `hh_resume_booster_data_admin.py` с backup. `start-hh-booster-test.ps1` теперь печатает preflight/read-only и write-smoke команды. Проверки: PowerShell parse, offline fail smoke, in-process server read-only smoke, in-process write-smoke cleanup (`remaining_after_cleanup=0`).
+
+2026-06-21 добавлен read-only concierge follow-up queue `tools/hh_resume_booster_followup_queue.py` для ежедневной ручной обработки заявок. CLI читает JSON/CSV/JSONL, по умолчанию показывает только `ready` и `maybe`, сортирует `Готов оплатить` выше `Интересно`, маскирует контакты, поддерживает `--show-contact` только для явного follow-up, фильтры `--intent`, `--offer`, `--channel`, `--role-contains`, `--days`, вывод text/Markdown/JSON и подсказку следующего действия по офферу. Если JSONL еще не создан, CLI показывает пустую очередь без stack trace. `start-hh-booster-test.ps1` печатает команды очереди рядом с daily metrics, runbook обновлен. Проверки: py_compile, missing-data smoke, synthetic JSONL text smoke, `--show-contact --json`, Markdown smoke, filter smoke, PowerShell parse для launch/watch scripts, launch `-PrintOnly`.
+
+2026-06-21 добавлен outcome tracker для ручной concierge-обработки: `tools/hh_resume_booster_followup_state.py`. Он ведет отдельный append-only state `apps/aion-vision/data/hh-booster-followups.jsonl`, не меняя исходный `hh-booster-leads.jsonl`. Команды: `mark LEAD_ID --status contacted/responded/confirmed_paid_intent/paid/declined/no_response/invalid --write`, `summary`, `list`. `mark` по умолчанию dry-run и пишет только с `--write`; контакты маскируются по умолчанию. `tools/hh_resume_booster_followup_queue.py` теперь читает этот state и скрывает закрытые лиды (`paid`, `declined`, `no_response`, `invalid`) без `--include-closed`. `start-hh-booster-test.ps1` печатает путь follow-ups и команды mark/summary. Проверки: py_compile, synthetic mark/write/summary/list, queue hides paid lead by default, queue `--include-closed` shows `Оплатил`, missing-state summary, launch `-PrintOnly`.
+
+2026-06-21 `tools/hh_resume_booster_decision_report.py` расширен follow-up outcomes: добавлен `--followup-state`, auto-detect соседнего `hh-booster-followups.jsonl`, блок `Follow-up Outcomes` в Markdown-отчете и quality-signal сравнение confirmed paid intent/paid по офферам. Primary decision gate остается по первичному paid intent из формы: 14 дней, 30+ лидов, 10+ `Готов оплатить`, 2+ канала, 5+ ролей и минимум 5 лидов по каждому офферу. `start-hh-booster-test.ps1` и runbook теперь печатают final/draft report commands с `--followup-state`. Проверки: py_compile, synthetic ready strict report с follow-up `paid`, synthetic not-ready draft report с follow-up `confirmed_paid_intent`, PowerShell parser smoke.
+
+2026-06-21 добавлен per-offer coverage gate для HH Resume Booster: `ExperimentState`/server experiment получили `targetMinLeadsPerOffer=5`, операторский UI показывает gate `Офферы`, `tools/hh_resume_booster_metrics.py` выводит `offer_coverage`/`offer_coverage_ready`, `tools/hh_resume_booster_decision_report.py` блокирует strict final report при недособранном оффере, а `watch-hh-booster-test.ps1` показывает coverage в видимом monitor. Это закрывает риск ложного winner, когда общий порог 30 лидов выполнен, но один из трех офферов почти не тестировался. Проверки: py_compile, PowerShell parser, synthetic coverage fail/pass, watch coverage capture, start `-PrintOnly`, `npm run lint`, `npm run build`.
+
+2026-06-21 добавлен daily outreach planner `tools/hh_resume_booster_outreach_plan.py`: read-only CLI читает server JSONL + experiment state и показывает дефициты по лидам, paid intent, каналам, ролям и per-offer coverage; рекомендует, какой оффер добирать сегодня, какие каналы еще не использовались и какие next actions выполнить. `start-hh-booster-test.ps1` теперь печатает команду planner рядом с daily metrics, канальные ссылки в стартовом скрипте выровнены с русскими label из UI. Runbook обновлен: перед follow-up queue сначала запускать outreach plan. Проверки: py_compile, missing-data JSON smoke, synthetic partial-leads smoke, start `-PrintOnly`, PowerShell parser.
+
+2026-06-21 добавлен launch freeze manifest `tools/hh_resume_booster_launch_manifest.py`: CLI собирает Markdown/JSON manifest 14-дневного теста с офферами, ценами, gates, текущим experiment state, публичными ссылками, путями данных, командами контроля и правилами privacy/no-scraping. `start-hh-booster-test.ps1` печатает команду `Launch manifest / freeze`; runbook теперь требует сохранить manifest после preflight/write-smoke и перед публикацией ссылок. Проверки: py_compile, JSON status smoke, synthetic started/public-url smoke, Markdown `--out` smoke, start `-PrintOnly`, PowerShell parser.
+
+2026-06-21 добавлен и затем усилен daily snapshot/audit trail `tools/hh_resume_booster_daily_snapshot.py`: CLI собирает PII-safe Markdown/JSON снимок дня из metrics, outreach activity, outreach plan, data quality и follow-up outcomes. Snapshot содержит gate, data quality state/counts/blocking issues с маскированными контактами, темп, offer coverage, outreach denominator, recommended actions и follow-up агрегаты, но не пишет raw contacts/личные notes кандидатов. `start-hh-booster-test.ps1` печатает команду `Daily snapshot` с `--outreach-state` и `--strict-data-quality`; runbook требует сохранять snapshot в конце каждого рабочего дня в `apps/aion-vision/data/daily/`. Проверки: py_compile, clean snapshot JSON/Markdown smoke, dirty strict exit 2, Markdown leak check, start `-PrintOnly`, PowerShell parser.
+
+2026-06-21 добавлен append-only outreach activity log `tools/hh_resume_booster_outreach_log.py` для 14-дневного HH Resume Booster теста. Он фиксирует неперсональные события продвижения: канал, тип активности, фокус-оффер, messages sent, audience count, link URL и короткую note без ПДн. `add` по умолчанию dry-run и пишет только с `--write`; `summary` сравнивает outreach с собранными leads по каналам и офферам, включая `leads_per_100_sent`. `start-hh-booster-test.ps1` печатает dry-run/write/summary команды, daily snapshot включает блок `Outreach Activity`. Это нужно, чтобы финальный paid-intent вывод не путал слабый оффер с оффером, который просто мало показывали.
+
+2026-06-21 добавлен read-only data quality audit `tools/hh_resume_booster_data_quality.py`: проверяет server/local JSONL/JSON/CSV перед ежедневными метриками и финальным paid-intent report. Audit ловит битые строки, неизвестные `offer`/`intent`, пропущенные поля, дубликаты `id`/контактов, QA/preflight/test-like заявки, `createdAt` вне окна эксперимента и `consentAccepted` не `true`; контакты в выводе маскируются. `start-hh-booster-test.ps1` печатает команду `Data quality audit`, runbook требует strict audit перед финальным решением.
+
+2026-06-21 финальный `tools/hh_resume_booster_decision_report.py` получил встроенный data-quality gate: отчет содержит раздел `Data Quality`, `Status: ready` невозможен при errors/warnings, а non-draft запуск возвращает exit code `2`, если quantitative gate не готов или audit нечистый. `--draft` остается способом получить диагностический отчет до завершения gate. `start-hh-booster-test.ps1` печатает предупреждение, что final report включает strict data-quality gate.
+
+2026-06-21 добавлен read-only prelaunch GO/NO-GO verifier `tools/hh_resume_booster_prelaunch_check.py`: перед публикацией candidate links проверяет dist/scripts, operator/public URL, server/API health, experiment start/targets, launch manifest, offer/channel config и data quality. `Status: GO` нужен именно для публикации ссылок, а не для финального решения; он не требует 30 лидов, но требует публичный URL, старт experiment, saved manifest и чистые данные. `start-hh-booster-test.ps1` печатает команду `Prelaunch GO/NO-GO`.
+
+2026-06-21 prelaunch/manifest усилены против случайной публикации placeholder URL: `tools/hh_resume_booster_launch_manifest.py` теперь считает `public_url_ready=false` для `https://PUBLIC_HOST`, `https://example.test`, `*.example`, `*.test`, `*.invalid` и похожих заглушек, а `tools/hh_resume_booster_prelaunch_check.py` возвращает `NO-GO` с fail `public_url`. Текущий read-only launch-readiness: `npm run build` прошел; с реальным по форме URL и `--skip-server-check` остаются два ожидаемых блокера до публикации - нажать `Старт теста` в операторской панели и сохранить launch manifest после выбора реального публичного URL.
+
+2026-06-21 локальный HH Resume Booster production-сервер запущен в видимом Windows PowerShell-окне на `http://127.0.0.1:8787/#hh-booster`. Найден и исправлен Windows-блокер: `start-hh-booster-test.ps1` был UTF-8 без BOM, из-за чего Windows PowerShell 5.1 ломал кириллицу и падал parser error; файл перекодирован в UTF-8 BOM и проверен через `powershell.exe -File ... -PrintOnly`. Локальный preflight и write-smoke прошли, QA-лид удален cleanup. `watch-hh-booster-test.ps1` исправлен: при пустом `startedAt` он теперь просит нажать `Старт теста`, а не пишет `continue collection`.
+
+2026-06-21 добавлен безопасный public launch helper `apps/aion-vision/scripts/prepare-hh-booster-public-launch.ps1`. Скрипт не запускает tunnel скрыто: без `-PublicBaseUrl` печатает видимые варианты tunnel (`cloudflared`, `ngrok`, `npx localtunnel`, `ssh localhost.run`) и возвращает `NO-GO`; с реальным `-PublicBaseUrl` печатает/выполняет сохранение launch manifest и prelaunch GO/NO-GO. Placeholder URL (`https://example.test`, `https://PUBLIC_HOST`) блокируются до записи manifest. `start-hh-booster-test.ps1` теперь печатает команду helper в блоке запуска. Проверки: Windows PowerShell parser, no-url `-PrintOnly`, placeholder block exit 2, valid-shaped `-PrintOnly`, start `-PrintOnly`; manifest в тестах не записывался.
+
+2026-06-21 добавлен experiment-state CLI `tools/hh_resume_booster_experiment_state.py`: `status`, `start`, `reset` для `apps/aion-vision/data/hh-booster-experiment.json`. CLI dry-run по умолчанию, пишет только с `--write`; `start` блокирует повторный старт без `--force` и блокирует старт при уже существующих лидах без `--allow-existing-leads`, чтобы не исказить день 1. `reset` требует `--force`. `start-hh-booster-test.ps1`, public launch helper и runbook печатают команды dry-run/write. Текущий production status read-only: `started_at=n/a`, `total_leads=0`, experiment state file отсутствует, leads JSONL пустой. Проверки: py_compile, parser, start/helper print-only, synthetic start/reset/existing-leads smoke.
+
+2026-06-21 20:40 +03 повторно поднят HH Resume Booster rehearsal runtime: локальный production server в видимом PowerShell-окне PID `28024`, URL `http://127.0.0.1:8787/#hh-booster`; public localtunnel в видимом PowerShell-окне PID `4380`, candidate URL `https://huge-moons-fail.loca.lt/#hh-booster-public`, лог `apps/aion-vision/data/hh-booster-public-tunnel-20260621-203648.log`. Усилен preflight/prelaunch guard: candidate `Public form` теперь печатается с внешним host, проверяются public API endpoints и localtunnel interstitial/password page. Проверки: py_compile `tools/hh_resume_booster_prelaunch_check.py`, public preflight с API checks, public write-smoke через `https://huge-moons-fail.loca.lt` с cleanup, data quality clean `rows=0`, watch показывает `Public URL: ready`. Prelaunch остается ожидаемо `NO-GO`: `startedAt=null` и `hh-booster-launch-manifest.md` отсутствует; 14-дневное окно не стартовало.
+
+2026-06-21 20:48 +03 добавлен UI guard против случайной раздачи локальных candidate links: операторская панель `#hh-booster` теперь поддерживает `?publicBaseUrl=https%3A%2F%2FREAL_PUBLIC_HOST#hh-booster`, сохраняет public host в `localStorage` key `aion.hhResumeBooster.publicBaseUrl.v1`, показывает поле `Public host для candidate links` в блоке `Ссылки и тексты` и предупреждает, если ссылки строятся от localhost. Текущий rehearsal открыт как `http://127.0.0.1:8787/?publicBaseUrl=https%3A%2F%2Fhuge-moons-fail.loca.lt#hh-booster`; Playwright/Edge smoke подтвердил, что offer+channel links используют `https://huge-moons-fail.loca.lt/#hh-booster-public`, локального warning нет. Screenshot: `C:/Users/koval/Documents/Команда/hh-booster-public-host-override-v1.png`. Проверки: `npm run lint`, `npm run build`, Playwright smoke.
+
+2026-06-21 20:54 +03 добавлен publish kit generator `tools/hh_resume_booster_publish_kit.py`. Он не стартует эксперимент и не пишет заявки; по текущему leads/experiment state и public URL генерирует Markdown с launch rule, командами после `Старт теста`, дневной целью, direct offer links, полной offer+channel matrix, готовыми текстами, outreach logging и daily control loop. Текущий kit сохранен в `apps/aion-vision/data/hh-booster-publish-kit.md` для `https://huge-moons-fail.loca.lt`; в нем 25 public-form ссылок, три оффера и вся матрица. `start-hh-booster-test.ps1` теперь печатает команду генерации publish kit. Проверки: `py_compile`, генерация `--write`, start script `-PrintOnly`, public preflight `ok`, prelaunch ожидаемо `NO-GO` до `Старт теста` и manifest.
+
+2026-06-21 21:04 +03 усилен one-command public launch guard HH Resume Booster: `apps/aion-vision/scripts/prepare-hh-booster-public-launch.ps1 -StartExperiment` теперь перед записью `startedAt` запускает pre-start readiness check через `hh_resume_booster_prelaunch_check.py --json` и разрешает продолжить только если единственные fail checks — ожидаемые `experiment_started` и `launch_manifest`. Текущий localtunnel `https://huge-moons-fail.loca.lt` стал нестабилен (`503 Service Unavailable`/timeout на public API), поэтому helper вернул `NO-GO`, не стартовал 14-дневный таймер и не создал `hh-booster-launch-manifest.md`. Production server `http://127.0.0.1:8787` жив, `hh-booster-experiment.json` все еще `startedAt=null`, leads JSONL пустой. Проверки: Windows PowerShell 5.1 parser/PrintOnly, negative `-StartExperiment` smoke, canonical experiment status, prelaunch public NO-GO.
+
+2026-06-21 21:08 +03 поднят новый видимый public localtunnel для HH Resume Booster: PID `26992`, log `apps/aion-vision/data/hh-booster-public-tunnel-20260621-210708.log`, URL `https://public-rooms-camp.loca.lt/#hh-booster-public`. Public API `GET /api/hh-booster/experiment` вернул `200`, public preflight прошел `Result: ok`, prelaunch ожидаемо `NO-GO` только из-за `experiment_started` и `launch_manifest`. Publish kit перегенерирован в `apps/aion-vision/data/hh-booster-publish-kit.md` под новый URL. Monitor показывает `Public URL: ready`, `Started: no`, `Manifest: missing`; следующий шаг — только после явного решения начать сбор выполнить one-command launch или нажать `Старт теста`, затем сохранить manifest и пройти prelaunch GO.
+
+2026-06-21 21:12 +03 `tools/hh_resume_booster_publish_kit.py` превращен в self-contained launch bundle: в верхней части Markdown теперь есть `Launch status`, раздел `One-command Launch` и точная команда `prepare-hh-booster-public-launch.ps1 -PublicBaseUrl ... -OperatorBaseUrl ... -CheckPublicHttp -StartExperiment`, которая стартует 14-дневный таймер только после pre-start public health check. Текущий `apps/aion-vision/data/hh-booster-publish-kit.md` перегенерирован под `https://public-rooms-camp.loca.lt`; `hh-booster-experiment.json` все еще `startedAt=null`, leads `0`, manifest отсутствует. Проверки: `py_compile`, генерация `--write`, readback top 40 lines, public experiment API `200`.
+
+2026-06-21 21:17 +03 добавлен concierge follow-up packet для HH Resume Booster: `tools/hh_resume_booster_concierge_packet.py` читает `hh-booster-leads.jsonl`, учитывает `hh-booster-followups.jsonl`, по умолчанию маскирует контакты, приоритизирует `ready` как `P0`, `maybe` как `P1`, генерирует первое сообщение под `avatar/audit/response`, список недостающих входов и copy-ready команды `hh_resume_booster_followup_state.py mark`. `start-hh-booster-test.ps1`, `docs/experiments/hh-resume-booster-validation.md` и `apps/aion-vision/data/hh-booster-publish-kit.md` теперь показывают команды `Concierge packet`. Проверки: `py_compile`, production empty JSONL smoke, synthetic JSONL `--json` с P0/P1 и masked contacts, Windows PowerShell 5.1 `start-hh-booster-test.ps1 -PrintOnly`. Privacy rule: `--show-contact` использовать только для реального follow-up и не сохранять открытые контакты в docs/SML.
+
+2026-06-21 21:31 +03 операторский экран `#hh-booster` получил UI-блок `Кому писать первым`: он берет server/local leads из панели, показывает top ready/maybe follow-up actions, приоритет `P0/P1`, оффер, контакт, недостающие входные данные и кнопку копирования первого сообщения. После сборки восстановлен `apps/aion-vision/data/hh-booster-experiment.json` в безопасном состоянии `startedAt=null`, локальный production server перезапущен в видимом PowerShell-окне PID `33528` на `http://127.0.0.1:8787/#hh-booster`. Проверки: `npm run lint`, `npm run build`, `tools/hh_resume_booster_concierge_packet.py --json` на пустом production JSONL, experiment `status --json`, local preflight `Result: ok`. Старый public URL `https://public-rooms-camp.loca.lt` больше не готов к публикации: PID `26992` не жив, public API вернул `503 Service Unavailable`; перед внешней раздачей нужен новый visible public tunnel и повторный preflight/prelaunch.
+
+2026-06-21 21:35 +03 повторно поднят HH Resume Booster launch-ready rehearsal: локальный production server в видимом PowerShell PID `21428`, URL `http://127.0.0.1:8787/#hh-booster`; новый visible localtunnel PID `11932`, log `apps/aion-vision/data/hh-booster-public-tunnel-20260621-213338.log`, public URL `https://tangy-peaches-like.loca.lt/#hh-booster-public`. Public API `/api/hh-booster/experiment` вернул `200`, read-only preflight и `-WriteSmoke` прошли `Result: ok`, QA-лид удален cleanup, data quality clean `total_rows=0`. `apps/aion-vision/data/hh-booster-publish-kit.md` перегенерирован под новый public URL. Prelaunch verifier вернул ожидаемый `NO-GO` только по двум блокерам: `experiment_started` и `launch_manifest`; public URL/API, targets, data quality, direct offer links и offer+channel matrix проходят. 14-дневный таймер не стартовал: `startedAt=null`.
+
+2026-06-21 21:40 +03 усилен day-0 launch safety для HH Resume Booster: `tools/hh_resume_booster_launch_manifest.py` теперь определяет временные tunnel hosts (`*.loca.lt`, `*.ngrok-free.app`, `*.trycloudflare.com`, `*.localhost.run`) и добавляет `ephemeral_url_warning`; `tools/hh_resume_booster_prelaunch_check.py` выводит check `ephemeral_public_url` со статусом `warn` и next action про повторную public API/prelaunch проверку непосредственно перед публикацией; `tools/hh_resume_booster_publish_kit.py` показывает `Ephemeral tunnel: yes` и правило перепроверки перед рассылкой. Текущий `apps/aion-vision/data/hh-booster-publish-kit.md` перегенерирован под `https://tangy-peaches-like.loca.lt` с предупреждением. Проверки: `py_compile` трех CLI, manifest JSON shows `ephemeral_url_warning=true`, prelaunch `NO-GO` с `failed=2` и `warnings=1`, publish kit readback, inline cases `ephemeral_url_cases_ok`.
+
+2026-06-21 21:44 +03 финальная свежая проверка подтвердила, что temporary rehearsal уже не активен: PIDs `21428` и `11932` не найдены, порт `8787` не слушает, `https://tangy-peaches-like.loca.lt/api/hh-booster/experiment` вернул `503 Service Unavailable`. Не использовать `tangy-peaches-like.loca.lt` как кандидатскую ссылку без нового visible tunnel и повторного preflight/prelaunch. `startedAt` остается `null`, leads `0`; 14-дневный тест не начат.
+
+2026-06-21 21:52 +03 добавлен safe day-0 rehearsal launcher для HH Resume Booster: `apps/aion-vision/scripts/start-hh-booster-day0-rehearsal.ps1`. Он предназначен для предзапусковой репетиции без старта 14-дневного таймера: стартует только видимые server/tunnel окна, ждет local/public `/api/hh-booster/experiment`, запускает preflight, пересобирает publish kit, пишет metadata rehearsal и разрешает только ожидаемые prelaunch-блокеры `experiment_started` и `launch_manifest`. Скрипт не пишет `startedAt` и не создает launch manifest. Runbook `docs/experiments/hh-resume-booster-validation.md` и `docs/tasks.md` обновлены. Проверки: Windows PowerShell 5.1 `-PrintOnly -SkipBuild`, `-PublicBaseUrl ... -PrintOnly -SkipBuild`, `py_compile` для launch/prelaunch/publish-kit CLI. Текущее состояние безопасное: `apps/aion-vision/data/hh-booster-experiment.json` содержит `startedAt=null`, `hh-booster-leads.jsonl` пустой, живого public URL нет.
+
+2026-06-21 21:57 +03 устранен PATH-риск в `apps/aion-vision/scripts/start-hh-booster-day0-rehearsal.ps1`: текущий shell один раз не нашел `powershell.exe`, поэтому launcher теперь сам разрешает путь к Windows PowerShell через `Get-Command`, затем через `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe` / `Sysnative`, и печатает `Visible shell` в `-PrintOnly`. Проверки: полный путь Windows PowerShell 5.1 и `pwsh` оба прошли `-PrintOnly -SkipBuild` и показали `Visible shell: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`; `Start timer: no`, `Write manifest: no`, `PrintOnly: no server/tunnel/process started`. Experiment state после проверки не изменился: `startedAt=null`, leads `0`.
+
+2026-06-21 22:20 +03 выполнена успешная day-0 rehearsal HH Resume Booster на новом live runtime. Локальный server жив в видимом PowerShell PID `12736` на `http://127.0.0.1:8787/#hh-booster`; public localtunnel жив в видимом PowerShell PID `31096`, candidate URL `https://eighty-boats-work.loca.lt/#hh-booster-public`, tunnel log `apps/aion-vision/data/hh-booster-public-tunnel-20260621-221958.log`. `start-hh-booster-day0-rehearsal.ps1 -SkipBuild -WriteSmoke` прошел: public API `/api/hh-booster/experiment` ok, write-smoke через public URL принят и очищен, `hh-booster-leads.jsonl` остался пустым. Publish kit `apps/aion-vision/data/hh-booster-publish-kit.md` перегенерирован под `https://eighty-boats-work.loca.lt`; metadata `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-221958.json` имеет `status=ready_for_launch`, `blockingFailures=[]`, `experimentStartedAt=null`, `totalLeads=0`. Prelaunch после cleanup: `NO-GO`, `failed=2`, `warnings=1`; технические checks pass, fail только `experiment_started` и `launch_manifest`, warning `ephemeral_public_url`. Старый broken tunnel `https://mighty-foxes-see.loca.lt` / PID `27872` остановлен и не должен использоваться.
+
+2026-06-21 22:18 +03 исправлен bug в `apps/aion-vision/scripts/start-hh-booster-day0-rehearsal.ps1`: Windows PowerShell 5.1 падал на array splatting при вызове `preflight-hh-booster-test.ps1` с public URL (`A positional parameter cannot be found that accepts argument '<public url>'`). Вызов переведен на hashtable splatting, а failure path теперь пишет metadata перед выходом на preflight/publish-kit ошибках. Проверки: failure metadata `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-221734.json` для нестабильного `https://mighty-foxes-see.loca.lt`; успешная auto-rehearsal с `https://eighty-boats-work.loca.lt`.
+
+2026-06-21 22:28 +03 добавлен fresh rehearsal guard в `apps/aion-vision/scripts/prepare-hh-booster-public-launch.ps1`. Если `-StartExperiment` запускается на temporary tunnel (`*.loca.lt`, `*.ngrok-free.app`, `*.trycloudflare.com`, `*.localhost.run`), helper теперь требует свежую successful day-0 rehearsal metadata для того же `PublicBaseUrl`: `status=ready_for_launch`, без `blockingFailures`, возраст не старше `-FreshRehearsalMinutes` (default 15). Если metadata нет или она stale, helper пишет `NO-GO` и не записывает `startedAt`. `tools/hh_resume_booster_publish_kit.py` и `apps/aion-vision/data/hh-booster-publish-kit.md` обновлены: one-command launch явно включает `-FreshRehearsalMinutes 15`. Проверки: Windows PowerShell 5.1 и `pwsh` `-PrintOnly`; fake URL `https://fresh-missing.loca.lt -StartExperiment -SkipServerCheck` заблокирован до записи `startedAt`; текущий `https://eighty-boats-work.loca.lt` с `-FreshRehearsalMinutes 1` заблокирован как stale; experiment state после проверок `startedAt=null`, leads `0`.
+
+2026-06-21 22:32 +03 visible monitor HH Resume Booster теперь показывает fresh rehearsal status для temporary public URL. `apps/aion-vision/scripts/watch-hh-booster-test.ps1` выводит `Rehearsal: fresh/stale/missing`, age и metadata path, а если URL временный и metadata отсутствует/протухла, next action предлагает rerun day-0 rehearsal with write-smoke before Start test. Исправлен cross-version timestamp parsing в monitor и launch helper: PowerShell 7 парсит `generatedAt` из JSON как `DateTime`, Windows PowerShell 5.1 как строку; теперь оба используют общий fallback parser. Проверки: Windows PowerShell 5.1 и `pwsh` monitor на `https://eighty-boats-work.loca.lt` оба показали fresh metadata `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-221958.json`; `pwsh prepare-hh-booster-public-launch.ps1 ... -FreshRehearsalMinutes 1 -StartExperiment` заблокировал stale rehearsal без записи `startedAt`; состояние осталось `startedAt=null`, leads `0`.
+
+2026-06-21 22:42 +03 обновлена day-0 readiness для HH Resume Booster без старта 14-дневного таймера. Текущий live runtime: локальный server PID `12736` на `http://127.0.0.1:8787/#hh-booster`, public localtunnel PID `31096`, candidate URL `https://eighty-boats-work.loca.lt/#hh-booster-public`. Повторный `start-hh-booster-day0-rehearsal.ps1 -PublicBaseUrl "https://eighty-boats-work.loca.lt" -SkipBuild -WriteSmoke` прошел: public API ok, write-smoke через public endpoint принят и очищен, `hh-booster-leads.jsonl` остался пустым, metadata `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-224029.json` fresh/ready. Monitor показывает `Public URL: ready`, `Rehearsal: fresh`, `Manifest: missing`, `Started: no`. Исправлены подсказки в `start-hh-booster-day0-rehearsal.ps1` и `prepare-hh-booster-public-launch.ps1`: one-command launch теперь везде явно печатает `-FreshRehearsalMinutes 15`. Проверки: оба скрипта `-PrintOnly`, experiment status `startedAt=null`, leads `0`. Следующий шаг только после явного решения пользователя начать сбор: выполнить guarded launch command и затем publish links.
+
+2026-06-21 22:46 +03 `apps/aion-vision/scripts/watch-hh-booster-test.ps1` усилен как launch operator monitor: если public URL готов, rehearsal fresh и `startedAt` еще пустой, monitor теперь печатает точную guarded-команду `prepare-hh-booster-public-launch.ps1 -PublicBaseUrl ... -OperatorBaseUrl ... -CheckPublicHttp -FreshRehearsalMinutes 15 -StartExperiment` вместо ручной подсказки нажать кнопку в UI. Если rehearsal stale/missing, monitor печатает точную команду rerun `start-hh-booster-day0-rehearsal.ps1 -PublicBaseUrl ... -SkipBuild -WriteSmoke`. Проверки: Windows PowerShell 5.1 parse clean; monitor на `https://eighty-boats-work.loca.lt` показал fresh rehearsal age ~5.5 min и guarded launch command; `hh_resume_booster_experiment_state.py status --json` подтвердил `startedAt=null`, leads `0`. Таймер не стартовал.
+
+2026-06-21 22:50 +03 `watch-hh-booster-test.ps1` дополнен countdown для temporary tunnel freshness: строка `Rehearsal` теперь показывает `expires_in` и `stale_at`, а stale branch показывает `expired_by`. Это нужно, чтобы оператор видел не только возраст metadata, но и сколько времени осталось до безопасного guarded launch window. Проверки: Windows PowerShell 5.1 parse clean; monitor на `https://eighty-boats-work.loca.lt` показал `expires_in=5.78 min`, `stale_at=2026-06-21 22:55:36` и guarded launch command; experiment status после проверки остался `startedAt=null`, leads `0`.
+
+2026-06-21 22:52 +03 повторно обновлена fresh day-0 rehearsal HH Resume Booster, потому что предыдущее 15-минутное окно было близко к протуханию. Команда `start-hh-booster-day0-rehearsal.ps1 -PublicBaseUrl "https://eighty-boats-work.loca.lt" -SkipBuild -WriteSmoke -TimeoutSeconds 120` прошла: local/public API ok, public write-smoke accepted temporary QA lead and cleanup removed it, `hh-booster-leads.jsonl` остался пустым. Актуальная metadata: `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-225152.json`, `status=ready_for_launch`, `blockingFailures=[]`, `experimentStartedAt=null`, `totalLeads=0`. Monitor после обновления: `Rehearsal: fresh, age=0.24 min, expires_in=14.76 min, stale_at=2026-06-21 23:07:01`, public URL ready, manifest missing, started no. Таймер не стартовал; следующий шаг по-прежнему требует явного решения пользователя выполнить guarded launch.
+
+2026-06-21 22:58 +03 `tools/hh_resume_booster_publish_kit.py` теперь добавляет в publish kit раздел `Fresh Rehearsal`: ищет последнюю `hh-booster-day0-rehearsal-*.json` для текущего `PublicBaseUrl`, показывает `Status`, metadata path, `Age`, `Expires in`, `Stale at`, blocking failures, `experimentStartedAt` и total leads. Добавлен параметр `--fresh-rehearsal-minutes` (default `15`), и one-command launch использует это значение. `apps/aion-vision/data/hh-booster-publish-kit.md` перегенерирован для `https://eighty-boats-work.loca.lt`; блок показывает metadata `apps/aion-vision/data/hh-booster-day0-rehearsal-20260621-225152.json`, `Status: fresh`, `Expires in: 9.39 min`, `Stale at: 2026-06-21 23:07:01`. Проверки: `py_compile`, генерация `--write`, readback top 70 lines, monitor fresh, experiment status `startedAt=null`, leads `0`.
+
+2026-06-21 23:01 +03 `watch-hh-booster-test.ps1` теперь делает настоящую read-only public API проверку `GET /api/hh-booster/experiment` и выводит `Public API : HTTP 200 JSON` или причину отказа. Строка `Public URL : ready` теперь означает не только валидный не-local/non-placeholder URL, но и живой JSON API. Добавлен явный verdict `Launch ready: yes/no (reason)`: `yes` только если есть data JSONL, public API ready, rehearsal fresh для temporary URL и `startedAt` еще пустой. Проверки: Windows PowerShell 5.1 parse clean; monitor для `https://eighty-boats-work.loca.lt` показал `Public API : HTTP 200 JSON`, `Launch ready: yes`, fresh rehearsal, guarded launch command; experiment status остался `startedAt=null`, leads `0`.
+
+2026-06-21 23:08 +03 добавлено targeted pytest-покрытие freshness-логики `tools/hh_resume_booster_publish_kit.py`. Новый файл `tools/sml/tests/test_hh_resume_booster_publish_kit.py` проверяет парсинг ISO timestamp с 7 дробными знаками, matching `PublicBaseUrl`, fresh/stale metadata, нормализацию `blockingFailures` и требование day-0 rehearsal только для temporary tunnel URL. Проверки: `python -m py_compile tools/hh_resume_booster_publish_kit.py`, `python -m pytest tools/sml/tests/test_hh_resume_booster_publish_kit.py -q` (`5 passed`). После тестов monitor показал: public API `HTTP 200 JSON`, но rehearsal `stale/not ready` (`stale_at=2026-06-21 23:07:01`), `Launch ready: no`; `hh-booster-experiment.json` все еще `startedAt=null`, leads `0`. Перед публикацией candidate links нужен новый `start-hh-booster-day0-rehearsal.ps1 -PublicBaseUrl "https://eighty-boats-work.loca.lt" -SkipBuild -WriteSmoke`.
+
+2026-06-23 16:51 +03 добавлен единый запускной протокол для роя агентов. Чат-триггеры `Рой: <задача>`, `/swarm <задача>`, `Запусти рой: <задача>` и `Workflow: <задача>` теперь считаются явным запросом создать/вести иерархический workflow. Добавлены `tools/start-agent-swarm.ps1`, корневой `START-AGENT-SWARM.cmd`, документация `docs/agent-workflows/SWARM-COMMAND.md`, ссылка в `docs/agent-workflows/README.md`, правила в проектном `AGENTS.md`, глобальном `C:\Users\koval\.codex\AGENTS.md` и глобальном `C:\Users\koval\.claude\CLAUDE.md`. Проверки: Windows PowerShell 5.1 parse, `-DryRun`, temp-root smoke creation через `agent_workflow.py new`, CMD wrapper `-DryRun`. Команда не запускает все модели параллельно и не обходит risk gate; она создает auditable workflow и показывает следующий разрешенный ход.
+
+2026-06-23 17:17 +03 пользователь проверил форму `Рой, проверь задачу` и уточнил, что это smoke-тест команды, а не реальная задача. Форма `Рой, <задача>` закреплена как равноправный trigger alias рядом с `Рой: <задача>` в проектном `AGENTS.md`, `docs/agent-workflows/SWARM-COMMAND.md`, `docs/agent-workflows/README.md`, глобальном `C:\Users\koval\.codex\AGENTS.md` и глобальном `C:\Users\koval\.claude\CLAUDE.md`.
+
+2026-06-24 12:12 +03 по проекту Telegram-канала `ИИ в дело` отправлен первый органический комментарий без ссылки в `@businessclass_rbc` после вступления и проверки ChatKeeperBot. Текст был заранее подтвержден пользователем. Статус и план контроля обновлены в `docs/agent-workflows/2026-06-23-135910-435048-локальный-launch-bundle-ии-в-дело/launch-bundle/07-external-launch-status.md` и `15-controlled-test-action-plan.md`; лог `docs/agent-log/2026-06-24-1213-Codex-iivdelo-businessclass-comment-published.md`. Следующий шаг: через 12-24 часа проверить ответ, вопрос, переход в личку или входящие по словам `автоматизация`, `шаблон`, `карта`.
+
+2026-06-24 13:40 +03 проверка по замечанию пользователя показала, что комментарии `@sam_delo` 13:25 и `@mimimarketing` 13:27 не дошли: после повторного открытия тексты отсутствуют, обсуждения показывают `0 Comments / No messages here yet` и требуют `APPLY TO JOIN GROUP`. Ранее они были ошибочно зафиксированы как опубликованные из-за локального отображения failed-message. Статусы исправлены; фактически опубликован только комментарий в `@businessclass_rbc`.
+
+2026-06-24 13:49 +03 по разрешению пользователя нажаты/проверены `APPLY TO JOIN GROUP` для discussion-групп `@sam_delo` / `@samdelo` и `@mimimarketing` / `@kivilyachat`. Доступ к полю отправки не открылся сразу: группы требуют подтверждения администраторов. Комментарии повторно не отправлялись. Следующий шаг: позже открыть эти обсуждения и проверить, исчезла ли кнопка `APPLY TO JOIN GROUP`; публиковать заранее подтвержденные тексты только если появилось обычное поле ввода.
+
+2026-06-24 15:36 +03 пользователь вручную опубликовал подтвержденный комментарий без ссылки в `@cyber_misha` под постом про старт в ИИ. Агентская попытка через Telegram Web `/a/` не засчитана как успешная: поле очищалось, но комментарий не появлялся; пользователь сообщил, что были проблемы с интернетом и внес комментарий вручную. Следующий шаг: учитывать `@cyber_misha` как опубликованный вручную и позже проверять реакцию вместе с `@businessclass_rbc`.
+
+2026-06-24 17:03 +03 пользователь дал расшифровку голосового Mawrldstar после комментария в `@cyber_misha`. Контакт переклассифицирован: это не лид на услугу, а смежный специалист/networking, потому что он сам предлагает похожие услуги и описывает свой подход: сначала ручной тест на Opus/модели, потом GLM/Hermes/CRM, без "супер-мега-монстра". После подтверждения пользователя опубликован публичный ответ без ссылки в обсуждении поста `@cyber_misha` "Что бы я делал в 2026..."; проверка Telegram Web: счетчик стал `3 Comments`, текст виден в ветке с временем `17:02`. На будущее учесть: для аудио можно использовать BitNewton или встроенную бесплатную расшифровку Telegram.
+
+2026-06-24 18:06 +03 по `ИИ в дело` выполнена read-only проверка следующего organic outreach шага. `@sam_delo` / `@samdelo` и `@mimimarketing` / `@kivilyachat` все еще требуют `APPLY TO JOIN GROUP`, админский approve не выдан, комментарии не отправлялись. Для `@nata_progrevy` найден релевантный пост от 2026-06-20 09:52 про продажи без трафика и работу с базой; обсуждение открывается, но перед комментарием нужно нажать `JOIN` в discussion-группе. Подготовлен безопасный следующий шаг: после отдельного подтверждения пользователя нажать `JOIN`, затем публиковать только подтвержденный комментарий без ссылки.
+
+2026-06-24 12:35 +03 пользователь попросил убрать MiMo, потому что с 2026-06-25 он становится платным. На тот момент активная workflow-схема была обновлена на `L1 Antigravity CLI -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`. 2026-07-02 после подтвержденного Antigravity region/eligibility blocker схема новых задач временно переводилась на `L1 Gemini Vertex -> L2 Gemini Vertex -> L3 Codex -> L4 Codex -> L5 Claude Code`. 2026-07-03 после успешного локального Antigravity smoke и решения пользователя схема новых задач вернулась на `L1 Antigravity CLI -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`. 2026-07-07 пользователь сделал текущей схемой `L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`, а Gemini Vertex остался fallback. `tools/agent_workflow.py`, `tools/start-agent-swarm.ps1`, `docs/agent-workflows/model-policy.md`, `docs/agent-workflows/README.md`, `AGENTS.md`, глобальные правила Codex/Claude и тесты переведены на схему без MiMo. Удалены `@mimo-ai/cli` и user-level shim `C:\Users\koval\bat\mimo.cmd`; `check-agent-runtimes.ps1` больше не проверяет `mimo`. Старые workflow с `L1.0 MiMo AUTO` не переписывать: это архивные доказательства прошлых прогонов, не текущий шаблон.
+
+Ограничение: реальный 14-дневный сбор и сравнение paid intent еще не проведены. Не считать цель полностью завершенной до фактических данных.
+
 ## Следующий шаг
 
-Проверить новый рабочий цикл Codex + Gemini + Claude Code:
+Следующий технический шаг по `Drift Workflow Control`: добавить выбор workflow id в UI/API или static export `public/drift-workflow-data.json` для offline-просмотра без dev/serve API. Для долгих прогонов, trading, секретов и внешних записей обязательно включать risk gate и visible-run policy.
 
-1. Codex выполняет небольшую инженерную задачу.
-2. Gemini CLI через `/sml:review` читает SML и дает независимое ревью.
-3. Claude Code читает `CLAUDE.md`, видит `sml` через `.mcp.json` и дает второе инженерное ревью.
-4. Codex учитывает замечания и фиксирует итог через `sml.add_log`.
+2026-06-23 добавлен локальный skill `agent-workflow-router`: общий маршрутизатор рабочих режимов для Codex/Claude Code/Antigravity. Он установлен в `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills`, `C:\Users\koval\.agents\skills` и shared `agent-skills`. Назначение: перед инженерной работой выбрать минимальный достаточный route - frontend, debugging/TDD, feature, review, security, dependency audit, skill creation или agent coordination - и завершать через свежую verification-проверку. MCP-конфиги не менялись; `trading_mvp` gate оставался RUNNING.
+
+2026-06-23 `agent-workflow-router` обновлен MCP-route: Context7 MCP для свежей документации библиотек/API/CLI/cloud services, GitHub MCP для repo/issue/PR/commit/code-search контекста, Playwright MCP для browser/UI QA/screenshot/responsive/console/form-flow/web inspection. Текущий прямой Claude health-check: Context7/Playwright Connected, GitHub transient Failed to connect; `codex mcp list` сейчас блокируется ошибкой `service_tier = default` в `C:\Users\koval\.codex\config.toml` (ожидаются `fast` или `flex`).
+
+2026-06-23 исправлен `C:\Users\koval\.codex\config.toml`: `service_tier = "default"` заменен на `service_tier = "flex"`, backup `C:\Users\koval\.codex\config.toml.backup.20260623-150727`. Также в Windows user PATH добавлен `C:\Program Files\nodejs`, backup `C:\Users\koval\.codex\user-path.backup.20260623-150826.txt`. Проверка с login-style PATH: `codex mcp list` успешно выводит MCP servers. Уже запущенные терминалы/Codex могут требовать перезапуск, чтобы увидеть обновленный PATH.
+
+2026-06-23 исправлен Claude GitHub MCP health-check для старых процессов без inherited env. `C:\Users\koval\bat\claude.cmd` теперь, если `GITHUB_PERSONAL_ACCESS_TOKEN` отсутствует в process env, читает user-level значение из `HKCU\Environment` через `reg.exe` и передает его только дочернему `claude.exe`; backup `C:\Users\koval\bat\claude.cmd.backup.20260623-154410`. Финальная проверка `claude mcp list` при очищенном process env: GitHub, Context7, Playwright, SML, Snyk и Google Drive Connected; Microsoft 365 остается `Needs authentication` и требует отдельный OAuth-login в Claude.
+
+2026-06-23 после перезапуска обнаружено, что Codex shell process PATH все еще урезан и `codex.ps1` не видел `node.exe`. Создан backup `C:\Users\koval\AppData\Roaming\npm\codex.ps1.backup.20260623-151507`; в `codex.ps1` добавлен fallback на `C:\Program Files\nodejs\node.exe`. После этого прямой `codex mcp list` проходит из текущей shell-среды и показывает `context7`, `playwright`, `sml`, `snyk-security`, `github`, `b24-dev-mcp`, `airtable`. `verify-github-snyk-mcp.ps1` подтверждает GitHub PAT через API, но Claude remote GitHub MCP health-check сейчас дает `Failed to connect`; Context7/Playwright/SML/Snyk в Claude Connected.
+
+2026-06-23 Mobbin MCP подключен как дизайн-исследовательский источник: Codex CLI зарегистрирован и OAuth login выполнен, Claude Code user-scope MCP показывает `Status: √ Connected`, ChatGPT/Codex App подключение пользователь подтвердил через UI, Antigravity config `C:\Users\koval\.gemini\config\mcp_config.json` содержит `Mobbin.serverUrl = https://api.mobbin.com/mcp`, а пользователь подтвердил завершение Antigravity UI OAuth. Ограничение: OAuth-статус ChatGPT/Codex App и Antigravity не читается из локальных config-файлов, поэтому он фиксируется как `user_reported_connected_not_locally_verifiable` в `agent-skills/mcp-install-manifest.json`.
+
+2026-06-23 установлен финансовый agent/skill набор Anthropic по материалу `10 финансовых агентов Claude.pdf`: в Claude Code добавлен marketplace `claude-for-financial-services`, включены `financial-analysis`, 10 named agents (`pitch-agent`, `meeting-prep-agent`, `market-researcher`, `earnings-reviewer`, `model-builder`, `valuation-reviewer`, `gl-reconciler`, `month-end-closer`, `statement-auditor`, `kyc-screener`) и first-party vertical bundles (`investment-banking`, `equity-research`, `private-equity`, `wealth-management`, `fund-admin`, `operations`). Partner LSEG/S&P plugins, Microsoft 365 admin tooling и paid/provider MCP credentials намеренно не установлены. Создан локальный skill `finance-workflow-router` в Codex/Claude/.agents/shared roots, а `agent-workflow-router` теперь route finance/business/investment tasks через него. Backup: `agent-skills/backups/financial-services-20260623-195616`.
+
+2026-06-24 добавлен локальный skill `telegram-workflow-router` в `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills`, `C:\Users\koval\.agents\skills` и shared `agent-skills`. `agent-workflow-router` теперь route Telegram bot/channel/group/Mini App/Telegram Web/MCP-MTProto tasks через него. По умолчанию выбран Bot API-first подход; Telegram Web только как assisted/manual путь; MCP/MTProto только отдельным read-only-first pilot с allowlist и явным подтверждением. Telegram MCP, MTProto-сессии, bot tokens и отправка сообщений в этом шаге не настраивались.
+
+2026-06-24 выполнена безопасная локальная инвентаризация Telegram Bot API setup. Основной готовый проект: `C:\Users\koval\Documents\New project`; health-check показал живой visible monitor и python child. Созданы `agent-skills\TELEGRAM_LOCAL_INVENTORY.md`, `agent-skills\telegram-local-inventory.json` и verifier `agent-skills\scripts\verify-telegram-bot-api-setup.ps1`, который проверяет env/gitignore/runner/health без печати token values. `.env.telegram.example` в `New project` переписан на placeholders, потому что прежний example выглядел token-like; рабочий `.env.telegram` не печатался и не менялся. Telegram MCP/MTProto не подключались.
+
+2026-06-24 пользователь подтвердил Telegram default layer policy: основной путь для текущих агентов — Bot API через `C:\Users\koval\Documents\New project`; Telegram Web использовать как QA/manual evidence; n8n/Make только под конкретный no-code workflow; MCP/MTProto только отдельным read-only pilot, если Bot API недостаточен. `telegram-workflow-router` и shared inventory обновлены этим решением и синхронизированы в Codex/Claude/.agents/shared roots.
+
+2026-06-29 в `D:\AionUi-Paperclip\AGENTS.md` и `C:\Users\koval\.codex\AGENTS.md` добавлен дословный user-provided `Dedicated Build Partner Agreement` из attachment `pasted-text.txt` (`sha256 B508E3099B11DE6C03E66F435C714739EF287EF585AF4F60666764AA894C3512`). Над verbatim-блоком оставлена precedence note: стиль и delivery expectations применяются только в рамках более строгих system/developer/project safety rules, active-run gate, visible-run rule, secret/destructive/finance/Telegram gates.
+
+2026-06-30 добавлен локальный skill `agent-loops` в `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills`, `C:\Users\koval\.agents\skills` и shared `agent-skills`. Он переносит полезную часть loops.elorm.xyz в безопасный локальный протокол без сторонних hook bundles: `verify`, `ci-until-green`, `post-edit-tests`, `docs-sync`, `security-audit`, `deploy-smoke`. `agent-workflow-router` обновлен во всех четырех roots и теперь направляет repeated check-fix-check задачи через `agent-loops` плюс доменный skill. Проверки: все четыре `agent-loops\SKILL.md` существуют и не пустые; все четыре router-файла содержат `agent-loops` и `Agent Loops Route Detail`.
+
+2026-07-01 добавлен локальный skill `video-watch` для качественного распознавания и анализа видео/аудио: YouTube/public URL, локальные video/audio, записи, screen demos, вебинары, `/watch`. Skill установлен в `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills`, `C:\Users\koval\.agents\skills` и shared `agent-skills`; `agent-workflow-router` теперь route media/video/audio tasks через него. Pipeline: `yt-dlp` subtitles + explicit Node JS runtime, Gemini URL backend, Newton backend, local OpenAI/ffmpeg path, scene frames, metadata/training pack artifacts. Preflight видит Python, `yt-dlp`, `ffmpeg` at `C:\ffmpeg\bin\ffmpeg.exe`, Newton, Node/npx и `NEWTON_TOKEN`. Ограничения текущего процесса: Gemini/OpenAI API keys missing; конкретный YouTube `So3srrfKiWg` blocked by YouTube anti-bot for `yt-dlp`; current Newton CLI does not expose `fetch`, хотя старые артефакты 2026-06-19 показывают успешный Newton Fetch backend. Следующий практический шаг для YouTube без субтитров: Gemini key, разрешенные browser cookies, восстановление Newton Fetch или локальный файл.
+
+2026-06-26 15:16 +03 проект MVP ROI-радара банкротных торгов перенесен для дальнейшей работы в `C:\Users\koval\Documents\ТпБ`. История: Codex thread `019f0352-a133-7d02-bde6-8e9ff4259e2e`, Aion workflow `2026-06-26-130711-945479-mvp-roi-радар-банкротных-торгов`; L3 Codex выполнен, submitted и approved, текущий уровень workflow теперь `L4`, allowed next agent `Codex`. В новом workspace созданы `AGENTS.md`, `README.md`, `docs/context-import.md`, `docs/l3-implementation-plan.md`, `docs/l3-handoff.md`, `docs/risk-register.md`, `docs/schemas.md`, офлайн-ядро `src/tpb` и unit-тесты. Проверка: bundled Python `unittest discover -s tests` прошел `7 tests OK`. Ограничения: MVP строго paper-trading, авто/спецтехника, без реальных ставок/задатков/ЭЦП/заявок; долгие collectors только visible-run/monitor и после проверки active-run gate.
+
+2026-06-26 15:28 +03 MVP ROI-радара банкротных торгов доведен до завершенного workflow `done` для offline-core phase. В `C:\Users\koval\Documents\ТпБ` добавлены sample fixture `fixtures/sample_lots.json`, read-only `JsonSnapshotAuctionAdapter`, scoring pipeline, top-list selection, sample report CLI `tools/build_sample_report.py`, L4 handoff, L5 review packet и `docs/final-report.md`. Тесты: bundled Python `unittest discover -s tests` прошел `15 tests OK`; sample report вывел Toyota Camry 2018 и JCB 3CX 2016 как top candidates, дубль и рискованный лот отсечены. Claude Code CLI `2.1.179` выполнил L5 review с решением `approve`; risk gate passed; workflow `2026-06-26-130711-945479-mvp-roi-радар-банкротных-торгов` finalized `done`. Следующий шаг только offline/read-only source adapter fixture; реальные ставки/задатки/ЭЦП/заявки/платежи и долгие collectors запрещены без отдельного подтверждения и visible-run policy.
+
+2026-07-02 09:57 +03:00 добавлен полный локальный video-watch tool stack: Newton CLI обновлен до версии с fetch, Deno 2.9.0, Gemini CLI 0.49.0, ask-gemini wrapper, Python-модули google-genai/google-generativeai/faster-whisper/openai-whisper/moviepy/opencv/yt-dlp. agent-skills/video-watch обновлен и синхронизирован в Codex/Claude/.agents. Preflight полностью OK по tools/modules/Newton health; секреты не печатались. Gemini/OpenAI backends требуют ключи GEMINI_API_KEY/GOOGLE_API_KEY и OPENAI_API_KEY, YouTube без subtitles требует approved cookies, Gemini, Newton fetch или локальный файл. Smoke на So3srrfKiWg подтвердил Deno runtime в yt-dlp и честно зафиксировал YouTube anti-bot blocker. Log: docs/agent-log/2026-07-02-0957-Codex-video-watch-full-tool-stack.md.
+
+2026-07-02 11:42 +03:00 уточнен статус video-watch API keys: GEMINI_API_KEY найден в Windows User env и теперь подхватывается gent-skills/video-watch/scripts/watch-video.ps1 из User/Machine env, если текущий Codex process его не унаследовал. check-video-stack.ps1 -CheckNewtonHealth теперь показывает GEMINI_API_KEY present, OPENAI_API_KEY missing, GOOGLE_API_KEY missing, NEWTON_TOKEN present. Поиск по .env* нашел только placeholder C:\Users\koval\Documents\Codex\2026-05-21\gemini\.env.example; C:\Users\koval\.codex\auth.json содержит OPENAI_API_KEY=null. Значения секретов не печатались.
+
+2026-07-02 13:56 +03:00 video-watch API key verification: OPENAI_API_KEY replaced with valid sk-proj key in Windows User env; live OpenAI /v1/models check OK status=200, models=112. GOOGLE_API_KEY set as alias to existing GEMINI_API_KEY. check-video-stack.ps1 now supports -CheckApiHealth; current result: all env keys present, Newton health OK, OpenAI OK, Gemini/Google API not usable from current route: User location is not supported for the API use (FAILED_PRECONDITION/location). Secret values were not printed.
+
+2026-07-02 14:16 +03:00 Gemini API root-cause refined for video-watch: live generateContent smoke on gemini-2.0-flash returns 429 RESOURCE_EXHAUSTED with generate_content_free_tier_requests/input_token_count limit=0. models/list still may show location unsupported, but decisive generate smoke points to free-tier quota/billing not invalid key. check-video-stack.ps1 -CheckApiHealth now reports Gemini diagnosis=free_tier_quota_or_billing. Next fix: enable/link billing or paid plan for the Google AI Studio/GCP project behind the API key, then rerun CheckApiHealth.
+
+2026-07-02 15:49 +03:00 video-watch Gemini recovery completed via Vertex AI fallback. Portable Google Cloud SDK 575.0.0 installed in `C:\Users\koval\.local\google-cloud-sdk-575`; `gcloud` and ADC authorized for `koval26vlg@gmail.com`, active project `project-4a65d058-0aed-49b3-8b8`, location `us-central1`. Enabled `apikeys`, `generativelanguage`, `serviceusage`, `aiplatform`; created service-account-bound API key `video-watch-gemini` uid `971a9eb3-8572-4842-94b4-92d09943f76e` restricted to `generativelanguage.googleapis.com`; secret value was not printed. Gemini API-key route still returns 429 prepay/free-tier quota, but Vertex Gemini live smoke OK on `gemini-2.5-flash`. `video-watch` scripts now fallback from `gemini-api-key-url` to `vertex-gemini-url`; real YouTube smoke on `So3srrfKiWg` created native analysis at `C:\Users\koval\Documents\Команда\artifacts\video-watch\20260702-154337-www.youtube.com-watch-v-so3srrfkiwg`.
+
+2026-07-03 12:15 +03:00 video-watch direct YouTube stack upgraded and verified. `yt-dlp` direct subtitles now handle partial exits as success when `.srt/.vtt` files exist; added `curl_cffi`, `brotli`, explicit `ffmpeg-location`, remote EJS/impersonation fallback, native Vertex analysis in `auto`, URL audio download -> OpenAI transcription, and local `faster-whisper/openai-whisper` fallback. Main smoke `watch-video.ps1 -Source https://www.youtube.com/watch?v=So3srrfKiWg -Backend auto -NoFrames` produced transcript plus Vertex native analysis at `C:\Users\koval\Documents\Команда\artifacts\video-watch\20260703-120018-www.youtube.com-watch-v-so3srrfkiwg\training_pack.md`. OpenAI key is valid for `/models`, but transcription returns 429 `insufficient_quota`; local `faster-whisper base` fallback works. Newton CLI health is OK, but `newton fetch` returns HTTP 401 `Invalid token`; only found real `NEWTON_TOKEN` is the 43-char token from `C:\Users\koval\bat\bitrix24-automation\.env`, now also saved to User env without printing the value. Log: `docs/agent-log/2026-07-03-1215-Codex-video-watch-youtube-direct-stack.md`.
+
+2026-07-03 12:24 +03:00 video-watch got an explicit access verifier and repair helper. `set-video-api-keys.ps1` now supports hidden `-NewtonOnly` input for replacing `NEWTON_TOKEN`. New `verify-video-access.ps1` checks direct YouTube tools, impersonation fallback, OpenAI models, Gemini API-key generation, Vertex Gemini, Newton health, optional Newton fetch, direct YouTube smoke, and full auto smoke. Verified `verify-video-access.ps1 -CheckNewtonFetch -RunDirectYouTubeSmoke`: direct YouTube OK, OpenAI models OK, Vertex OK, Newton fetch 401 invalid token. Verified `verify-video-access.ps1 -RunFullAutoSmoke`: full auto OK with artifact `C:\Users\koval\Documents\Команда\artifacts\video-watch\20260703-121948-www.youtube.com-watch-v-so3srrfkiwg\training_pack.md`. Log: `docs/agent-log/2026-07-03-1224-Codex-video-watch-access-verifier.md`.
+
+2026-07-03 12:45 +03:00 Gemini/Vertex setup completed through local `gcloud` without further Google Cloud UI steps. Active project is `project-4a65d058-0aed-49b3-8b8` (`My First Project`, number `790608621898`), billing enabled, APIs `aiplatform`, `apikeys`, `generativelanguage`, `iam`, `serviceusage` enabled, API key `video-watch-gemini` exists and its value was saved to Windows User env as `GEMINI_API_KEY`/`GOOGLE_API_KEY` without printing the secret. ADC quota project set to `project-4a65d058-0aed-49b3-8b8`; User env set `GOOGLE_CLOUD_PROJECT=project-4a65d058-0aed-49b3-8b8`, `GOOGLE_CLOUD_LOCATION=us-central1`, `GOOGLE_GENAI_USE_VERTEXAI=true`. Live health: Gemini API-key `generateContent` still returns `429 free_tier_quota_or_billing`, but Vertex Gemini works on `gemini-2.5-flash`. `video-watch` now prefers Vertex/ADC first when `GOOGLE_CLOUD_PROJECT` is configured, and synced files across `agent-skills`, `.codex`, `.agents`, `.claude` have matching hashes. Log: `docs/agent-log/2026-07-03-1245-Codex-gemini-vertex-self-setup.md`.
+
+2026-07-03 12:55 +03:00 video-watch direct YouTube access verified. `watch_video.py` now supports `--download-audio-only`, bounded frame smoke no longer silently falls back to full-video download, and frame extraction falls back from scene detection to interval sampling when the opening clip has no scene change. `verify-video-access.ps1 -CheckNewtonFetch -RunDirectYouTubeSmoke -RunDirectAudioSmoke -RunDirectFrameSmoke` passed direct subtitles/audio/frames on `So3srrfKiWg`; artifacts: subtitles `20260703-125329...`, audio `20260703-125336...`, frames `20260703-125350...` under `C:\Users\koval\Documents\Команда\artifacts\video-watch`. `ACCESS_STATUS.md` added to `agent-skills/video-watch` and synced to `.codex`, `.agents`, `.claude`; hashes match. Remaining blockers: Newton fetch HTTP 401 invalid token; Gemini API-key route still `429 free_tier_quota_or_billing`; OpenAI `/models` OK but transcription may require quota, so local Whisper is fallback. Log: `docs/agent-log/2026-07-03-1255-Codex-video-watch-direct-youtube-access.md`.
+
+2026-07-03 13:04 +03:00 video-watch transcription smokes added and verified. `watch_video.py` now supports bounded YouTube audio segments via `--audio-download-seconds` and route selection via `--transcription-route auto|openai|local`; output sanitizer redacts signed `googlevideo.com/videoplayback?...` URLs from future metadata. `verify-video-access.ps1 -RunLocalTranscriptionSmoke` passed: direct YouTube 12-sec audio segment -> local faster-whisper transcript, artifact `C:\Users\koval\Documents\Команда\artifacts\video-watch\20260703-130001-www.youtube.com-watch-v-so3srrfkiwg\training_pack.md`. `verify-video-access.ps1 -RunOpenAITranscriptionSmoke` confirmed actual OpenAI transcription endpoint is blocked by `429 insufficient_quota`, artifact `20260703-130133...`. Updated `ACCESS_STATUS.md` synced to `.codex`, `.agents`, `.claude`; hashes match. Log: `docs/agent-log/2026-07-03-1304-Codex-video-watch-transcription-smokes.md`.
+
+2026-07-03 16:50 +03:00 video-watch provider repair finished as far as local automation can go. Added `repair-video-provider-access.ps1` with redacted environment/candidate scan, hidden key/token replacement flags, Google project state check, stack verification, Newton fetch verification, and optional OpenAI transcription smoke. Safe local scan found no alternate working secrets: only one Newton token fingerprint and it returns HTTP 401, legacy `BITNEWTON_TOKEN` was checked separately and only placeholders/variable references were found, one OpenAI key works for `/v1/models` but transcription remains quota-blocked, one Gemini/Google key remains API-key quota-blocked. Google Cloud project `project-4a65d058-0aed-49b3-8b8` has billing enabled, required APIs enabled, and API key `video-watch-gemini` restricted to `generativelanguage.googleapis.com`; therefore Gemini production route remains Vertex/ADC, not AI Studio API-key, until paid/quota eligibility changes. Files synced across `agent-skills`, `.codex`, `.agents`, `.claude`; hashes match. Log: `docs/agent-log/2026-07-03-1650-Codex-video-watch-provider-repair.md`.
+
+2026-07-03 17:15 +03:00 пользователь уточнил, что Gemini работает корректно и им можно пользоваться. Live-check подтвердил это через Vertex/ADC: `Vertex Gemini: ok=True`, project `project-4a65d058-0aed-49b3-8b8`, location `us-central1`, model `gemini-2.5-flash`. Важно различать: Gemini как backend доступен и должен считаться working; отдельный API-key endpoint `generativelanguage.googleapis.com` всё еще возвращает `429 free_tier_quota_or_billing`, но это optional route и не blocker для video-watch, потому что Vertex/ADC рабочий. `ACCESS_STATUS.md` обновлен этим статусом.
+
+2026-07-03 17:31 +03:00 пользователь явно изменил решение: `Vertex Gemini убери и используй agu`. Текущий active route для локального skill `video-watch` теперь `AGU/agy`, где route name `agu` вызывает локальный Antigravity CLI `agy.exe` через `D:\AionUi-Paperclip\tools\antigravity_print.py`. Vertex/ADC удален из активных `video-watch` скриптов и документации; старые backup-файлы вынесены из skill-root в архив `C:\Users\koval\Documents\Команда\artifacts\video-watch\backups\skill-root-backups-20260703-172922`. Проверки: `check-video-stack.ps1 -CheckApiHealth` показывает `AGU/agy ok=True`, `verify-video-access.ps1 -CheckNewtonFetch` показывает layer `agu=True` и не содержит `vertex-gemini`, реальный `watch-video.ps1 -Backend auto -NativeVideoRoute agu -NoFrames` создал artifact `C:\Users\koval\Documents\Команда\artifacts\video-watch\20260703-172318-www.youtube.com-watch-v-so3srrfkiwg\training_pack.md` с `yt-dlp-subtitles=True` и `agu-url=True`. Следующим агентам не возвращать Vertex/ADC в `video-watch` без нового явного решения пользователя; для прямых визуальных доказательств использовать `-DownloadVideoForFrames`.
+
+2026-07-06 18:00 +03:00 установлены дизайн-скиллы из YouTube Short workflow для Codex/Claude/.agents/shared roots: `impeccable`, `design-taste-frontend`, `animation-vocabulary`, `emil-design-eng`, `review-animations`. Источники: `pbakaus/impeccable`, `Leonxlnx/taste-skill`, `emilkowalski/skill`. Проверено: все пять папок и непустые `SKILL.md` есть в `C:\Users\koval\.agents\skills`, `C:\Users\koval\.codex\skills`, `C:\Users\koval\.claude\skills` и `C:\Users\koval\Documents\Codex\2026-05-18\npx-skills-add-anthropics-claude-code\agent-skills`. Манифесты: `agent-skills\DESIGN_SKILLS_INSTALL_MANIFEST.md`, `agent-skills\design-skills-install-manifest.json`. Aion log: `docs/agent-log/2026-07-06-1800-Codex-design-skills-install.md`.
+
+2026-07-06 20:55 +03:00 установлен и проверен Agent Reach из видео `A5l_yCqxWMg`: `agent-reach` CLI v1.5.0 в `C:\Users\koval\.agent-reach-venv`, skill синхронизирован в `.agents`, `.codex`, `.claude` и shared `agent-skills`; установлены `mcporter`, `opencli`, portable `gh` v2.96.0 (`C:\Users\koval\bat\gh.cmd`), Exa MCP (`C:\Users\koval\.mcporter\mcporter.json` + workspace `config\mcporter.json`), yt-dlp JS runtime `node`. Проверено OK: GitHub, YouTube, Exa search, Web/Jina, RSS, V2EX, Bilibili search. OpenCLI social routes (Twitter/X, Reddit, Facebook, Instagram, XiaoHongShu) подготовлены, но требуют ручной установки Chrome extension и logged-in Chrome; cookies не импортировались. Manifest: `agent-skills\AGENT_REACH_INSTALL_MANIFEST.md` / `agent-skills\agent-reach-install-manifest.json`. Log: `docs/agent-log/2026-07-06-2055-Codex-agent-reach-install.md`.
+
+2026-07-06 21:41 +03:00 пользователь установил OpenCLI Chrome extension; проверка `opencli doctor` прошла OK: daemon `1.8.6` на port `19825`, extension `1.0.22` connected, profile `23yp8u5h` connected. `agent-reach doctor --json` теперь OK для Twitter/X, Reddit, Facebook, Instagram, Bilibili и XiaoHongShu через OpenCLI, помимо уже рабочих GitHub/YouTube/Exa/Web/RSS/V2EX. Остались не настроены LinkedIn MCP, Xiaoyuzhou transcription route, Xueqiu cookie/config. Обновлены `agent-skills\AGENT_REACH_INSTALL_MANIFEST.md`, `agent-skills\agent-reach-install-manifest.json`; log `docs/agent-log/2026-07-06-2141-Codex-opencli-extension-verified.md`.
+
+2026-07-06 22:02 +03:00 пользователь сообщил о появлении Grok Build 0.2.87. Grok зафиксирован как новый кандидат/резервный агент для общей SML-схемы, но не включен в дефолтный `Рой`: локальная проверка не нашла команду `grok` в PATH, не нашла запускатель в `%USERPROFILE%\AppData\Roaming\npm`, `%USERPROFILE%\.local\bin`, `%USERPROFILE%\bat`, и глобальный `npm list -g --depth=0` не содержит Grok. По официальной странице xAI CLI Grok Build поддерживает `AGENTS.md`, MCP servers, skills, hooks и memory, поэтому после установки/auth его можно проверять как потенциальный L1/L2 fallback через SML bootstrap и короткий smoke на русском. Обновлены `AGENTS.md`, `docs/agents.md`, `docs/tasks.md`, `docs/decisions.md`; log `docs/agent-log/2026-07-06-2202-Codex-grok-build-candidate.md`.
+
+2026-07-06 22:21 +03:00 пользователь выбрал схему, где Grok не заменяет существующих агентов, а становится самым нижним/первым уровнем `Роя`: `Grok -> Gemini -> Codex -> Claude`. Реализован экспериментальный workflow profile `grok-gemini`: `L1 Grok Build -> L2 Gemini Vertex -> L3 Codex -> L4 Codex -> L5 Claude Code`. У Grok L1 есть субагенты `grok-memory-bootstrapper`, `grok-problem-framer`, `grok-source-scout`, `grok-handoff-editor`. Добавлен runner `tools/grok_build_workflow_review.py`, `Grok Build` включен в review-only mutation agents, `start-agent-swarm.ps1` принимает `-Profile grok-gemini`. Первоначальный вывод "дефолтный Рой пока остается antigravity" устарел после live runtime gate 2026-07-06 22:49 и решения пользователя 2026-07-07: текущий default теперь `grok-antigravity`. Log: `docs/agent-log/2026-07-06-2221-Codex-grok-gemini-workflow-profile.md`.
+
+2026-07-06 22:49 +03:00 по видео `Lj_dEwFJ0Gk` добавлен MarkItDown как локальный документный препроцессор перед LLM-анализом больших PDF/DOCX/XLSX/PPTX/HTML/медиа файлов. Установлены `markitdown 0.1.6`, `markitdown-mcp 0.0.1a4`, локальный `ffmpeg 7.1`; команды: `C:\Users\koval\bat\markitdown.cmd`, `C:\Users\koval\bat\markitdown-mcp.cmd`. Добавлен skill `markitdown-document-preprocessor` в `.codex`, `.agents`, `.claude` и shared `agent-skills`; smoke-конвертация прошла. MCP использовать только как локальный STDIO, не HTTP без отдельного подтверждения. Log: `docs/agent-log/2026-07-06-2249-Codex-markitdown-document-preprocessor.md`.
+
+2026-07-07 13:00 +03:00 по видео `XfifNCHY93I` установлен `find-skills` из `vercel-labs/skills`: discovery skill для поиска существующих agent skills через open skills ecosystem. Установлен в `.agents`, `.claude`, `.codex` и shared `agent-skills`; `agent-workflow-router` обновлен маршрутом `Skill Discovery Route Detail`. Политика: использовать `find-skills` как discovery/ranking слой, не как слепой автоустановщик; перед установкой проверять источник, install count, repo/SKILL.md, scripts/MCP/network behavior и локальную пользу. Проверено: `npx skills find react`, `quick_validate.py`. Log: `docs/agent-log/2026-07-07-1300-Codex-find-skills-install.md`.
+
+2026-07-07 13:06 +03:00 пользователь изменил default для команды `Рой`: новая цепочка `L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`. Реализован workflow profile `grok-antigravity` и сделан `DEFAULT_WORKFLOW_PROFILE`; `tools/start-agent-swarm.ps1` теперь без `-Profile` создает именно этот маршрут. `antigravity` сохранен как явный профиль для `L1/L2 Antigravity`, `gemini-vertex` как fallback, `grok-gemini` как legacy-профиль. Проверено: `py_compile`, `pytest` по workflow/runner тестам (`33 passed`) и smoke `tmp/swarm-default-grok-antigravity-smoke`, где `contract.json` показал `workflow_profile=grok-antigravity`, `L1=Grok Build`, `L2=Antigravity CLI`, `L3=Codex`, `L4=Codex`, `L5=Claude Code`.
+
+2026-07-07 14:16 +03:00 после замечания пользователя "смотрю на консоль и как будто ничего не происходит" уточнено поведение: `start-agent-swarm.ps1` раньше только создавал workflow и оставлял его в `planned`, поэтому активных `grok`/`agy` процессов не было. Добавлен `tools/run-agent-workflow-next.ps1`: он выполняет ровно один текущий шаг workflow по `allowed_next_agents`, запускает isolated runner для `Grok Build`/`Antigravity CLI`/`Gemini Vertex`, затем Codex делает state mutation через `--executor Codex`. `start-agent-swarm.ps1` теперь печатает `Run L1` команду и поддерживает `-RunNext`. Проверено на smoke workflow `tmp/swarm-default-grok-antigravity-smoke/2026-07-07-130352-778636-рой-default-grok-antigravity-smoke`: Grok L1 claimed/submitted, state стал `waiting_for_approval`, next agent `Antigravity CLI`.

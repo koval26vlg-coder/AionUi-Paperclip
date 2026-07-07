@@ -1,6 +1,6 @@
 # Стартовый файл для любого агента
 
-Этот файл нужно читать первым, независимо от того, какой агент используется: Codex, Cursor, Kiro, Claude Code, Gemini CLI, OpenCode, Goose, Aider или другой.
+Этот файл нужно читать первым, независимо от того, какой агент используется: Codex, Claude Code, Antigravity CLI, OpenCode, Goose, Aider или другой.
 
 ## Для человека-новичка
 

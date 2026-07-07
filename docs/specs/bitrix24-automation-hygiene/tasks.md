@@ -1,5 +1,10 @@
 # План задач: bitrix24-automation-hygiene
 
+> Статус на 2026-07-06 (Claude Code): задачи 1-9, 11, 12 выполнены, подтверждено git-историей
+> bitrix24-automation (коммиты fd08574, 5303f29, 7b5afa7, 24dc451, e634d77, ac4cea0, 632227b,
+> 00b89b3, 4137b1e). Открыты: задача 10 (S7.3 - web_ui.py и ui_audio_downloader.py еще на print)
+> и задача 13 (финальная сверка инвариантов).
+
 ## Обзор
 
 План реализации итерации «гигиена» в целевом каталоге `C:\Users\koval\bat\bitrix24-automation` в 7 позиционных коммитов (S1..S7) согласно `design.md`, с разбиением S7 на серию под-коммитов S7.1..S7.5 по Requirement 7.14. Работа выполняется «на месте» вне рабочего пространства Kiro, платформа — Windows, оболочка — `cmd`/PowerShell. Язык изменений — Python (для `logging_setup.py` и точечных правок Scope_Python_Files), TOML (`pyproject.toml`), Markdown (`FACADE_DECISION.md`) и PowerShell (для файловых операций). Автоформатирование и автофиксы линтера по существующему коду запрещены на протяжении всей итерации (Requirement 6.6, Риск R5, EH6).
@@ -10,7 +15,7 @@
 
 ## Задачи
 
-- [ ] 1. Baseline — read-only подготовка перед S1
+- [x] 1. Baseline — read-only подготовка перед S1
   - [-] 1.1 Проверить наличие `git` в PATH
     - Выполнить в корне Target_Repo: `git --version`.
     - Если команда не найдена — остановить итерацию, зафиксировать причину в отчёте итерации (EH1, Риск R1). Пользователю рекомендуется установить Git for Windows или скорректировать PATH.
@@ -51,7 +56,7 @@
     - _Компонент: P12, DM1, C7_
     - _Requirements: 7.4, 7.5_
 
-- [ ] 2. S1 — инициализация локального git и baseline `.gitignore`
+- [x] 2. S1 — инициализация локального git и baseline `.gitignore`
   - [~] 2.1 Выполнить `git init` в корне Target_Repo
     - Предусловие: задачи 1.1 и 1.2 пройдены, `.git` отсутствует.
     - Команда: `git init` в корне Target_Repo.
@@ -83,7 +88,7 @@
     - _Компонент: План проверки «После S1», P1_
     - _Requirements: 1.1, 1.4, 1.6_
 
-- [ ] 3. S2 — архивирование устаревших `.txt`-заметок в `docs\_archive\`
+- [x] 3. S2 — архивирование устаревших `.txt`-заметок в `docs\_archive\`
   - [~] 3.1 Grep Hygiene_Notes по `*.bat` и `*.py` перед перемещением
     - Для каждого имени из Hygiene_Notes (11 файлов по C1): `FIXED.txt`, `FIXED_ENCODING.txt`, `INSTALL_FFMPEG.txt`, `NEXT_STEP.txt`, `PROJECT_STRUCTURE.txt`, `PROJECT_SUMMARY.txt`, `README_FIRST.txt`, `SETUP_READY.txt`, `START_HERE.txt`, `SUCCESS.txt`, `TROUBLESHOOTING.txt` — выполнить: `Get-ChildItem -Recurse -Include *.bat,*.py -Exclude __pycache__,venv,.venv,reports,system--diarize,docs | Select-String -Pattern ([regex]::Escape('<имя>')) -SimpleMatch`.
     - Имена с ≥1 совпадением — исключить из перемещения и зафиксировать в отчёте итерации (Requirement 2.4, EH4, Риск R3).
@@ -119,7 +124,7 @@
     - _Компонент: План проверки «После S2», P2_
     - _Requirements: 2.1, 2.2, 2.3, 4.5_
 
-- [ ] 4. S3 — чистка `reports\` (Transient_Artifacts + TTL 30 дней для Report_Outputs)
+- [x] 4. S3 — чистка `reports\` (Transient_Artifacts + TTL 30 дней для Report_Outputs)
   - [~] 4.1 Удалить Transient_Artifacts в `reports\`
     - Выполнить набор из C3 (идемпотентно):
       - `Remove-Item -Force -ErrorAction SilentlyContinue reports\debug_download_*.html`
@@ -194,7 +199,7 @@
     - _Компонент: План проверки «После S3», P3, P4, P9_
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
 
-- [ ] 5. S4 — фиксация решения по фасадам Bitrix (`FACADE_DECISION.md`)
+- [x] 5. S4 — фиксация решения по фасадам Bitrix (`FACADE_DECISION.md`)
   - [~] 5.1 Grep публичного API `bitrix24_api.py` и модулей пакета `bitrix\`
     - Выполнить: `Select-String -Path bitrix24_api.py -Pattern '^\s*def ','^\s*class '` и аналогично для `bitrix\api.py`, `bitrix\recordings.py`, `bitrix\dump_one_call_debug.py`.
     - Сформировать список публичных символов (имена, не начинающиеся с `_`) и выявить совпадающие имена между `bitrix24_api.py` и файлами пакета `bitrix\` — это «дубликаты» для раздела «Перечень дубликатов» в `FACADE_DECISION.md`.
@@ -228,7 +233,7 @@
     - _Компонент: План проверки «После S4»_
     - _Requirements: 5.1, 5.2, 5.5_
 
-- [ ] 6. S5 — удаление неиспользуемых `Facade_Stub_Files` (может быть пропущен)
+- [x] 6. S5 — удаление неиспользуемых `Facade_Stub_Files` (может быть пропущен)
   - [~] 6.1 Grep по `Facade_Package_Import_Patterns` для пакета `bitrix`
     - Собрать список `*.py` в Target_Repo с исключениями: `__pycache__\`, `venv\`, `.venv\`, `reports\`, `system--diarize\`, `docs\` и сам файл `bitrix\__init__.py`.
     - Прогнать четыре паттерна (C8):
@@ -298,7 +303,7 @@
     - _Компонент: План проверки «После S5», P10_
     - _Requirements: 10.1, 10.2, 10.3, 10.9_
 
-- [ ] 7. S6 — добавление `pyproject.toml` с конфигурацией Ruff и Black
+- [x] 7. S6 — добавление `pyproject.toml` с конфигурацией Ruff и Black
   - [~] 7.1 Сверить `requires-python` с ожиданиями `check_python*.bat`
     - Прочитать содержимое `check_python.bat` и `check_python_simple.bat` (и любых `check_python*.bat`) в корне Target_Repo.
     - Определить ожидаемую минимальную версию Python (Риск R4, EH5).
@@ -335,7 +340,7 @@
     - _Компонент: План проверки «После S6», P8_
     - _Requirements: 6.1, 6.2, 6.4, 8.4_
 
-- [ ] 8. S7.1 — добавить `logging_setup.py` и перевести core api-модули
+- [x] 8. S7.1 — добавить `logging_setup.py` и перевести core api-модули
   - [~] 8.1 Определить `Stdout_Contract_Scripts` (только один раз, в начале S7.1)
     - Собрать список Scope_Python_Files (см. 1.5) и все `*.bat` в корне Target_Repo.
     - Для каждого `*.py` проверить:
@@ -427,7 +432,7 @@
     - _Компонент: План проверки «После S7.1..S7.5», P6, P7, P11, P12, EH12_
     - _Requirements: 7.4, 7.5, 7.13, 8.2_
 
-- [ ] 9. S7.2 — перевод CRM-модулей отчётности на logging
+- [x] 9. S7.2 — перевод CRM-модулей отчётности на logging
   - [~] 9.1 Обработать `crm_contacts.py`
     - Grep `^\s*print\(`. Если 0 — пропустить (Property 12).
     - При ≥1: вставить `from logging_setup import get_logger` + `logger = get_logger(__name__)` после `from __future__` или после docstring; заменить `print(...)` → `logger.<level>(...)` по эвристикам C7; `python -m py_compile crm_contacts.py`.
@@ -551,7 +556,7 @@
     - _Компонент: План проверки, P11, P12, P8_
     - _Requirements: 7.5, 7.13, 8.2_
 
-- [ ] 11. S7.4 — перевод helper-модулей пакетов `bitrix\` и `asr\`
+- [x] 11. S7.4 — перевод helper-модулей пакетов `bitrix\` и `asr\`
   - [~] 11.1 Обработать `bitrix\api.py`
     - Grep `^\s*print\(`. Если 0 — пропустить.
     - При ≥1: импорт + `logger`, замена, `python -m py_compile bitrix\api.py`.
@@ -599,7 +604,7 @@
     - _Компонент: План проверки, P11, P12, P8_
     - _Requirements: 7.5, 7.13, 8.2_
 
-- [ ] 12. S7.5 — перевод остальных утилитарных скриптов
+- [x] 12. S7.5 — перевод остальных утилитарных скриптов
   - [~] 12.1 Обработать `download_ffmpeg.py`
     - Grep `^\s*print\(`. Если 0 — пропустить.
     - При ≥1: импорт + `logger`, замена, `python -m py_compile download_ffmpeg.py`.

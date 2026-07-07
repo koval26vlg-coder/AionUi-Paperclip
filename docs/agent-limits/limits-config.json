@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "notes": "Fill explicit limits/reset times here when a provider exposes them or when the user wants manual tracking. Null means do not guess.",
+  "agents": {
+    "Codex": {
+      "token_limit": null,
+      "message_limit": null,
+      "cost_limit_usd": null,
+      "reset_at": null,
+      "notes": "Codex local state exposes tokens_used by thread, but account remaining/reset is not exposed locally."
+    },
+    "Gemini Vertex": {
+      "token_limit": null,
+      "message_limit": null,
+      "cost_limit_usd": null,
+      "reset_at": null,
+      "notes": "Gemini Vertex local workflow usage is measured from docs/agent-limits/gemini-vertex-usage.jsonl. Actual project/org remaining throughput is managed by Google Cloud and not exposed locally as a simple reset counter."
+    },
+    "Claude Code": {
+      "token_limit": null,
+      "message_limit": null,
+      "cost_limit_usd": null,
+      "reset_at": null,
+      "notes": "Claude Code JSONL exposes request usage; subscription remaining/reset is not exposed locally."
+    },
+    "Antigravity CLI": {
+      "token_limit": null,
+      "message_limit": null,
+      "cost_limit_usd": null,
+      "reset_at": null,
+      "notes": "Antigravity logs quota refresh events, but no numeric usage/remaining/reset source has been found locally."
+    }
+  }
+}

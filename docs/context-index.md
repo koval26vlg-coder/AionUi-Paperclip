@@ -11,6 +11,7 @@
 - `docs/tasks.md` - активные и завершенные задачи.
 - `docs/decisions.md` - важные решения и причины.
 - `docs/agent-log/` - история работы агентов.
+- `docs/agent-workflows/` - активные и завершенные иерархические workflow задач между Antigravity CLI, Codex, Claude Code и пользователем. Старые workflow могут содержать исторический `L1.0 MiMo AUTO`, но новые workflow его не используют.
 - `docs/handoffs/` - передачи задач между агентами.
 - `docs/memory/architecture.md` - как устроена память.
 - `docs/memory/layers/` - долговременные слои памяти.

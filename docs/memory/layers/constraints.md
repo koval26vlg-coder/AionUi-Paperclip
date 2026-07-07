@@ -3,10 +3,11 @@
 ## Подписки и лимиты
 
 - Codex требует регулярной подписки или доступного плана.
-- На 2026-06-18 активная связка — Codex + Claude Code + Gemini CLI.
-- Cursor, Kiro и MiMo Code выведены из схемы 2026-06-18, их конфиги удалены; их нельзя планировать как шаги без отдельного решения пользователя.
+- Активная связка — Grok Build + Antigravity CLI + Codex + Claude Code; Gemini Vertex доступен как резервный `gemini-vertex` profile.
+- Cursor, Kiro, Gemini CLI, проектный MiMo Code и `MiMo AUTO` выведены из схемы; их конфиги и запускатели не использовать.
+- По решению 2026-06-24 прежнее исключение `MiMo AUTO L1.0` отменено, потому что MiMo становится платным с 2026-06-25. Решение 2026-07-03 о дефолте `antigravity` superseded: с 2026-07-07 дефолтный `Рой` стартует с `L1 Grok Build`, затем `L2 Antigravity CLI`; Gemini Vertex используется только через явный `--profile gemini-vertex`.
 - Claude Code доступен как активный исполнитель/ревьюер через `CLAUDE.md`, проектный `.mcp.json` и SML.
-- Gemini CLI доступен как активный ревьюер/аналитик через VS Code, `GEMINI.md`, проектные команды `/sml:task` и `/sml:review`.
+- Antigravity CLI доступен как дефолтный L2 ревьюер/аналитик через `agy`, `AGENTS.md`, SML bootstrap и `docs/agent-workflows/`. Для автоматического handoff нужен wrapper `tools/antigravity_print.py` / isolated runner `tools/antigravity_workflow_review.py`; raw `agy --print` не считать достаточным workflow-контролем.
 - Ollama опциональна (с 2026-06-18): без неё `sml.semantic_query` и поиск в дашборде деградируют на FTS5 (поиск по словам). Снос безопасен, но теряется поиск по смыслу; при возврате Ollama нужен реиндекс записей без эмбеддингов.
 
 ## Архитектурное решение

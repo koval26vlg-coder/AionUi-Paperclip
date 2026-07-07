@@ -1,6 +1,6 @@
 # Локальное окружение
 
-Дата последнего обновления: 2026-06-18
+Дата последнего обновления: 2026-07-03
 
 ## Рабочая папка
 
@@ -12,12 +12,15 @@ D:\AionUi-Paperclip
 
 | Инструмент | Путь или состояние | Комментарий |
 | --- | --- | --- |
-| VS Code | `C:\Users\koval\AppData\Local\Programs\Microsoft VS Code\Code.exe` | Установлен, версия `1.124.2`; общая IDE-оболочка для `D:\AionUi-Paperclip`, SML, терминалов Codex/Claude/Gemini и VS Code Tasks. Команда `code` не найдена в PATH текущей PowerShell-сессии |
+| VS Code | `C:\Users\koval\AppData\Local\Programs\Microsoft VS Code\Code.exe` | Установлен, версия `1.124.2`; общая IDE-оболочка для `D:\AionUi-Paperclip`, SML, терминалов Codex/Claude/Antigravity и VS Code Tasks. Команда `code` не найдена в PATH текущей PowerShell-сессии |
 | Codex CLI | `C:\Users\koval\AppData\Roaming\npm\codex.cmd` и `C:\Users\koval\AppData\Local\OpenAI\Codex\bin\codex.exe` | Версия проверялась: `codex-cli 0.128.0` |
 | Cursor | `C:\Users\koval\AppData\Local\Programs\cursor\resources\app\bin\cursor.cmd` | Исторически настроен, но не активен в текущей схеме |
 | Kiro | `C:\Users\koval\AppData\Local\Programs\Kiro\Kiro.exe` | Исторически настроен, но не активен в текущей схеме |
-| Gemini CLI | `C:\Users\koval\AppData\Roaming\npm\gemini.cmd` | Проверено: `0.42.0`, авторизован, MCP `sml` подключен и показывает `Connected` |
-| MiMo Code | `C:\Users\koval\AppData\Roaming\npm\mimo.cmd` | Исторически устанавливался, но выведен из активной схемы 2026-06-18; проектные конфиги/запускатели не возвращать без отдельного решения |
+| Gemini CLI | Удален | 2026-06-19 удалены `@google/gemini-cli`, `codex-gemini-helper`, npm shims `gemini`/`ask-gemini`, проектная `.gemini/`, `GEMINI.md`, Gemini launchers и root-файлы `C:\Users\koval\.gemini` без удаления `antigravity-cli` |
+| Gemini Vertex | Google ADC + `google-genai`; `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` | Резервный L1/L2 route для agent-workflows через `tools/gemini_vertex_workflow_review.py`; smoke на `gemini-2.5-flash` проходил 2026-07-02 |
+| Antigravity / `agy` CLI | `C:\Users\koval\AppData\Local\Programs\Antigravity\Antigravity.exe`; `C:\Users\koval\AppData\Local\agy\bin\agy.exe` | Дефолтный L2 route для `Рой` через isolated runner `tools/antigravity_workflow_review.py`; свежий smoke проходил 2026-07-03, при повторном runtime blocker использовать fallback `gemini-vertex` |
+| Grok Build | `grok` / `@xai-official/grok@0.2.87` | Дефолтный L1 route для `Рой` через `tools/grok_build_workflow_review.py`; auth и `grok-build` smoke подтверждены 2026-07-06 |
+| MiMo Code / MiMo AUTO | Удален из активного CLI | Исторически устанавливался; проектная интеграция выведена 2026-06-18. Решением 2026-06-24 отменено прежнее исключение `MiMo AUTO L1.0`, удален глобальный npm-пакет `@mimo-ai/cli`, команда `mimo` больше не резолвится |
 | OpenCode | Установлен ранее, версия проверялась как `1.14.33` | Может зависеть от PATH текущей сессии |
 | Hermes | Удален/отключен | Не используется в новой архитектуре |
 | AionUi | Удален пользователем | Не используется |
@@ -42,9 +45,11 @@ D:\AionUi-Paperclip
 
 - Codex через `C:\Users\koval\.codex\AGENTS.md`, skill `C:\Users\koval\.codex\skills\sml-memory-bootstrap` и проектные файлы `AGENTS.md`/SML;
 - Claude Code через проектный `.mcp.json`, `C:\Users\koval\.claude\CLAUDE.md` и user-scope MCP `sml`;
-- Gemini CLI через `C:\Users\koval\.gemini\settings.json` и `D:\AionUi-Paperclip\.gemini\settings.json`.
+- Grok Build через `grok`, `.grok/config.toml`, bootstrap SML и файлы `docs/agent-workflows/`, как дефолтный L1 profile.
+- Antigravity CLI через `agy`, `C:\Users\koval\.gemini\antigravity-cli\settings.json`, bootstrap SML и файлы `docs/agent-workflows/`, как дефолтный L2 profile после smoke.
+- Gemini Vertex через Google ADC, `tools/gemini_vertex_workflow_review.py`, bootstrap SML и файлы `docs/agent-workflows/`, как fallback profile `gemini-vertex`;
 
-Исторические конфиги Cursor/Kiro/MiMo удалены из активного проекта. Историческая память о них хранится в `docs/agent-log/`, SML и `docs/specs/`.
+Исторические конфиги Cursor/Kiro/MiMo удалены из активного проекта. Историческая память о них хранится в `docs/agent-log/`, SML и `docs/specs/`. С 2026-06-24 `MiMo AUTO` больше не используется в новых agent-workflow.
 
 Глобальный bootstrap для агентов:
 
@@ -54,16 +59,32 @@ D:\AionUi-Paperclip
 
 Старый `aion-file-memory` оставлен только как legacy/reference в `tools/aion_memory_mcp.py` и не должен быть основным сервером в конфигурациях агентов.
 
-## Gemini CLI
+## Gemini Vertex
 
-Добавлены запускатели:
+Default route для `L1/L2` в новых agent-workflows:
 
-- `D:\AionUi-Paperclip\OPEN-GEMINI-SML.cmd`;
-- `D:\AionUi-Paperclip\CHECK-GEMINI-SML.cmd`.
+```powershell
+D:\AionUi-Paperclip\.venv-sml\Scripts\python.exe D:\AionUi-Paperclip\tools\gemini_vertex_workflow_review.py <workflow-id> --task "<задача уровня>" --out <handoff-draft.md>
+```
 
-Подробная инструкция по запуску и проверке находится в `D:\AionUi-Paperclip\docs\gemini-sml.md`.
+Требует Google ADC, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` и Python package `google-genai`. Текущая модель: `gemini-2.5-flash`.
 
-Отдельная инструкция для подключения Gemini как модели внутри Cursor находится в `D:\AionUi-Paperclip\docs\cursor-gemini-model.md`.
+## Antigravity CLI
+
+`agy` установлен и добавлен в пользовательский PATH командой:
+
+```powershell
+C:\Users\koval\AppData\Local\agy\bin\agy.exe install
+```
+
+Проверка:
+
+```powershell
+agy --version
+agy --help
+```
+
+На 2026-06-19 подтверждено: `agy --version` возвращает `1.0.10`; live smoke-test авторизовался через keyring и сделал `streamGenerateContent`. Ограничение: `agy --print "Return exactly OK."` завершился с кодом 0, ответ `OK` найден в conversation DB, но stdout пустой. На 2026-07-02 OAuth восстанавливался, но model-call smoke блокировался `FAILED_PRECONDITION (code 400): User location is not supported for the API use`. Этот статус superseded успешным smoke 2026-07-03 и решением 2026-07-07: новые workflow используют default `grok-antigravity`, где Antigravity является `L2`; `gemini-vertex` остается fallback.
 
 ## VS Code
 
@@ -93,55 +114,7 @@ D:\AionUi-Paperclip\CHECK-VSCODE-SML.cmd
 
 ## Выведенные агенты
 
-Cursor, Kiro и MiMo Code не входят в активный рабочий цикл. Их старые настройки считаются историей и не должны использоваться как текущие инструкции запуска.
-
-### VS Code IDE integration
-
-Для использования Gemini CLI как IDE-инструмента в VS Code установлено расширение:
-
-```text
-Google.gemini-cli-vscode-ide-companion@0.20.0
-```
-
-Установлено командой:
-
-```powershell
-code --install-extension Google.gemini-cli-vscode-ide-companion --force
-```
-
-После установки нужно перезапустить окно VS Code и в Gemini CLI выполнить:
-
-```text
-/ide enable
-```
-
-Проектные правила для Gemini CLI находятся в:
-
-```text
-D:\AionUi-Paperclip\GEMINI.md
-```
-
-Gemini CLI должен автоматически загружать их при запуске из рабочей папки. После изменения правил выполнить:
-
-```text
-/memory reload
-```
-
-Для надежного режима, в котором SML-контекст вставляется в prompt технически до ответа модели, добавлены:
-
-```text
-D:\AionUi-Paperclip\tools\gemini-sml-context.ps1
-D:\AionUi-Paperclip\.gemini\commands\sml\task.toml
-D:\AionUi-Paperclip\.gemini\commands\sml\review.toml
-```
-
-В Gemini CLI использовать:
-
-```text
-/commands reload
-/sml:task <задача>
-/sml:review <что проверить>
-```
+Cursor, Kiro, Gemini CLI, проектный MiMo Code и `MiMo AUTO` не входят в активный рабочий цикл. Их старые настройки считаются историей и не должны использоваться как текущие инструкции запуска.
 
 ## Автосинхронизация памяти
 

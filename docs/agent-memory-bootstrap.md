@@ -6,7 +6,7 @@
 
 Общая память проекта находится в `D:\AionUi-Paperclip`. Агент обязан подтягивать ее сам, даже если пользователь запустил агента из другой папки и отдельно не просил "посмотреть память".
 
-На 2026-06-18 активная связка: Codex + Claude Code + Gemini CLI. Cursor, Kiro и MiMo Code выведены из схемы и не должны возвращаться без отдельного решения пользователя.
+Активная связка: Grok Build + Antigravity CLI + Codex + Claude Code. По решению пользователя от 2026-07-07 дефолтный `Рой` запускает `grok-antigravity` (`L1 Grok Build -> L2 Antigravity CLI -> L3 Codex -> L4 Codex -> L5 Claude Code`). Gemini Vertex остается резервным профилем `gemini-vertex`, если `agy`/Antigravity недоступен или явно нужен Vertex fallback. По решению 2026-06-24 `MiMo AUTO` выведен из новых `docs/agent-workflows/`; Cursor, Kiro, Gemini CLI и проектные конфиги MiMo Code остаются выведенными из общей схемы и не должны возвращаться без отдельного решения пользователя.
 
 ## Абсолютные пути
 
@@ -53,4 +53,4 @@
 
 ## Безопасность
 
-Не записывать секреты, API-ключи, пароли, OAuth-токены и приватные данные в `docs`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.mcp.json`, SML или agent-log.
+Не записывать секреты, API-ключи, пароли, OAuth-токены и приватные данные в `docs`, `AGENTS.md`, `CLAUDE.md`, `.mcp.json`, SML или agent-log.
