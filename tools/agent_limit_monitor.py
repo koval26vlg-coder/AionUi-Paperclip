@@ -481,29 +481,19 @@ def build_report(usages: list[AgentUsage], snapshot: dict[str, Any]) -> str:
         f"Checked at: `{snapshot['checked_at']}`",
         f"Window: `{snapshot['window_days']}` days",
         "",
-        "| Agent | Status | Observed tokens | Cost | Limit | Remaining | Reset |",
-        "| --- | --- | ---: | ---: | ---: | ---: | --- |",
+        "| Agent | Status | Observed tokens | Cost |",
+        "| --- | --- | ---: | ---: |",
     ]
     for usage in usages:
         data = usage.measured
-        limits = usage.limits
         observed = data.get("observed_tokens")
         cost = data.get("cost_usd")
-        limit = limits.get("token_limit") or limits.get("message_limit") or limits.get("cost_limit_usd")
-        remaining = limits.get("token_remaining")
-        if remaining is None:
-            remaining = limits.get("message_remaining")
-        if remaining is None:
-            remaining = limits.get("cost_remaining_usd")
         lines.append(
-            "| {agent} | `{status}` | {observed} | {cost} | {limit} | {remaining} | {reset} |".format(
+            "| {agent} | `{status}` | {observed} | {cost} |".format(
                 agent=usage.agent,
                 status=usage.status,
                 observed=format_int(observed) if observed is not None else "n/a",
                 cost=format_money(cost),
-                limit=str(limit) if limit is not None else "n/a",
-                remaining=str(remaining) if remaining is not None else "n/a",
-                reset=limits.get("reset_at") or "n/a",
             )
         )
     lines.extend(["", "## Notes", ""])
@@ -513,9 +503,8 @@ def build_report(usages: list[AgentUsage], snapshot: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Reset And Remaining",
-            "",
-            "Remaining/reset values are shown only when `docs/agent-limits/limits-config.json` contains explicit limits. Provider subscription limits that are not exposed locally are marked `n/a`.",
+            "Монитор показывает только локально измеренный расход. Остаток/reset подписок "
+            "провайдеры локально не отдают, поэтому ручное отслеживание лимитов не ведется.",
         ]
     )
     return "\n".join(lines) + "\n"
