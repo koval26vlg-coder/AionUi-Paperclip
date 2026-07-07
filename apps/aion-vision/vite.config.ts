@@ -9,6 +9,7 @@ const appDir = dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = resolve(appDir, '..', '..')
 const smlDashboardScript = resolve(appDir, 'scripts', 'export-sml-dashboard.py')
 const smlSearchScript = resolve(appDir, 'scripts', 'search-sml.py')
+const driftWorkflowScript = resolve(appDir, 'scripts', 'export-drift-workflow.py')
 const bundledPython = resolve(workspaceRoot, '.venv-sml', 'Scripts', 'python.exe')
 const pythonExecutable = process.env.PYTHON || (existsSync(bundledPython) ? bundledPython : 'python')
 
@@ -127,7 +128,51 @@ function smlSearchApi(): Plugin {
   }
 }
 
+function driftWorkflowApi(): Plugin {
+  return {
+    name: 'drift-workflow-api',
+    configureServer(server) {
+      server.middlewares.use('/api/drift-workflow', (_req, res) => {
+        const child = spawn(pythonExecutable, [driftWorkflowScript, '--json'], {
+          cwd: appDir,
+          windowsHide: true,
+        })
+        let stdout = ''
+        let stderr = ''
+        const timeout = setTimeout(() => {
+          child.kill()
+        }, 10_000)
+
+        child.stdout.setEncoding('utf8')
+        child.stderr.setEncoding('utf8')
+        child.stdout.on('data', (chunk) => {
+          stdout += chunk
+        })
+        child.stderr.on('data', (chunk) => {
+          stderr += chunk
+        })
+        child.on('close', (code) => {
+          clearTimeout(timeout)
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          if (code === 0 && stdout.trim()) {
+            res.statusCode = 200
+            res.end(stdout)
+            return
+          }
+          res.statusCode = 500
+          res.end(
+            JSON.stringify({
+              status: 'error',
+              message: stderr || `export-drift-workflow.py exited with code ${code}`,
+            }),
+          )
+        })
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), smlDashboardApi(), smlSearchApi()],
+  plugins: [react(), smlDashboardApi(), smlSearchApi(), driftWorkflowApi()],
 })

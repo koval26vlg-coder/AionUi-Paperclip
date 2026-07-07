@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { User, Calendar } from 'lucide-react';
+import { translateType } from '../../lib/dashboardData';
 
 interface RecordCardProps {
   id: string;
@@ -20,13 +21,14 @@ const RecordCard: React.FC<RecordCardProps> = ({ id, type, content, author, date
       className="bg-white/5 border border-white/10 p-6 rounded-sm hover:bg-white/[0.07] transition-colors relative overflow-hidden group"
     >
       <div className="absolute top-0 right-0 p-1 bg-white/10 text-[8px] font-mono uppercase tracking-tighter opacity-50 group-hover:opacity-100">
-        ID_{id.toUpperCase()}
+        ID: {id.toUpperCase()}
       </div>
 
       <div className="flex items-center gap-3 mb-4">
         <span className={`w-2 h-2 rounded-full ${getTypeColor(type)}`}></span>
-        <span className="text-[10px] font-mono uppercase tracking-widest font-bold">{type}</span>
+        <span className="text-[10px] font-mono uppercase tracking-widest font-bold">{translateType(type)}</span>
       </div>
+
 
       <div className="space-y-4">
         <div className="text-sm leading-relaxed text-white/80 font-mono whitespace-pre-wrap">

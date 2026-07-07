@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { SmlWeeklyActivity, SmlAgent, SmlTypeCount } from '../../types/dashboard';
+import { translateType } from '../../lib/dashboardData';
 
 interface MemoryAnalyticsProps {
   weekly?: SmlWeeklyActivity[];
@@ -105,7 +106,7 @@ export default function MemoryAnalytics({ weekly, agents, typeCounts }: MemoryAn
           {typeCounts.map((t, idx) => (
             <BreakdownBar
               key={t.type}
-              label={t.type}
+              label={translateType(t.type)}
               value={t.total}
               total={typesTotal}
               color={AGENT_COLORS[idx % AGENT_COLORS.length]}

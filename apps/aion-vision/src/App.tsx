@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import DashboardLayout from './components/layout/DashboardLayout';
+import type { DashboardView } from './components/layout/DashboardLayout';
 import MetricTile from './components/dashboard/MetricTile';
 import RecordCard from './components/dashboard/RecordCard';
 import AutomationPulse from './components/dashboard/AutomationPulse';
@@ -7,19 +8,39 @@ import NexusGraph from './components/dashboard/NexusGraph';
 import MemorySearch from './components/dashboard/MemorySearch';
 import SystemHealth from './components/dashboard/SystemHealth';
 import MemoryAnalytics from './components/dashboard/MemoryAnalytics';
+import DriftWorkflowDashboard from './components/dashboard/DriftWorkflowDashboard';
+import HhBoosterValidation from './components/dashboard/HhBoosterValidation';
+import HhBoosterLanding from './components/dashboard/HhBoosterLanding';
 import { Activity, Brain, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 import {
   EMPTY_DASHBOARD_DATA,
   compactNumber,
   formatDateTime,
   loadDashboardData,
+  translateType,
 } from './lib/dashboardData';
 import type { DashboardData, SmlAgent } from './types/dashboard';
+
+
+const viewFromHash = (): DashboardView => {
+  if (typeof window === 'undefined') return 'drift';
+  const hash = window.location.hash.replace('#', '').split('?')[0];
+  if (hash === 'overview' || hash === 'hh-booster' || hash === 'hh-booster-public') return hash;
+  return 'drift';
+};
 
 function App() {
   const [data, setData] = useState<DashboardData>(EMPTY_DASHBOARD_DATA);
   const [loading, setLoading] = useState(true);
+  const [activeView, setActiveView] = useState<DashboardView>(() => viewFromHash());
   const autoRefreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const changeView = useCallback((view: DashboardView) => {
+    setActiveView(view);
+    if (typeof window !== 'undefined') {
+      window.location.hash = view;
+    }
+  }, []);
 
   const refreshData = useCallback(async () => {
     setLoading(true);
@@ -28,6 +49,12 @@ function App() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const handleHashChange = () => setActiveView(viewFromHash());
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   useEffect(() => {
@@ -61,8 +88,43 @@ function App() {
     ? Math.round((data.totals.currentRecords * 100) / data.totals.recordsTotal)
     : 0;
 
+  const stateTranslation: Record<string, string> = {
+    'live': 'В ЭФИРЕ',
+    'empty': 'ПУСТО',
+    'error': 'ОШИБКА',
+  };
+  const sourceValue = stateTranslation[data.status.state] || data.status.state.toUpperCase();
+
+  const layoutStatusLabel = activeView === 'hh-booster' ? 'HH BOOSTER TEST' : statusLabel;
+
+  if (activeView === 'drift') {
+    return <DriftWorkflowDashboard onOpenOverview={() => changeView('overview')} />;
+  }
+
+  if (activeView === 'hh-booster') {
+    return (
+      <DashboardLayout
+        statusLabel={layoutStatusLabel}
+        generatedAt={data.generatedAt}
+        activeView={activeView}
+        onViewChange={changeView}
+      >
+        <HhBoosterValidation />
+      </DashboardLayout>
+    );
+  }
+
+  if (activeView === 'hh-booster-public') {
+    return <HhBoosterLanding />;
+  }
+
   return (
-    <DashboardLayout statusLabel={statusLabel} generatedAt={data.generatedAt}>
+    <DashboardLayout
+      statusLabel={layoutStatusLabel}
+      generatedAt={data.generatedAt}
+      activeView={activeView}
+      onViewChange={changeView}
+    >
       <div className="space-y-12 max-w-7xl mx-auto">
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricTile
@@ -86,12 +148,13 @@ function App() {
           />
           <MetricTile
             label="Источник"
-            value={data.status.state === 'live' ? 'В ЭФИРЕ' : data.status.state.toUpperCase()}
+            value={sourceValue}
             trend={formatDateTime(data.generatedAt)}
             icon={<ShieldCheck className="w-5 h-5" />}
             color="amber"
           />
         </section>
+
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-8">
@@ -170,11 +233,12 @@ function App() {
               <h2 className="text-sm font-mono uppercase tracking-[0.4em] font-bold">Типы записей</h2>
               {data.typeCounts.map((item) => (
                 <div key={item.type} className="flex items-center justify-between text-xs font-mono uppercase">
-                  <span className="text-white/60">{item.type}</span>
+                  <span className="text-white/60">{translateType(item.type)}</span>
                   <span className="text-cyan-data">{item.current}/{item.total}</span>
                 </div>
               ))}
             </section>
+
           </div>
         </section>
       </div>

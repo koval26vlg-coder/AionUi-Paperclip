@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Loader2, Brain, Type } from 'lucide-react';
-import { searchMemory } from '../../lib/dashboardData';
+import { searchMemory, translateType } from '../../lib/dashboardData';
 import type { SearchResponse } from '../../types/dashboard';
 
 export default function MemorySearch() {
@@ -78,7 +78,7 @@ export default function MemorySearch() {
                   className="border-l-2 border-cyan-data/30 pl-4 py-1 group hover:border-cyan-data transition-colors"
                 >
                   <div className="flex items-center gap-3 mb-1 text-[9px] font-mono uppercase">
-                    <span className="text-cyan-data tracking-widest">{item.type}</span>
+                    <span className="text-cyan-data tracking-widest">{translateType(item.type)}</span>
                     <span className="text-white/30">{item.author}</span>
                     <span className="ml-auto text-amber-industrial/70">
                       {Math.round(item.relevanceScore * 100)}%

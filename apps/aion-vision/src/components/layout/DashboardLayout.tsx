@@ -1,47 +1,74 @@
-import { LayoutDashboard, Database, Activity, Cpu, Menu } from 'lucide-react';
+import { LayoutDashboard, Database, Activity, BriefcaseBusiness, Cpu, Menu, Route } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+export type DashboardView = 'drift' | 'overview' | 'hh-booster' | 'hh-booster-public';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   statusLabel: string;
   generatedAt?: string;
+  activeView?: DashboardView;
+  onViewChange?: (view: DashboardView) => void;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, statusLabel, generatedAt }) => {
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({
+  children,
+  statusLabel,
+  generatedAt,
+  activeView = 'overview',
+  onViewChange,
+}) => {
   return (
-    <div className="min-h-screen bg-background text-white flex overflow-hidden">
+    <div className="min-h-screen bg-background text-white flex flex-col lg:flex-row overflow-hidden">
       {/* Side Navigation */}
-      <aside className="w-64 border-r border-white/10 bg-background/50 backdrop-blur-xl flex flex-col z-20">
-        <div className="p-6 border-b border-white/10">
+      <aside className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/10 bg-background/50 backdrop-blur-xl flex lg:flex-col z-20">
+        <div className="p-4 lg:p-6 border-r lg:border-r-0 lg:border-b border-white/10 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-amber-industrial rounded-sm flex items-center justify-center">
               <Cpu className="w-5 h-5 text-black" />
             </div>
-            <h1 className="text-xl font-bold tracking-tighter uppercase italic">Aion Vision</h1>
+            <h1 className="hidden sm:block text-xl font-bold tracking-tighter uppercase italic">Aion Vision</h1>
           </div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2">
-          <NavItem icon={<LayoutDashboard className="w-5 h-5" />} label="Обзор" active />
+        <nav className="flex-1 p-3 lg:p-4 flex lg:block gap-2 lg:space-y-2 overflow-x-auto">
+          <NavItem
+            icon={<Route className="w-5 h-5" />}
+            label="Drift workflow"
+            active={activeView === 'drift'}
+            onClick={() => onViewChange?.('drift')}
+          />
+          <NavItem
+            icon={<LayoutDashboard className="w-5 h-5" />}
+            label="Обзор SML"
+            active={activeView === 'overview'}
+            onClick={() => onViewChange?.('overview')}
+          />
+          <NavItem
+            icon={<BriefcaseBusiness className="w-5 h-5" />}
+            label="HH Booster"
+            active={activeView === 'hh-booster'}
+            onClick={() => onViewChange?.('hh-booster')}
+          />
           <NavItem icon={<Activity className="w-5 h-5" />} label="Потоки SML" />
           <NavItem icon={<Database className="w-5 h-5" />} label="Источники памяти" />
         </nav>
         
-        <div className="p-4 border-t border-white/10 opacity-50 text-[10px] font-mono tracking-widest uppercase">
+        <div className="hidden lg:block p-4 border-t border-white/10 opacity-50 text-[10px] font-mono tracking-widest uppercase">
 Система Vanguard v1.0.0
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 relative overflow-y-auto">
+      <main className="flex-1 min-w-0 relative overflow-y-auto">
         {/* Kinetic Background */}
         <div className="absolute inset-0 kinetic-bg pointer-events-none opacity-30 z-0"></div>
         
         {/* Header */}
-        <header className="sticky top-0 h-16 border-b border-white/10 bg-background/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
+        <header className="sticky top-0 min-h-16 border-b border-white/10 bg-background/80 backdrop-blur-md flex items-center justify-between gap-4 px-4 lg:px-8 py-3 z-10">
           <div className="flex items-center gap-4">
             <Menu className="w-5 h-5 opacity-50 cursor-pointer lg:hidden" />
-            <div className="flex gap-2 text-[10px] font-mono uppercase tracking-widest opacity-50">
+            <div className="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-widest opacity-50">
               <span>Статус:</span>
               <span className="text-cyan-data">{statusLabel}</span>
               {generatedAt && <span>{new Date(generatedAt).toLocaleTimeString('ru-RU')}</span>}
@@ -54,7 +81,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, statusLabel
         </header>
 
         {/* Page Content */}
-        <div className="p-8 relative z-10">
+        <div className="p-4 lg:p-8 relative z-10">
           {children}
         </div>
       </main>
@@ -62,14 +89,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, statusLabel
   );
 };
 
-const NavItem = ({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) => (
-  <motion.div 
+const NavItem = ({
+  icon,
+  label,
+  active = false,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}) => (
+  <motion.button
+    type="button"
     whileHover={{ x: 4 }}
-    className={`flex items-center gap-3 px-4 py-3 rounded-sm cursor-pointer transition-colors ${active ? 'bg-amber-industrial text-black font-bold' : 'hover:bg-white/5 text-white/60'}`}
+    onClick={onClick}
+    className={`shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-3 rounded-sm cursor-pointer transition-colors text-left ${active ? 'bg-amber-industrial text-black font-bold' : 'hover:bg-white/5 text-white/60'}`}
   >
     {icon}
-    <span className="text-sm uppercase tracking-wide">{label}</span>
-  </motion.div>
+    <span className="text-xs lg:text-sm uppercase tracking-wide whitespace-nowrap">{label}</span>
+  </motion.button>
 );
 
 export default DashboardLayout;
